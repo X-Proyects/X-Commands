@@ -1,0 +1,52 @@
+# Archivo de Idioma Español
+prefix: "&8[&bX-Commands&8]&r"
+
+# Mensajes Generales
+no-permission: "&cNo tienes permiso para usar este comando."
+player-only: "&cEste comando solo puede ser ejecutado por un jugador."
+reload-success: "&a¡Plugin recargado exitosamente!"
+reload-error: "&cError al recargar el plugin. Revisa la consola para más detalles."
+upcoming-feature: "&cProximamente..."
+
+# Gestión de Comandos
+command-usage: "&cUso: /xc command [create|delete|edit]"
+create-usage: "&cUso: /xc command create <nombre>"
+create-success: "&a¡Comando '&e{0}&a' creado exitosamente!"
+create-exists: "&cEl comando '&e{0}&c' ya existe."
+delete-usage: "&cUso: /xc command delete <nombre>"
+delete-success: "&aComando '&e{0}&a' eliminado correctamente."
+delete-not-found: "&cNo se encontró el comando '&e{0}&c'."
+edit-usage: "&cUso: /xc command edit <comando> <línea> <contenido>"
+edit-success: "&aAcción del comando '&e{0}&a' actualizada."
+edit-invalid-line: "&cLínea de acción inválida. Debe ser un número."
+
+# Errores de Comandos Personalizados
+command-no-permission: "&cNo tienes permiso para usar este comando."
+command-wrong-world: "&cEste comando no puede ser usado en este mundo."
+command-cooldown: "&cDebes esperar %time% segundos para volver a usar este comando."
+command-error: "&cError al ejecutar el comando. Revisa la consola para más detalles."
+
+# Errores de Acciones
+action-invalid: "&cAcción inválida: {0}"
+action-parse-error: "&cError al procesar la acción: {0}"
+
+# Mensajes de Actualización
+update-checking: "&7Buscando actualizaciones..."
+update-no-new: "&a¡Estás usando la versión más reciente!"
+update-new: "&a¡Una nueva actualización está disponible: &e{0}&a! Descárgala en: &b{1}"
+update-error: "&cError al buscar actualizaciones."
+update-check-no-new: "&7No hay nuevas actualizaciones disponibles."
+update-check-new: "&a¡Una nueva actualización está disponible! Local: &ev{0} &7| Remota: &ev{1}"
+update-check-download: "&aDescárgala en: &b{0}"
+update-check-error-console: "&cNo se pudo buscar actualizaciones: {0}"
+update-available: "&a¡Nueva actualización disponible! Local: &ev{0} &7| Remota: &ev{1}"
+update-download: "&aDescárgala en: &b{0}"
+update-current: "&a¡Estás usando la última versión!"
+
+# Menú de Ayuda
+help-header: "&8&m----------&r &bAyuda X-Commands &8&m----------"
+help-gui: "&e/xc -gui &7- Abrir el editor visual"
+help-reload: "&e/xc reload &7- Recargar el plugin"
+help-update: "&e/xc update &7- Buscar actualizaciones"
+help-footer: "&8&m--------------------------------"
+

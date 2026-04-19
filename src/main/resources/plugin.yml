@@ -1,0 +1,45 @@
+name: X-Commands
+version: 2.2
+main: com.fabian.XCommands
+api-version: 1.18
+folia-supported: true
+author: Fabián
+description: Custom commands plugin
+softdepend: [Vault, PlaceholderAPI]
+
+commands:
+  xc:
+    description: Main X-Commands command
+    usage: /xc [-gui|command|reload|update]
+    aliases: [x]
+    permission: xcommands.admin
+
+permissions:
+  xcommands.admin:
+    description: Access to all admin commands
+    default: op
+    children:
+      xcommands.admin.gui: true
+      xcommands.admin.create: true
+      xcommands.admin.delete: true
+      xcommands.admin.edit: true
+      xcommands.admin.reload: true
+      xcommands.admin.update: true
+  xcommands.admin.gui:
+    description: Permission to open the GUI editor
+    default: op
+  xcommands.admin.create:
+    description: Permission to create new commands
+    default: op
+  xcommands.admin.delete:
+    description: Permission to delete commands
+    default: op
+  xcommands.admin.edit:
+    description: Permission to edit commands and actions
+    default: op
+  xcommands.admin.reload:
+    description: Permission to reload the plugin
+    default: op
+  xcommands.admin.update:
+    description: Permission to check for updates
+    default: op

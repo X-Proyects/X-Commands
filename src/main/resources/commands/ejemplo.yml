@@ -1,0 +1,96 @@
+# ==============================================================================
+#                      X-Commands: Custom Command Configuration
+# ==============================================================================
+# This file demonstrates how to create custom commands with various actions.
+
+# [name]
+# The primary name of the command. Players will use this as /<name>
+name: ejemplo
+
+# [aliases]
+# A list of alternative names for this command.
+aliases:
+  - example
+  - test
+  - probando
+  
+# [item]
+# Defines the icon for this command if it's displayed in a GUI menu.
+item:
+  material: DIAMOND
+  display-name: "&bComando de Ejemplo"
+
+# [description]
+# A brief explanation of what the command does.
+description: "&7Este es el mensaje que se ve en la descripción y lore del item."
+
+# [register]
+# If true, the command is automatically registered in the server's command mob.
+register: true
+
+# [permission]
+# The permission node required to execute this command.
+# Leave empty ("") if you want everyone to be able to use it.
+permission: xcommands.ejemplo
+
+# [world]
+# Restricts the command to specific worlds.
+# Leave empty ("") for all worlds.
+world: ""
+
+# [cooldown]
+# The wait time (in seconds) between executions for each player.
+cooldown: 0
+# [interval]
+# The interval (in seconds) for automatic execution.
+# Use 0 to disable automatic execution.
+interval: 0
+
+# [actions]
+# A list of actions that will be performed when the command is run.
+#
+# Available Tags:
+# [MESSAGE] <text> - Private message to player
+# [BROADCAST] <text> - Message to all players
+# [ACTIONBAR] <text> - Message above hotbar
+# [TITLE] <title>;<subtitle>;<fadeIn>;<stay>;<fadeOut> - Big screen title
+# [CONSOLE] <command> - Execute command from console
+# [PLAYER] <command> - Execute command as the player
+# [OP] <command> - Execute command as OP
+# [SOUND] <sound>;<volume>;<pitch> - Play a sound
+# [EFFECT] <effect>;<time>;<level> - Give potion effect
+# [PARTICLE] <particle> <x> <y> <z> <count> - Spawn particles
+# [HEAL] - Restore player health
+# [FEED] - Restore player hunger
+# [DAMAGE] <amount> - Damage the player
+# [GIVE] <material>;<amount>;<name> - Give item with custom name
+# [TELEPORT] <world>;<x>;<y>;<z> - Teleport player
+# [GIVE_MONEY] <amount> - Deposit money (Vault)
+# [TAKE_MONEY] <amount> - Withdraw money (Vault)
+# [KICK] <reason> - Kick the player
+# [BUNGEE] <server> - Send player to a Bungee server
+# [CLOSE] - Close player's current inventory
+# [DELAY] <seconds> - Wait (ticks) before next action
+# 
+# Conditionals (Skips next action if false):
+# [IF_PERMISSION] <node> - If player has permission
+# ![IF_PERMISSION] <node> - If player lacks permission (Use ! for NOT)
+# [IF_MONEY] <amount> - If player has enough money
+# [IF_OP] - If player is server operator
+# [IF_WORLD] <world> - If player is in specific world
+# [IF_CHANCE] <percentage> - If random chance (0-100) succeeds
+# 
+# Note: You can use _NOT suffix as well: [IF_PERMISSION_NOT]
+#
+actions:
+  - "[MESSAGE] &aHola %player%! Bienvenido a &bX-Commands&a."
+  - "[SOUND] ENTITY_PLAYER_LEVELUP;1.0;1.0"
+  - "[TITLE] &bX-Commands;&eEjemplo de comando;10;40;10"
+  - "[ACTIONBAR] &7Mundo: &f%player_world% &7| Dinero: &a$%player_money%"
+  - "[IF_CHANCE] 20"
+  - "[MESSAGE] &6¡Suerte! Has ganado un diamante extra."
+  - "[IF_CHANCE] 20"
+  - "[GIVE] DIAMOND;1;&bDiamante de la Suerte"
+  - "[DELAY] 40"
+  - "[MESSAGE] &e¡Aquí tienes una propina!"
+  - "[GIVE_MONEY] 50"

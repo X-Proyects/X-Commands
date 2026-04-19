@@ -1,0 +1,53 @@
+# 言語ファイル (日本語)
+prefix: "&8[&bX-Comands&8]&r"
+
+# 一般メッセージ
+no-permission: "&cこのコマンドを使用する権限がありません。"
+player-only: "&cこのコマンドはプレイヤーのみが実行できます。"
+reload-success: "&aプラグインが正常に再読み込みされました！"
+reload-error: "&cプラグインの再読み込み中にエラーが発生しました。詳細はコンソールを確認してください。"
+upcoming-feature: "&c近日公開予定..."
+
+# コマンド管理
+command-usage: "&c使用法: /xc command [create|delete|edit]"
+create-usage: "&c使用法: /xc command create <名前>"
+create-success: "&aコマンド '&e{0}&a' が正常に作成されました！"
+create-exists: "&cコマンド '&e{0}&c' は既に存在します。"
+delete-usage: "&c使用法: /xc command delete <名前>"
+delete-success: "&aコマンド '&e{0}&a' が正常に削除されました。"
+delete-not-found: "&cコマンド '&e{0}&c' が見つかりませんでした。"
+edit-usage: "&c使用法: /xc command edit <コマンド> <行> <内容>"
+edit-success: "&aコマンド '&e{0}&a' のアクションが更新されました。"
+edit-invalid-line: "&c無効なアクション行です。数値である必要があります。"
+
+# カスタムコマンドエラー
+command-no-permission: "&cこのコマンドを使用する権限がありません。"
+command-wrong-world: "&cこのコマンドはこのワールドでは使用できません。"
+command-cooldown: "&cこのコマンドを再度使用するには、あと %time% 秒待つ必要があります。"
+command-error: "&cコマンド実行中にエラーが発生しました。詳細はコンソールを確認してください。"
+
+# アクションエラー
+action-invalid: "&c無効なアクション: {0}"
+action-parse-error: "&cアクションの解析エラー: {0}"
+
+# 更新メッセージ
+update-checking: "&7アップデートを確認中..."
+update-no-new: "&a最新バージョンを使用しています！"
+update-new: "&a新しいアップデートが利用可能です: &e{0}&a! ダウンロード: &b{1}"
+update-error: "&cアップデート確認中にエラーが発生しました。"
+update-check-no-new: "&7新しいアップデートはありません。"
+update-check-new: "&a新しいアップデートが利用可能です！ ローカル: &ev{0} &7| リモート: &ev{1}"
+update-check-download: "&aダウンロード: &b{0}"
+update-check-error-console: "&cアップデートを確認できませんでした: {0}"
+update-available: "&a新しいアップデートが利用可能です！ 現在: &ev{0} &7| 最新: &ev{1}"
+update-download: "&aダウンロード: &b{0}"
+update-current: "&a最新バージョンを使用しています！"
+
+# ヘルプメニュー
+help-header: "&8&m----------&r &bX-Comands ヘルプ &8&m----------"
+help-gui: "&e/xc -gui &7- ビジュアルエディタを開く"
+help-reload: "&e/xc reload &7- プラグインを再読み込み"
+help-update: "&e/xc update &7- アップデートを確認"
+help-footer: "&8&m--------------------------------"
+
+

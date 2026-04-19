@@ -1,0 +1,36 @@
+# ==============================================================================
+#  __  __         ____                                          _     
+#  \ \/ /        / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |___ 
+#   \  /  _____ | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __|
+#   /  \ |_____|| |__| (_) | | | | | | | | | | | (_| | | | | (_| \__ \
+#  /_/\_\        \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
+# 
+# ==============================================================================
+# [language]
+# Specifies the language file to be used for all plugin messages.
+# The plugin will look for a file named '<language>.yml' in the 'languages/' folder.
+# 
+# Available defaults: EN, ES, RU, JA, PT, CUSTOM
+# Tip: You can create your own file (e.g., messages.yml) and set 'language: messages'
+# 
+# Note: Filenames are case-insensitive (e.g., 'en' will load 'EN.yml').
+language: EN
+
+# [check-updates]
+# When set to true, the plugin will check for new versions on SpigotMC at startup.
+# If an update is found, admins will receive a notification in the console.
+check-updates: true
+
+# This ensures that players only see the clean, primary version of commands.
+hide-minecraft-commands: false
+
+# [debug]
+# If enabled (true), the plugin will log additional technical information to the console.
+# Useful for troubleshooting complex action/condition chains.
+debug: false
+
+# ------------------------------------------------------------------------------
+# INTERNAL SETTINGS - DO NOT MODIFY THESE
+# ------------------------------------------------------------------------------
+# 'code' tracks the configuration version for automatic updates.
+code: 6

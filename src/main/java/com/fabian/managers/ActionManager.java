@@ -1,0 +1,213 @@
+package com.fabian.managers;
+
+import com.fabian.XCommands;
+import com.fabian.actions.*;
+import com.fabian.utils.SchedulerUtils;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Manages action registration and execution
+ */
+public class ActionManager {
+
+    private final XCommands plugin;
+    private final Map<String, Action> actions;
+    private final Map<String, ActionEntry> actionCache = new HashMap<>();
+    private final Pattern actionPattern = Pattern.compile("\\[([A-Z_]+)\\]\\s*(.*)");
+
+    private static class ActionEntry {
+        final Action action;
+        final String tag;
+        final String params;
+        final boolean isDelay;
+        long parsedDelay = 0;
+
+        ActionEntry(Action action, String tag, String params) {
+            this.action = action;
+            this.tag = tag;
+            this.params = params;
+            this.isDelay = tag.equals("DELAY");
+            if (isDelay) {
+                try {
+                    parsedDelay = Long.parseLong(params.trim());
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+    }
+
+    public ActionManager(XCommands plugin) {
+        this.plugin = plugin;
+        this.actions = new HashMap<>();
+        registerActions();
+    }
+
+    /**
+     * Registers all available actions
+     */
+    private void registerActions() {
+        registerAction(new MessageAction());
+        registerAction(new BroadcastAction());
+        registerAction(new ActionBarAction());
+        registerAction(new TitleAction());
+        registerAction(new ConsoleAction());
+        registerAction(new PlayerAction());
+        registerAction(new SoundAction());
+        registerAction(new EffectAction());
+        registerAction(new HealAction());
+        registerAction(new FeedAction());
+        registerAction(new DamageAction());
+        registerAction(new GiveAction());
+        registerAction(new TeleportAction());
+        registerAction(new DelayAction());
+        registerAction(new CloseInventoryAction());
+        registerAction(new KickAction());
+        registerAction(new ParticleAction());
+        registerAction(new BungeeAction());
+        registerAction(new GiveMoneyAction());
+        registerAction(new TakeMoneyAction());
+    }
+
+
+    /**
+     * Registers a single action
+     */
+    private void registerAction(Action action) {
+        actions.put(action.getTag(), action);
+    }
+
+    /**
+     * Executes a list of action strings for a player
+     * 
+     * @param player        The player executing the actions (null if console)
+     * @param actionStrings List of action strings to execute
+     */
+    public void executeActions(Player player, List<String> actionStrings) {
+        executeActionsLoop(player, actionStrings, 0);
+    }
+
+    /**
+     * Recursively executes actions via loop, scheduling only when needed
+     */
+    private void executeActionsLoop(Player player, List<String> actionStrings, int startIndex) {
+        if (actionStrings == null || startIndex >= actionStrings.size()) {
+            return;
+        }
+
+        for (int i = startIndex; i < actionStrings.size(); i++) {
+            String actionString = actionStrings.get(i);
+            ActionEntry entry = getByKeyOrParse(actionString);
+
+            if (entry == null) {
+                continue; // Skip invalid actions
+            }
+
+            if (entry.isDelay) {
+                final int nextIndex = i + 1;
+                // Schedule remainder of the list
+                SchedulerUtils.runTaskLater(plugin, () -> {
+                    executeActionsLoop(player, actionStrings, nextIndex);
+                }, entry.parsedDelay);
+                return; // Break current loop, remainder handled by task
+            }
+
+            // Execute synchronous action
+            if (entry.tag.startsWith("IF_")) {
+                if (!evaluateCondition(player, entry)) {
+                    i++; // Skip the NEXT action
+                }
+                continue;
+            }
+
+            executeEntry(entry, player);
+        }
+    }
+
+    /**
+     * Gets an ActionEntry from file or parses it
+     */
+    private ActionEntry getByKeyOrParse(String actionString) {
+        ActionEntry entry = actionCache.get(actionString);
+        if (entry != null)
+            return entry;
+
+        Matcher matcher = actionPattern.matcher(actionString);
+        if (!matcher.matches()) {
+            plugin.logWarning("Invalid action format: " + actionString);
+            return null;
+        }
+
+        String tag = matcher.group(1);
+        String params = matcher.group(2).trim();
+        Action action = actions.get(tag);
+
+        if (action == null) {
+            plugin.logWarning("Unknown action type: " + tag);
+            return null;
+        }
+
+        entry = new ActionEntry(action, tag, params);
+        actionCache.put(actionString, entry);
+        return entry;
+    }
+
+    private void executeEntry(ActionEntry entry, Player player) {
+        if (player == null) {
+            // Console or Global execution
+            try {
+                Map<String, Object> context = new HashMap<>();
+                context.put("params", entry.params);
+                context.put("plugin", plugin);
+                entry.action.execute(null, context);
+            } catch (Exception e) {
+                plugin.logSevere("Error executing global action " + entry.tag + ": " + e.getMessage());
+            }
+            return;
+        }
+
+        // For players, we MUST ensure we are on the correct region thread (especially for Folia 26.1)
+        SchedulerUtils.runForPlayer(plugin, player, () -> {
+            try {
+                Map<String, Object> context = new HashMap<>();
+                context.put("params", entry.params);
+                context.put("plugin", plugin);
+                
+                entry.action.execute(player, context);
+            } catch (Exception e) {
+                plugin.logSevere("Error executing action [" + entry.tag + "] for player " + player.getName() + " with params: " + entry.params, e);
+            }
+        });
+    }
+
+    /**
+     * Executes a single action string (Legacy public method)
+     */
+    public void executeSingleAction(Player player, String actionString) {
+        ActionEntry entry = getByKeyOrParse(actionString);
+        if (entry != null) {
+            executeEntry(entry, player);
+        }
+    }
+
+    private boolean evaluateCondition(Player player, ActionEntry entry) {
+        Map<String, Object> context = new HashMap<>();
+        // Wrap the tag in brackets so ConditionManager can parse it correctly
+        String formattedCondition = "[" + entry.tag + "]" + (entry.params.isEmpty() ? "" : " " + entry.params);
+        return plugin.getConditionManager().check(player, formattedCondition, context);
+    }
+
+    /**
+     * Gets all registered action tags
+     * 
+     * @return Set of action tags
+     */
+    public Map<String, Action> getActions() {
+        return new HashMap<>(actions);
+    }
+}

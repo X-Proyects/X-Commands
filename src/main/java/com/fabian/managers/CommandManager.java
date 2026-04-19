@@ -1,0 +1,775 @@
+package com.fabian.managers;
+
+import com.fabian.XCommands;
+import com.fabian.executors.CustomCommandExecutor;
+import com.fabian.utils.ColorUtils;
+import com.fabian.utils.SchedulerUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Manages custom command registration and loading
+ */
+public class CommandManager {
+
+    private final XCommands plugin;
+    private final Map<String, CustomCommandExecutor> customCommands;
+    private CommandMap commandMap;
+    // Cached reflection field
+    private Field knownCommandsField;
+    private final Map<String, Object> commandTimers = new HashMap<>(); // Object to store BukkitTask or ScheduledTask
+
+    public CommandManager(XCommands plugin) {
+        this.plugin = plugin;
+        this.customCommands = new HashMap<>();
+        initCommandMap();
+    }
+
+    /**
+     * Initializes the Bukkit CommandMap using reflection
+     */
+    private void initCommandMap() {
+        try {
+            Field field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            field.setAccessible(true);
+            commandMap = (CommandMap) field.get(Bukkit.getServer());
+
+            // Cache knownCommands field if possible
+            if (commandMap != null) {
+                Class<?> clazz = commandMap.getClass();
+                while (clazz != Object.class && knownCommandsField == null) {
+                    try {
+                        knownCommandsField = clazz.getDeclaredField("knownCommands");
+                    } catch (NoSuchFieldException e) {
+                        clazz = clazz.getSuperclass();
+                    }
+                }
+                if (knownCommandsField != null) {
+                    knownCommandsField.setAccessible(true);
+                }
+            }
+        } catch (Exception e) {
+            plugin.logSevere("Failed to initialize CommandMap: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Loads all custom commands from the commands folder
+     */
+    public void loadCommands() {
+        // Clear existing custom commands
+        unregisterAllCommands();
+
+        File oldFolder = new File(plugin.getDataFolder(), "comands");
+        File commandsFolder = new File(plugin.getDataFolder(), "commands");
+
+        // Legacy migration support
+        if (oldFolder.exists() && !commandsFolder.exists()) {
+            plugin.logWarning("Legacy 'comands' folder detected. Renaming it to 'commands'...");
+            if (oldFolder.renameTo(commandsFolder)) {
+                plugin.logInfo("Successfully migrated legacy folder.");
+            } else {
+                plugin.logSevere("Failed to rename 'comands' to 'commands'. Please do it manually.");
+            }
+        }
+
+        boolean firstRun = !commandsFolder.exists();
+        if (firstRun && commandsFolder.mkdirs()) {
+
+            // Save default commands only on very first install
+            String[] defaults = { "ejemplo.yml", "admin.yml", "welcome.yml" };
+            for (String def : defaults) {
+                plugin.saveResource("commands/" + def, false);
+            }
+        }
+
+        // Load all command files
+        File[] files = commandsFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+        if (files != null) {
+            for (File file : files) {
+                try {
+                    loadCommand(file);
+                } catch (Exception e) {
+                    plugin.logSevere("Critical error loading command file: " + file.getName(), e);
+                }
+            }
+        }
+
+        plugin.logInfo("Loaded " + customCommands.size() + " custom commands");
+    }
+
+    /**
+     * Loads a single command from a file
+     */
+    private void loadCommand(File file) {
+        try {
+            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+            String name = config.getString("name");
+            boolean register = config.getBoolean("register", true);
+
+            if (name == null || name.isEmpty()) {
+                plugin.logWarning("Command file " + file.getName() + " has no name");
+                return;
+            }
+
+            String permission = config.getString("permission", "");
+            String world = config.getString("world", "");
+            String description = config.getString("description", "");
+            List<String> actions = config.getStringList("actions");
+            List<String> aliases = config.getStringList("aliases");
+            String material = config.getString("item.material", "PAPER");
+            String displayName = config.getString("item.display-name", "&b" + name);
+            int cooldown = config.getInt("cooldown", 0);
+            int interval = config.getInt("interval", 0);
+
+            long creationTime = 0;
+            try {
+                Path filePath = file.toPath();
+                BasicFileAttributes attrs = Files.readAttributes(filePath, BasicFileAttributes.class);
+                creationTime = attrs.creationTime().toMillis();
+            } catch (IOException e) {
+                creationTime = System.currentTimeMillis(); // Fallback
+            }
+
+            // Create executor regardless of registration status so it appears in GUI
+            CustomCommandExecutor executor = new CustomCommandExecutor(
+                    plugin, name, aliases, permission, world, actions, material, displayName, description, register,
+                    creationTime, cooldown, interval);
+
+            // Track the original name (filename without extension)
+            String fileName = file.getName().replace(".yml", "");
+            executor.setOriginalName(fileName);
+
+            customCommands.put(name.toLowerCase(), executor);
+
+            if (register) {
+                registerCommand(name, executor);
+                startTimer(name, executor);
+            }
+
+        } catch (Exception e) {
+            plugin.logSevere("Error loading command from " + file.getName() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Registers a command with Bukkit
+     */
+    private void registerCommand(String name, CustomCommandExecutor executor) {
+        if (commandMap == null) {
+            plugin.logSevere("CommandMap is null, cannot register command: " + name);
+            return;
+        }
+
+        Command command = new Command(name.toLowerCase()) {
+            @Override
+            public boolean execute(org.bukkit.command.CommandSender sender, String label, String[] args) {
+                return executor.onCommand(sender, this, label, args);
+            }
+
+            @Override
+            public java.util.List<String> tabComplete(org.bukkit.command.CommandSender sender, String alias,
+                    String[] args) throws IllegalArgumentException {
+                if (sender instanceof org.bukkit.entity.Player) {
+                    // Default behavior: return list of players
+                    // If we want more complex logic later, we can delegate to executor
+                    return null; // returning null in Bukkit defaults to online players
+                }
+                return java.util.Collections.emptyList();
+            }
+        };
+
+        command.setDescription("Custom command from X-Commands");
+        command.setAliases(executor.getAliases());
+        commandMap.register("xcommands", command);
+    }
+
+    /**
+     * Unregisters all custom commands
+     */
+    private void unregisterAllCommands() {
+        if (commandMap == null) {
+            return;
+        }
+
+        for (String cmdName : customCommands.keySet()) {
+            try {
+                Command command = commandMap.getCommand(cmdName);
+                if (command != null) {
+                    command.unregister(commandMap);
+                }
+            } catch (Exception e) {
+                plugin.logWarning("Error unregistering command " + cmdName + ": " + e.getMessage());
+            }
+        }
+
+        unregisterAllTimers();
+        customCommands.clear();
+    }
+
+    private void unregisterAllTimers() {
+        for (String cmdName : new java.util.HashSet<>(commandTimers.keySet())) {
+            stopTimer(cmdName);
+        }
+    }
+
+    /**
+     * Starts a repeating timer for a command if interval > 0
+     */
+    public void startTimer(String commandName, CustomCommandExecutor executor) {
+        stopTimer(commandName);
+
+        if (executor.getInterval() <= 0) {
+            return;
+        }
+
+        long ticks = executor.getInterval() * 20L;
+        // Folia compatible timer
+        Object task = SchedulerUtils.runTaskTimer(plugin, () -> {
+            plugin.getActionManager().executeActions(null, executor.getActions());
+        }, ticks, ticks);
+        
+        commandTimers.put(commandName.toLowerCase(), task);
+    }
+
+    /**
+     * Stops a timer for a specific command
+     */
+    public void stopTimer(String commandName) {
+        Object task = commandTimers.remove(commandName.toLowerCase());
+        if (task != null) {
+            SchedulerUtils.cancelTask(task);
+        }
+    }
+
+    /**
+     * Reloads all custom commands
+     */
+    public void reload() {
+        loadCommands();
+    }
+
+    /**
+     * Creates a new command file
+     * 
+     * @param commandName The name of the command to create
+     * @return true if the file was created successfully
+     */
+    public boolean createCommand(String commandName) {
+        if (customCommands.containsKey(commandName.toLowerCase())) {
+            return false;
+        }
+
+        try {
+            // Read template as String to preserve comments
+            InputStream resourceStream = plugin.getResource("commands/ejemplo.yml");
+            if (resourceStream == null) {
+                // Try legacy check if folder was recently renamed
+                resourceStream = plugin.getResource("comands/ejemplo.yml"); 
+            }
+            if (resourceStream == null) {
+                plugin.logSevere("Template 'commands/ejemplo.yml' not found in resources.");
+                return false;
+            }
+
+            String content;
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(resourceStream, StandardCharsets.UTF_8))) {
+                content = reader.lines().collect(Collectors.joining("\n"));
+            }
+
+            // Perform replacements to keep comments intact
+            // name: ejemplo -> name: NewName
+            content = content.replaceAll("(?m)^name:.*", "name: " + commandName);
+            // permission: xcommands.ejemplo -> permission: xcommands.newname
+            content = content.replaceAll("(?m)^permission:.*", "permission: xcommands." + commandName.toLowerCase());
+            // display-name: "..." -> display-name: "&bNewName"
+            content = content.replaceAll("(?m)^(\\s*)display-name:.*", "$1display-name: \"&b" + commandName + "\"");
+
+            // Save the file with comments
+            File commandsFolder = new File(plugin.getDataFolder(), "commands");
+            if (!commandsFolder.exists() && !commandsFolder.mkdirs()) {
+                plugin.logWarning("Could not create commands folder!");
+            }
+
+            File commandFile = new File(commandsFolder, commandName + ".yml");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(commandFile, StandardCharsets.UTF_8))) {
+                writer.write(content);
+            }
+
+            // Now load THIS specific file into memory (using the standard loader logic)
+            loadCommand(commandFile);
+
+            return true;
+        } catch (Exception e) {
+            plugin.logSevere("Error creating command from template: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Deletes a command file and unregisters it
+     * 
+     * @param commandName The name of the command to delete
+     * @return true if the command was deleted successfully
+     */
+    public boolean deleteCommand(String commandName) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        if (executor == null)
+            return false;
+
+        // Remove from memory immediately
+        customCommands.remove(commandName.toLowerCase());
+        stopTimer(commandName);
+
+        // Async file deletion
+        SchedulerUtils.runTaskAsynchronously(plugin, () -> {
+            File commandFile = new File(new File(plugin.getDataFolder(), "commands"), commandName + ".yml");
+            if (commandFile.exists()) {
+                commandFile.delete();
+            }
+        });
+
+        // Unregister from Bukkit
+        if (commandMap != null) {
+            try {
+                Command command = commandMap.getCommand(commandName.toLowerCase());
+                if (command != null) {
+                    command.unregister(commandMap);
+
+                    // Remove from known commands map in CommandMap using reflection if necessary
+                    // Many CommandMap implementations require this to fully remove the command
+                    try {
+                        Field knownCommandsField = commandMap.getClass().getDeclaredField("knownCommands");
+                        knownCommandsField.setAccessible(true);
+                        @SuppressWarnings("unchecked")
+                        Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
+                        knownCommands.remove(commandName.toLowerCase());
+                        knownCommands.remove("xcommands:" + commandName.toLowerCase());
+                    } catch (Exception e1) {
+                        // Ignore if failed, as it might be version dependent
+                    }
+                }
+            } catch (Exception e) {
+                plugin.logWarning("Error unregistering command " + commandName + ": " + e.getMessage());
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Updates an action for a command and saves to file
+     * 
+     * @param commandName The command to edit
+     * @param index       The index of the action to change
+     * @param newContent  The new action content
+     */
+    public void editAction(String commandName, int index, String newContent) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        if (executor != null) {
+            List<String> actions = executor.getActions();
+            if (index >= 0 && index < actions.size()) {
+                actions.set(index, newContent);
+                // Updated in memory only
+            }
+        }
+    }
+
+    /**
+     * Saves all actions for a command
+     */
+    public void saveActions(String commandName, List<String> actions) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        if (executor != null) {
+            // Update the live list in memory
+            executor.getActions().clear();
+            executor.getActions().addAll(actions);
+        }
+    }
+
+    /**
+     * Updates a single value in the command config and returns the potentially
+     * updated command name
+     */
+    public String updateConfigValue(String commandName, String path, Object value) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        if (executor == null)
+            return commandName;
+
+        // Update memory based on path
+        if (path.equals("name")) {
+            // Renaming is complex because key changes.
+            // For now, simpler implementation: just update display name or internal name
+            // field if existing
+            // But CustomCommandExecutor has 'commandName' field.
+            // If we rename the command key, we need to re-key it in the map and
+            // re-register.
+            // For simplicity, let's say "name" here refers to config 'name' which is the
+            // command alias/key?
+            // Actually, usually 'name' in config is the command name.
+            // If the user changes the command NAME, we need to re-key it in the map and
+            // re-register.
+            // This is complex. Let's assume for now we only support changing
+            // description/permission/item name in memory easily.
+            // If it's the actual command KEY/NAME, we might need a specific rename method.
+            // Looking at InventoryListener, it calls updateConfigValue(..., "name", input).
+            // Creating a rename method is safer.
+        }
+
+        if (path.equals("description")) {
+            executor.setDescription(value.toString());
+            markDirty(commandName);
+        } else if (path.equals("permission")) {
+            executor.setPermission(value.toString());
+            markDirty(commandName);
+        } else if (path.equals("cooldown")) {
+            try {
+                int cooldown = Integer.parseInt(value.toString());
+                executor.setCooldown(cooldown);
+                markDirty(commandName);
+            } catch (NumberFormatException e) {
+                // Ignore invalid numbers
+            }
+        } else if (path.equals("interval")) {
+            try {
+                int interval = Integer.parseInt(value.toString());
+                executor.setInterval(interval);
+                startTimer(commandName, executor);
+                markDirty(commandName);
+            } catch (NumberFormatException e) {
+                // Ignore invalid numbers
+            }
+        } else if (path.equals("aliases")) {
+            // value is expected to be a comma-separated string from chat or list
+            if (value instanceof String) {
+                String[] parts = value.toString().split(",");
+                executor.getAliases().clear();
+                for (String part : parts) {
+                    String trimmed = part.trim();
+                    if (!trimmed.isEmpty()) {
+                        executor.getAliases().add(trimmed);
+                    }
+                }
+            } else if (value instanceof List) {
+                executor.getAliases().clear();
+                @SuppressWarnings("unchecked")
+                List<String> listValue = (List<String>) value;
+                executor.getAliases().addAll(listValue);
+            }
+            markDirty(commandName);
+        }
+        // Config path 'item.display-name' etc is not handled generically well here
+        // without accessors.
+        // We really should add setters to CustomCommandExecutor.
+        // For now assuming the listener handles logic.
+        // BUT WAIT: The listener uses "name" for "Cambiar Nombre".
+        // If we rename, we usually need to re-create the file.
+
+        // Handling special case for renaming in memory:
+        if (path.equals("name")) {
+            renameCommand(commandName, value.toString());
+            return value.toString();
+        }
+
+        return commandName;
+    }
+
+    private void renameCommand(String oldName, String newName) {
+        // This is tricky in memory. We need to remove old, add new.
+        CustomCommandExecutor executor = customCommands.remove(oldName.toLowerCase());
+        if (executor != null) {
+            stopTimer(oldName);
+            // Update internal name
+            executor.setCommandName(newName);
+            // Also update display name default to &bName
+            executor.setDisplayName("&b" + newName);
+
+            customCommands.put(newName.toLowerCase(), executor);
+            markDirty(newName); // Mark dirty on rename
+
+            // Re-register Bukkit command
+            registerCommand(newName, executor);
+            startTimer(newName, executor);
+        }
+    }
+
+    /**
+     * Saves the command from memory to disk asynchronously
+     */
+    /**
+     * Saves the command preserving comments using "Smart Edit"
+     */
+    public void saveCommand(String commandName) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        if (executor == null)
+            return;
+
+        SchedulerUtils.runTaskAsynchronously(plugin, () -> {
+            try {
+                File commandsFolder = new File(plugin.getDataFolder(), "commands");
+                String currentName = executor.getCommandName();
+                String originalName = executor.getOriginalName();
+
+                // 1. Handle Rename
+                if (originalName != null && !originalName.equalsIgnoreCase(currentName)) {
+                    File oldFile = new File(commandsFolder, originalName.toLowerCase() + ".yml");
+                    File newFile = new File(commandsFolder, currentName.toLowerCase() + ".yml");
+                    if (oldFile.exists()) {
+                        oldFile.renameTo(newFile);
+                    }
+                }
+
+                File commandFile = new File(commandsFolder, currentName.toLowerCase() + ".yml");
+                if (!commandFile.exists()) {
+                    // Standard save for new files: Create a fresh YAML structure
+                    // Since it's a new file, there are no user comments to preserve.
+                    YamlConfiguration fresh = new YamlConfiguration();
+                    fresh.set("name", executor.getCommandName());
+                    fresh.set("register", executor.isRegistered());
+                    fresh.set("permission", executor.getPermission());
+                    fresh.set("aliases", executor.getAliases());
+                    fresh.set("world", executor.getWorld());
+                    fresh.set("description", executor.getDescription());
+                    fresh.set("cooldown", executor.getCooldown());
+                    fresh.set("interval", executor.getInterval());
+                    fresh.set("actions", executor.getActions());
+                    fresh.set("item.material", executor.getMaterial());
+                    fresh.set("item.display-name", executor.getDisplayName());
+                    fresh.save(commandFile);
+                } else {
+                    // "Smart Edit" logic: Preserves user comments and custom formatting by
+                    // reading the file line-by-line and only replacing the specific values.
+                    List<String> lines = Files.readAllLines(commandFile.toPath(), StandardCharsets.UTF_8);
+                    List<String> newLines = new java.util.ArrayList<>();
+                    boolean skipping = false; // Flag to skip lines within list blocks (aliases/actions)
+
+                    for (String line : lines) {
+                        String trimmed = line.trim();
+
+                        // Block skipping logic: If we are inside an 'actions:' or 'aliases:' block,
+                        // we skip its items (lines starting with '-' or indented) until we find a new
+                        // key.
+                        if (skipping) {
+                            if (trimmed.isEmpty()) {
+                                newLines.add(line); // Preserve empty lines for formatting
+                                continue;
+                            }
+                            if (trimmed.startsWith("-") || line.startsWith("  ") || line.startsWith("    ")) {
+                                continue; // Skip existing list items to replace them later
+                            }
+                            skipping = false; // Next key found, stop skipping
+                        }
+
+                        // Replace specific keys while maintaining the rest of the file structure
+                        if (trimmed.startsWith("actions:")) {
+                            newLines.add("actions:");
+                            for (String action : executor.getActions()) {
+                                // Escape single quotes for YAML compliance
+                                newLines.add("  - '" + action.replace("'", "''") + "'");
+                            }
+                            skipping = true; // Start skipping old actions
+                        } else if (trimmed.startsWith("aliases:")) {
+                            newLines.add("aliases:");
+                            for (String alias : executor.getAliases()) {
+                                newLines.add("  - " + alias);
+                            }
+                            skipping = true; // Start skipping old aliases
+                        } else if (trimmed.startsWith("name:")) {
+                            newLines.add("name: " + executor.getCommandName());
+                        } else if (trimmed.startsWith("register:")) {
+                            newLines.add("register: " + executor.isRegistered());
+                        } else if (trimmed.startsWith("permission:")) {
+                            newLines.add("permission: " + executor.getPermission());
+                        } else if (trimmed.startsWith("world:")) {
+                            newLines.add("world: " + executor.getWorld());
+                        } else if (trimmed.startsWith("description:")) {
+                            newLines.add("description: \"" + ColorUtils.translate(executor.getDescription()) + "\"");
+                        } else if (trimmed.startsWith("cooldown:")) {
+                            newLines.add("cooldown: " + executor.getCooldown());
+                        } else if (trimmed.startsWith("interval:")) {
+                            newLines.add("interval: " + executor.getInterval());
+                        } else if (trimmed.startsWith("material:")
+                                && (line.contains("item") || line.startsWith("  "))) {
+                            // Only replace 'material' if it's likely inside the 'item' section (indented)
+                            int indent = line.indexOf("material:");
+                            newLines.add(line.substring(0, indent) + "material: " + executor.getMaterial());
+                        } else if (trimmed.startsWith("display-name:")
+                                && (line.contains("item") || line.startsWith("  "))) {
+                            int indent = line.indexOf("display-name:");
+                            newLines.add(
+                                    line.substring(0, indent) + "display-name: \"" + executor.getDisplayName() + "\"");
+                        } else {
+                            newLines.add(line); // Preserve comments and unknown keys
+                        }
+                    }
+                    // Write back using UTF-8 to prevent character corruption
+                    Files.write(commandFile.toPath(), newLines, StandardCharsets.UTF_8);
+                }
+
+                // Finalize updates on the Main Thread to ensure thread safety with Bukkit API
+                SchedulerUtils.runTask(plugin, () -> {
+                    executor.setOriginalName(currentName);
+                    dirtyCommands.remove(currentName.toLowerCase());
+                    if (executor.isRegistered()) {
+                        syncRegistration(currentName);
+                    }
+                });
+            } catch (Exception e) {
+                plugin.logSevere("Error saving command " + commandName + ": " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Refreshes a command's registration in Bukkit's command map.
+     * Use this when aliases or registration status change.
+     */
+    public void syncRegistration(String commandName) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        if (executor != null) {
+            unregisterCommand(commandName);
+            if (executor.isRegistered()) {
+                registerCommand(commandName, executor);
+                startTimer(commandName, executor);
+            } else {
+                stopTimer(commandName);
+            }
+        }
+    }
+
+    /**
+     * Reloads a single command's configuration from disk, discarding any unsaved
+     * changes in memory.
+     */
+    public void reloadCommand(String commandName) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        String fileName = (executor != null) ? executor.getOriginalName() : commandName;
+
+        File commandsFolder = new File(plugin.getDataFolder(), "commands");
+        File commandFile = new File(commandsFolder, fileName + ".yml");
+
+        if (commandFile.exists()) {
+            // Unregister first if it was registered (use current name in memory for unreg)
+            unregisterCommand(commandName);
+            // Load from file (this replaces the memory entry with stored data)
+            loadCommand(commandFile);
+            // Clear dirty flag for BOTH potential names
+            dirtyCommands.remove(commandName.toLowerCase());
+            CustomCommandExecutor newExec = customCommands.get(fileName.toLowerCase());
+            if (newExec != null) {
+                dirtyCommands.remove(newExec.getCommandName().toLowerCase());
+            }
+        }
+    }
+
+    private final java.util.Set<String> dirtyCommands = new java.util.HashSet<>();
+
+    /**
+     * Checks if a command has unsaved changes
+     */
+    public boolean isDirty(String commandName) {
+        return dirtyCommands.contains(commandName.toLowerCase());
+    }
+
+    /**
+     * Marks a command as having unsaved changes
+     */
+    public void markDirty(String commandName) {
+        dirtyCommands.add(commandName.toLowerCase());
+    }
+
+    public Map<String, CustomCommandExecutor> getCustomCommands() {
+        return customCommands;
+    }
+
+    /**
+     * Toggles the registration status of a command
+     */
+    public void toggleCommandRegistration(String commandName) {
+        CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
+        if (executor != null) {
+            boolean current = executor.isRegistered();
+            executor.setRegistered(!current); // Update memory
+
+            if (!current) {
+                // Was disabled, now enabling
+                registerCommand(commandName, executor);
+                startTimer(commandName, executor);
+            } else {
+                // Was enabled, now disabling
+                unregisterCommand(commandName);
+                stopTimer(commandName);
+            }
+
+            markDirty(commandName);
+        }
+    }
+
+    /**
+     * Unregisters a command from Bukkit
+     */
+    private void unregisterCommand(String commandName) {
+        stopTimer(commandName);
+        if (commandMap == null) {
+            return;
+        }
+
+        try {
+            Command command = commandMap.getCommand(commandName.toLowerCase());
+            if (command != null) {
+                // 1. Standard unregister
+                command.unregister(commandMap);
+
+                // 2. Reflection removal from knownCommands map
+                // Iterate up hierarchy to find 'knownCommands' (it's usually in
+                // SimpleCommandMap)
+                if (knownCommandsField != null) {
+                    try {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
+
+                        // Remove all variations
+                        knownCommands.remove(commandName.toLowerCase());
+                        knownCommands.remove("xcommands:" + commandName.toLowerCase());
+                        knownCommands.remove(command.getName().toLowerCase());
+                        knownCommands.remove(command.getLabel().toLowerCase());
+
+                        // Also remove aliases
+                        for (String alias : command.getAliases()) {
+                            knownCommands.remove(alias.toLowerCase());
+                            knownCommands.remove("xcommands:" + alias.toLowerCase());
+                        }
+                    } catch (IllegalAccessException e) {
+                        plugin.logWarning("Failed to access knownCommands map: " + e.getMessage());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            plugin.logWarning("Error unregistering command " + commandName + ": " + e.getMessage());
+        }
+    }
+}

@@ -1,0 +1,258 @@
+# ============================================
+# X-COMANDS - ENGLISH LANGUAGE FILE
+# ============================================
+
+# ============================================
+# MAIN MENU
+# ============================================
+gui-main-title: "&3&lX-Comands &8- &7List"
+gui-main-create: "&a&lCreate Command"
+gui-main-create-lore: "&7Click to create a new command.| |&eClick to start"
+gui-main-prev: "&ePrevious"
+gui-main-next: "&eNext"
+gui-main-page: "&7Go to page {0}"
+gui-main-click-left: "&7Left Click: &bEdit"
+gui-main-click-right: "&7Right Click: &eSee actions"
+
+# ============================================
+# COMMAND EDIT MENU
+# ============================================
+gui-edit-title: "&8Editing: &3/{0}"
+gui-edit-name: "&eChange Name"
+gui-edit-name-lore: "&7Current: &f{0}| |&bClick to change"
+gui-edit-desc: "&eChange Description"
+gui-edit-desc-lore: "&7Current: &f{0}| |&bClick to change"
+gui-edit-reg: "&eChange Registration"
+gui-edit-reg-lore: "&7Status: {0}| |&bClick to toggle"
+gui-edit-reg-on: "&aEnabled"
+gui-edit-reg-off: "&cDisabled"
+gui-edit-perm: "&eChange Permission"
+gui-edit-perm-lore: "&7Current: &f{0}| |&bClick to change"
+gui-edit-cooldown: "&eChange Cooldown"
+gui-edit-cooldown-lore: "&7Current: &f{0}s| |&bClick to change"
+gui-edit-interval: "&eChange Interval"
+gui-edit-interval-lore: "&7Current: &f{0}s| |&bClick to change"
+gui-edit-alias: "&eChange Aliases"
+gui-edit-alias-lore: "&7Current: &f{0}| |&bClick to change"
+gui-edit-actions: "&bEdit Actions"
+gui-edit-actions-lore: "&7Manage the list of steps|&7that this command executes.| |&eClick to enter"
+gui-edit-reorder: "&6Reorder Actions"
+gui-edit-reorder-lore: "&7Allows you to change the usual order|&7of executed actions.| |&eClick to enter"
+gui-edit-save: "&a&lSave Changes"
+gui-edit-save-lore: "&7Permanently saves modifications.| |&eClick to save to disk"
+gui-edit-delete: "&c&lDELETE COMMAND"
+gui-edit-delete-lore: "&7Permanently deletes this file.| |&4Click to delete"
+gui-edit-back: "&7Back"
+
+# ============================================
+# ALIAS MENU
+# ============================================
+gui-alias-title: "&8Aliases: &3/{0}"
+gui-alias-add: "&aAdd Alias"
+gui-alias-add-lore: "&7Click to add a new alias"
+gui-alias-edit-lore: "&7Current: &f{0}| |&bRight-Click to edit|&cShift + Left-Click to delete"
+
+# ============================================
+# ACTIONS MENU
+# ============================================
+gui-actions-title: "&8Actions: &3/{0}"
+gui-actions-order: "&eExecution Order"
+gui-actions-order-lore: "&7Sequence management"
+gui-actions-add: "&aAdd Action"
+gui-actions-add-lore: "&7Click to add new"
+gui-actions-item-name: "&eAction #{0}"
+gui-actions-item-lore: "&7Content:|&f{0}| |&7Right Click: &bEdit|&7Left Click: &eMove|&7Shift + Right: &cDelete"
+gui-actions-reorder: "&6Reorder Actions"
+gui-actions-reorder-lore: "&7Drag and drop to reorder| |&eClick to open"
+
+# ============================================
+# ACTION EDIT MENU
+# ============================================
+gui-action-edit-title: "&8Editing: &3{0}"
+gui-action-edit-type: "&eEdit Type"
+gui-action-edit-type-lore: "&7Current: &f{0}| |&bClick to change"
+gui-action-edit-value: "&eEdit Content"
+gui-action-edit-value-lore: "&7Current: &f{0}| |&bClick to change"
+
+# ============================================
+# ACTION TYPE SELECTION MENU
+# ============================================
+gui-type-title: "&8Type: &3Action #{0}"
+gui-type-select: "&bClick to select"
+
+# ============================================
+# ACTION REORDER MENU
+# ============================================
+gui-reorder-title: "&8Reorder: &3/{0}"
+gui-reorder-lore: "&7Drag to reorder|&7Drop on trash to delete"
+gui-reorder-trash: "&c&lDELETE ACTION"
+gui-reorder-trash-lore: "&7Drag an action here|&7to delete it permanently."
+
+# ============================================
+# NUMERIC ACTION MENU
+# ============================================
+gui-numeric-title: "&8Editing: &3{0}"
+gui-numeric-current: "&7Current value"
+gui-numeric-add: "&7Click to add"
+gui-numeric-reset: "&cReset Value"
+gui-numeric-reset-lore: "&7Set to 0"
+gui-numeric-confirm: "&aConfirm & Save"
+
+# ============================================
+# TITLE ACTION MENU
+# ============================================
+gui-title-menu-title: "&8Title Action: &3{0}"
+gui-title-main: "&eMain Title"
+gui-title-main-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-title-sub: "&eSubtitle"
+gui-title-sub-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-title-fadein: "&eFade In (ticks)"
+gui-title-fadein-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-title-stay: "&eStay (ticks)"
+gui-title-stay-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-title-fadeout: "&eFade Out (ticks)"
+gui-title-fadeout-lore: "&7Current: &f{0}| |&bClick to edit"
+
+# ============================================
+# TELEPORT ACTION MENU
+# ============================================
+gui-teleport-menu-title: "&8Teleport Action: &3{0}"
+gui-teleport-current: "&eCurrent Location"
+gui-teleport-current-lore: "&7Click to set to your position"
+gui-teleport-coords: "&eManual Coordinates"
+gui-teleport-coords-lore: "&7X: &f{0}|&7Y: &f{1}|&7Z: &f{2}| |&bClick to edit"
+gui-teleport-world: "&eWorld"
+gui-teleport-world-lore: "&7Current: &f{0}| |&bClick to edit"
+
+# ============================================
+# EFFECT ACTION MENU
+# ============================================
+gui-effect-menu-title: "&8Effect Action: &3{0}"
+gui-effect-type: "&eEffect Type"
+gui-effect-type-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-effect-duration: "&eDuration (seconds)"
+gui-effect-duration-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-effect-amplifier: "&eAmplifier (level)"
+gui-effect-amplifier-lore: "&7Current: &f{0}| |&bClick to edit"
+
+# ============================================
+# GIVE ITEM ACTION MENU
+# ============================================
+gui-give-menu-title: "&8Give Item Action: &3{0}"
+gui-give-material: "&eMaterial"
+gui-give-material-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-give-amount: "&eAmount"
+gui-give-amount-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-give-name: "&eCustom Name"
+gui-give-name-lore: "&7Current: &f{0}| |&bClick to edit"
+
+# ============================================
+# PARTICLE ACTION MENU
+# ============================================
+gui-particle-menu-title: "&8Particle Action: &3{0}"
+gui-particle-type: "&eParticle Type"
+gui-particle-type-lore: "&7Current: &f{0}| |&bClick to edit"
+gui-particle-amount: "&eAmount"
+gui-particle-amount-lore: "&7Current: &f{0}| |&bClick to edit"
+
+# ============================================
+# CONFIRMATION MENU
+# ============================================
+gui-confirm-delete-title: "&4Confirm Deletion: &0/{0}"
+gui-confirm-yes: "&a&lCONFIRM"
+gui-confirm-yes-lore: "&7Delete permanently."
+gui-confirm-no: "&c&lCANCEL"
+gui-confirm-no-lore: "&7Return to previous menu."
+
+# ============================================
+# COMMON GUI ELEMENTS
+# ============================================
+gui-back: "&7Back"
+gui-back-lore: "&7Return to previous menu"
+gui-none: "None"
+
+# ============================================
+# SYSTEM MESSAGES
+# ============================================
+command-saved: "&aSaved successfully."
+command-deleted-success: "&aCommand deleted successfully."
+command-name-updated: "&aName updated to: {0}"
+command-description-updated: "&aDescription updated."
+command-permission-updated: "&aPermission updated to: {0}"
+command-cooldown-updated: "&aCooldown updated to: {0} seconds."
+command-interval-updated: "&aInterval updated to: {0} seconds."
+command-alias-updated: "&aAliases updated!"
+alias-added: "&aAlias added successfully!"
+alias-updated: "&aAlias updated successfully!"
+alias-deleted: "&cAlias deleted successfully!"
+chat-alias-new: "&eEnter the new alias in chat (or type 'cancel'):"
+chat-alias-edit: "&eEnter the new name for the alias in chat (or type 'cancel'):"
+create-success-msg: "&aCommand created successfully."
+changes-discarded: "&c&lChanges discarded."
+unsaved-changes-warning: "&e⚠ &cWarning: You have unsaved changes. Exiting again in the next 5 seconds will lose your changes."
+
+# ============================================
+# ACTION MESSAGES
+# ============================================
+action-updated: "&aAction updated."
+action-type-changed: "&aType changed to: &e{0}"
+action-added: "&aAction added."
+action-deleted: "&cAction deleted."
+actions-reordered: "&aActions reordered successfully."
+
+# ============================================
+# INPUT MESSAGES
+# ============================================
+input-wait: "&b&lAWAITING INPUT"
+input-instructions: "&7Type the new value in chat or &ccancel &7to cancel."
+input-cancelled: "&cOperation cancelled."
+input-invalid-name: "&cInvalid name. Use only letters, numbers and underscores."
+input-command-exists: "&cCommand already exists."
+
+# ============================================
+# ACTION TYPES - NAMES
+# ============================================
+action-name-message: "&aMessage"
+action-name-broadcast: "&6Broadcast"
+action-name-actionbar: "&eActionBar"
+action-name-title: "&bTitle"
+action-name-sound: "&dSound"
+action-name-effect: "&5Effect"
+action-name-give: "&9Give Item"
+action-name-teleport: "&3Teleport"
+action-name-delay: "&7Wait (Ticks)"
+action-name-heal: "&cHeal"
+action-name-feed: "&6Feed"
+action-name-damage: "&4Damage"
+action-name-console: "&cConsole"
+action-name-player: "&aPlayer"
+action-name-kick: "&4Kick"
+action-name-close: "&7Close Inv"
+action-name-particle: "&eParticle"
+action-name-bungee: "&5Bungee"
+action-name-give-money: "&6Give Money"
+action-name-take-money: "&cTake Money"
+
+# ============================================
+# ACTION TYPES - DESCRIPTIONS
+# ============================================
+action-desc-message: "&7Sends a message to the player."
+action-desc-broadcast: "&7Sends a message to the whole server."
+action-desc-actionbar: "&7Shows text above the health bar."
+action-desc-title: "&7Shows a large title on the screen."
+action-desc-sound: "&7Plays a sound effect."
+action-desc-effect: "&7Applies a potion effect."
+action-desc-give: "&7Delivers items to the player."
+action-desc-teleport: "&7Moves the player to a location."
+action-desc-delay: "&7Adds a delay between actions."
+action-desc-heal: "&7Restores player's health."
+action-desc-feed: "&7Restores player's hunger."
+action-desc-damage: "&7Takes health from the player."
+action-desc-console: "&7Executes a console command."
+action-desc-player: "&7Forces the player to use a command."
+action-desc-kick: "&7Kicks the player from the server."
+action-desc-close: "&7Closes the current inventory."
+action-desc-particle: "&7Spawns visual particle effects."
+action-desc-bungee: "&7Sends the player to another server."
+action-desc-give-money: "&7Gives money to the player (Vault)."
+action-desc-take-money: "&7Takes money from the player (Vault)."

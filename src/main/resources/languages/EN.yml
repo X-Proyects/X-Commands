@@ -1,0 +1,52 @@
+# English Language File
+prefix: "&8[&bX-Commands&8]&r"
+
+# General Messages
+no-permission: "&cYou don't have permission to use this command."
+player-only: "&cThis command can only be executed by a player."
+reload-success: "&aPlugin reloaded successfully!"
+reload-error: "&cError reloading plugin. Check console for details."
+upcoming-feature: "&cComing soon..."
+
+# Command Management
+command-usage: "&cUsage: /xc command [create|delete|edit]"
+create-usage: "&cUsage: /xc command create <name>"
+create-success: "&aCommand '&e{0}&a' created successfully!"
+create-exists: "&cCommand '&e{0}&c' already exists."
+delete-usage: "&cUsage: /xc command delete <name>"
+delete-success: "&aCommand '&e{0}&a' deleted successfully."
+delete-not-found: "&cCould not find command '&e{0}&c'."
+edit-usage: "&cUsage: /xc command edit <command> <line> <content>"
+edit-success: "&aAction for command '&e{0}&a' updated."
+edit-invalid-line: "&cInvalid action line. Must be a number."
+
+# Custom Command Errors
+command-no-permission: "&cYou don't have permission to use this command."
+command-wrong-world: "&cThis command cannot be used in this world."
+command-cooldown: "&cYou must wait %time% seconds before using this command again."
+command-error: "&cError executing command. Check console for details."
+
+# Action Errors
+action-invalid: "&cInvalid action: {0}"
+action-parse-error: "&cError parsing action: {0}"
+
+# Update Messages
+update-checking: "&7Checking for updates..."
+update-no-new: "&aYou are running the latest version!"
+update-new: "&aA new update is available: &e{0}&a! Download it at: &b{1}"
+update-error: "&cError checking for updates."
+update-check-no-new: "&7There is no new update available."
+update-check-new: "&aA new update is available! Local: &ev{0} &7| Remote: &ev{1}"
+update-check-download: "&aDownload: &b{0}"
+update-check-error-console: "&cUnable to check for updates: {0}"
+update-available: "&aA new update is available! Local: &ev{0} &7| Remote: &ev{1}"
+update-download: "&aDownload at: &b{0}"
+update-current: "&aYou are running the latest version!"
+
+# Help Menu
+help-header: "&8&m----------&r &bX-Commands Help &8&m----------"
+help-gui: "&e/xc -gui &7- Open visual editor"
+help-reload: "&e/xc reload &7- Reload the plugin"
+help-update: "&e/xc update &7- Check for updates"
+help-footer: "&8&m--------------------------------"
+

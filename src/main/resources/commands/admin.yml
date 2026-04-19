@@ -1,0 +1,97 @@
+#                      X-Commands: Custom Command Configuration
+# This file defines a specific custom command. You can create as many 
+# .yml files as you want in this folder to add more commands.
+
+# [name]
+# The primary name of the command. Players will use this as /<name>
+# Example: /admin
+name: admin
+
+# [aliases]
+# A list of alternative names for this command.
+# These work exactly like the primary name.
+aliases:
+  - adm
+  - xadmin
+  - tools
+
+# [item]
+# Defines the icon for this command if it's displayed in a GUI menu.
+item:
+  # Material name from Spigot (e.g., DIAMOND, IRON_SWORD, GOLDEN_APPLE)
+  material: GOLDEN_APPLE
+  # Display name with color code support
+  display-name: "&6Admin Tools"
+
+# [description]
+# A brief explanation of what the command does. 
+# This is used in the plugin's help menus and tooltips.
+description: "&7Comandos administrativos listos para usar."
+
+# [register]
+# If true, the command is automatically registered in the server's command map.
+# If false, the command exists but cannot be executed by players directly.
+register: true
+
+# [permission]
+# The permission node required to execute this command.
+# If a player doesn't have this permission, they will receive an error message.
+# Leave empty ("") if you want everyone to be able to use it.
+permission: xcommands.admin
+
+# [world]
+# Restricts the command to specific worlds.
+# Leave empty ("") for all worlds. 
+# Example: "world,world_nether"
+world: ""
+
+# [cooldown]
+# The wait time (in seconds) between executions for each player.
+# Use 0 to disable the cooldown entirely.
+cooldown: 0
+# [interval]
+# The interval (in seconds) for automatic execution.
+# Use 0 to disable automatic execution.
+interval: 0
+
+# [actions]
+# A list of actions that will be performed when the command is run.
+# Actions are executed sequentially (top to bottom).
+# 
+# Available Tags:
+# [MESSAGE] <text> - Private message to player
+# [BROADCAST] <text> - Message to all players
+# [ACTIONBAR] <text> - Message above hotbar
+# [TITLE] <title>;<subtitle>;<fadeIn>;<stay>;<fadeOut> - Big screen title
+# [CONSOLE] <command> - Execute command from console
+# [PLAYER] <command> - Execute command as the player
+# [OP] <command> - Execute command as OP
+# [SOUND] <sound>;<volume>;<pitch> - Play a sound
+# [EFFECT] <effect>;<time>;<level> - Give potion effect
+# [PARTICLE] <particle> <x> <y> <z> <count> - Spawn particles
+# [HEAL] - Restore player health
+# [FEED] - Restore player hunger
+# [DAMAGE] <amount> - Damage the player
+# [GIVE] <material>;<amount>;<name> - Give item with custom name
+# [TELEPORT] <world>;<x>;<y>;<z> - Teleport player
+# [GIVE_MONEY] <amount> - Deposit money (Vault)
+# [TAKE_MONEY] <amount> - Withdraw money (Vault)
+# [KICK] <reason> - Kick the player
+# [BUNGEE] <server> - Send player to a Bungee server
+# [CLOSE] - Close player's current inventory
+# [DELAY] <seconds> - Wait before next action
+# 
+# Conditionals (Skips next action if false):
+# [IF_PERMISSION] <node> - If player has permission
+# ![IF_PERMISSION] <node> - If player lacks permission
+# [IF_MONEY] <amount> - If player has enough money
+# [IF_OP] - If player is server operator
+# [IF_CHANCE] <percentage> - Random chance (0-100)
+actions:
+  - "[MESSAGE] &6[Admin] &fHas sido curado y alimentado."
+  - "[HEAL]"
+  - "[FEED]"
+  - "[SOUND] ENTITY_PLAYER_LEVELUP;1.0;1.5"
+  - "[EFFECT] SPEED;1200;1"
+  - "[ACTIONBAR] &6&lADMIN MODO ACTIVADO"
+  - "[BROADCAST] &c[!] &e%player% &7ha entrado en modo administrativo."

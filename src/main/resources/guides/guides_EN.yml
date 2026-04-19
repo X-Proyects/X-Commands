@@ -1,0 +1,135 @@
+# 🚀 X-Commands - Action Guide
+# -----------------------------------------------------------
+# This file contains descriptions and usage examples for all
+# available actions in the plugin.
+# -----------------------------------------------------------
+
+actions:
+  MESSAGE:
+    description: "Sends a private message to the player's chat."
+    format: "[MESSAGE] text"
+    example: "[MESSAGE] &aHello %player%! Welcome to the server."
+  
+  BROADCAST:
+    description: "Sends a message to all connected players."
+    format: "[BROADCAST] text"
+    example: "[BROADCAST] &e&l[NOTICE] &fThe server will restart soon."
+  
+  ACTIONBAR:
+    description: "Shows a dynamic message above the hotbar."
+    format: "[ACTIONBAR] text"
+    example: "[ACTIONBAR] &6&lEnergy at maximum!"
+  
+  TITLE:
+    description: "Shows a title and subtitle on screen with custom timings."
+    format: "[TITLE] title;subtitle;fadein;stay;fadeout"
+    example: "[TITLE] &6&lVICTORY!;&fYou won the match;10;70;20"
+  
+  SOUND:
+    description: "Plays a Minecraft sound for the player."
+    format: "[SOUND] sound_name;volume;pitch"
+    example: "[SOUND] ENTITY_PLAYER_LEVELUP;1.0;1.2"
+  
+  EFFECT:
+    description: "Applies a potion effect to the player."
+    format: "[EFFECT] effect_name;duration_ticks;amplifier"
+    example: "[EFFECT] SPEED;600;2"
+  
+  CONSOLE:
+    description: "Executes a command from the server console."
+    format: "[CONSOLE] command"
+    example: "[CONSOLE] money give %player% 100"
+  
+  PLAYER:
+    description: "Forces the player to execute a command."
+    format: "[PLAYER] command"
+    example: "[PLAYER] spawn"
+  
+  TELEPORT:
+    description: "Teleports the player to specific coordinates."
+    format: "[TELEPORT] world;x;y;z;yaw;pitch"
+    example: "[TELEPORT] world;100;64;100;90;0"
+  
+  HEAL:
+    description: "Heals the player completely."
+    example: "[HEAL]"
+  
+  FEED:
+    description: "Fills the hunger and saturation bar."
+    example: "[FEED]"
+  
+  DAMAGE:
+    description: "Inflicts damage on the player (in half-hearts)."
+    format: "[DAMAGE] amount"
+    example: "[DAMAGE] 4.0"
+  
+  GIVE:
+    description: "Delivers an item to the player's inventory with an optional name."
+    format: "[GIVE] material;amount;name"
+    example: "[GIVE] DIAMOND;5;&bGift Diamond"
+  
+  DELAY:
+    description: "Pauses execution before the next action."
+    format: "[DELAY] ticks"
+    example: "[DELAY] 40"
+  
+  CLOSE_INVENTORY:
+    description: "Closes any open menu or inventory."
+    example: "[CLOSE_INVENTORY]"
+  
+  KICK:
+    description: "Kicks the player from the server with a reason."
+    format: "[KICK] reason"
+    example: "[KICK] &cYou have been kicked by the administration."
+  
+  PARTICLE:
+    description: "Spawns particles around the player."
+    format: "[PARTICLE] particle_name x_offset y_offset z_offset count"
+    example: "[PARTICLE] FLAME 0.5 0.5 0.5 10"
+  
+  BUNGEE:
+    description: "Sends the player to another server in a BungeeCord network."
+    format: "[BUNGEE] server"
+    example: "[BUNGEE] lobby"
+  
+  GIVE_MONEY:
+    description: "Gives money to the player's economy balance (Requires Vault)."
+    format: "[GIVE_MONEY] amount"
+    example: "[GIVE_MONEY] 100"
+  
+  TAKE_MONEY:
+    description: "Takes money from the player's economy balance (Requires Vault)."
+    format: "[TAKE_MONEY] amount"
+    example: "[TAKE_MONEY] 50"
+
+  IF_PERMISSION:
+    description: "Conditional: Only executes the NEXT action if the player HAS the permission."
+    format: "[IF_PERMISSION] permission"
+    example: "[IF_PERMISSION] rank.vip"
+  
+  IF_PERMISSION_NOT:
+    description: "Conditional: Only executes the NEXT action if the player DOES NOT HAVE the permission."
+    format: "[IF_PERMISSION_NOT] permission"
+    example: "[IF_PERMISSION_NOT] rank.vip"
+  
+  IF_MONEY:
+    description: "Conditional: Only executes the NEXT action if the player HAS the money (Econ)."
+    format: "[IF_MONEY] amount"
+    example: "[IF_MONEY] 500.0"
+  
+  IF_MONEY_NOT:
+    description: "Conditional: Only executes the NEXT action if the player DOES NOT HAVE the money."
+    format: "[IF_MONEY_NOT] amount"
+  IF_OP:
+    description: "Conditional: Only executes the NEXT action if the player IS an operator."
+    example: "[IF_OP]"
+  
+  IF_WORLD:
+    description: "Conditional: Only executes the NEXT action if the player is in the specified WORLD."
+    format: "[IF_WORLD] world_name"
+    example: "[IF_WORLD] survival"
+  
+  IF_CHANCE:
+    description: "Conditional: Only executes the NEXT action if the random CHANCE (0-100) succeeds."
+    format: "[IF_CHANCE] percentage"
+    example: "[IF_CHANCE] 50"
