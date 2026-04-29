@@ -1,6 +1,8 @@
 package com.fabian.actions;
 
+import com.fabian.utils.ColorUtils;
 import com.fabian.utils.PlaceholderUtils;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -17,7 +19,8 @@ public class KickAction implements Action {
         String params = (String) context.get("params");
         if (params == null) return;
 
-        player.kickPlayer(PlaceholderUtils.process(params, player));
+        String reason = ColorUtils.translate(PlaceholderUtils.process(params, player));
+        player.kick(LegacyComponentSerializer.legacySection().deserialize(reason));
     }
 
     @Override

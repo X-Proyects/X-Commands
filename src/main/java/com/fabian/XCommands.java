@@ -52,7 +52,7 @@ public class XCommands extends JavaPlugin {
             instance = this;
 
             // Soporte temporal para nombre antiguo
-            if (getDescription().getName().equalsIgnoreCase("X-Comands")) {
+            if (getPluginMeta().getName().equalsIgnoreCase("X-Comands")) {
                 logWarning("Deprecated name detected, use X-Commands");
             }
 
@@ -125,9 +125,16 @@ public class XCommands extends JavaPlugin {
                 updateChecker = new UpdateChecker(this, 132155);
             }
 
-            logInfo("v" + getDescription().getVersion() + " successfully started!");
+            // Initialize bStats Metrics if enabled
+            if (getConfig().getBoolean("metrics", true)) {
+                int pluginId = 30996;
+                new com.fabian.metrics.Metrics(this, pluginId);
+            }
+
+            logInfo("v" + getPluginMeta().getVersion() + " successfully started!");
         } catch (Exception e) {
-            com.fabian.utils.LoggerUtils.severe("Failed to enable X-Commands! Please check your configuration and server version.", e);
+            com.fabian.utils.LoggerUtils
+                    .severe("Failed to enable X-Commands! Please check your configuration and server version.", e);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -158,7 +165,8 @@ public class XCommands extends JavaPlugin {
     }
 
     /**
-     * Performs migration of the internal commands folder from the old name to the new one.
+     * Performs migration of the internal commands folder from the old name to the
+     * new one.
      */
     private void performInternalMigration() {
         File legacyCommands = new File(getDataFolder(), "comands");

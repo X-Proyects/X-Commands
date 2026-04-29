@@ -19,8 +19,10 @@ public class ConfigManager {
     private FileConfiguration config;
 
     private String cachedLanguage;
+    private String cachedPrefix;
     private boolean cachedCheckUpdates;
     private boolean cachedHideMinecraftCommands;
+    private boolean cachedHidePluginCommands;
 
     public ConfigManager(XCommands plugin) {
         this.plugin = plugin;
@@ -40,8 +42,10 @@ public class ConfigManager {
 
         // Cache values
         this.cachedLanguage = config.getString("language", "en").trim().toUpperCase();
+        this.cachedPrefix = config.getString("prefix", "&8[&bX-Commands&8]&r");
         this.cachedCheckUpdates = config.getBoolean("check-updates", true);
-        this.cachedHideMinecraftCommands = config.getBoolean("hide-minecraft-commands", false);
+        this.cachedHideMinecraftCommands = config.getBoolean("hide-namespaced-commands.hide-minecraft", false);
+        this.cachedHidePluginCommands = config.getBoolean("hide-namespaced-commands.hide-plugins", false);
 
         validateConfig();
 
@@ -59,8 +63,19 @@ public class ConfigManager {
             changed = true;
         }
 
+        if (!config.contains("prefix")) {
+            config.set("prefix", "&8[&bX-Commands&8]&r");
+            changed = true;
+        }
+
         if (!config.contains("check-updates")) {
             config.set("check-updates", true);
+            changed = true;
+        }
+
+        if (!config.contains("hide-namespaced-commands")) {
+            config.set("hide-namespaced-commands.hide-minecraft", false);
+            config.set("hide-namespaced-commands.hide-plugins", false);
             changed = true;
         }
 
@@ -101,6 +116,15 @@ public class ConfigManager {
     }
 
     /**
+     * Gets the configured plugin prefix
+     *
+     * @return The prefix string with color codes
+     */
+    public String getPrefix() {
+        return cachedPrefix;
+    }
+
+    /**
      * Gets the configured language
      * 
      * @return The language code (EN, ES, or CUSTOM)
@@ -125,6 +149,15 @@ public class ConfigManager {
      */
     public boolean isHideMinecraftCommands() {
         return cachedHideMinecraftCommands;
+    }
+
+    /**
+     * Checks if hiding Plugin namespaced commands is enabled
+     * 
+     * @return true if Plugin commands should be hidden
+     */
+    public boolean isHidePluginCommands() {
+        return cachedHidePluginCommands;
     }
 
     /**

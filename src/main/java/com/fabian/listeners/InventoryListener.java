@@ -10,6 +10,7 @@ import com.fabian.managers.menus.ParticleMenu;
 import com.fabian.managers.menus.ActionReorderMenu;
 import com.fabian.managers.menus.NumericActionMenu;
 import com.fabian.managers.menus.AliasMenu;
+import com.fabian.managers.menus.BaseMenu;
 import com.fabian.utils.ColorUtils;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
@@ -21,7 +22,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.NamespacedKey;
@@ -69,19 +71,21 @@ public class InventoryListener implements Listener {
 
         UUID uuid = event.getPlayer().getUniqueId();
 
-        // Check if there's a scheduled transition (within last 100ms)
+        // Check if there's a scheduled transition (within last 1500ms)
         if (scheduledTransitions.containsKey(uuid)) {
-            long transitionTime = scheduledTransitions.get(uuid);
-            if (System.currentTimeMillis() - transitionTime < 100) {
+            long transitionTime = scheduledTransitions.remove(uuid); // Consume the transition
+            if (System.currentTimeMillis() - transitionTime < 1500) {
                 // This is a scheduled transition, allow it
                 return;
             }
-            // Clean up old transition
-            scheduledTransitions.remove(uuid);
+        }
+
+        if (chatInputs.containsKey(uuid)) {
+            return; // Player is typing in chat, do not warn about unsaved changes
         }
 
         MenuHolder holder = (MenuHolder) event.getInventory().getHolder();
-        if (holder.getType() == MenuType.CONFIRM_DELETE) {
+        if (holder.getMenuType() == MenuType.CONFIRM_DELETE) {
             return;
         }
 
@@ -108,7 +112,7 @@ public class InventoryListener implements Listener {
             Bukkit.getScheduler().runTask(plugin, () -> {
                 event.getPlayer().openInventory(event.getInventory());
             });
-
+            
             event.getPlayer().sendMessage(plugin.getLanguageManager().getMessage("unsaved-changes-warning"));
         }
     }
@@ -126,8 +130,9 @@ public class InventoryListener implements Listener {
         ItemStack clicked = event.getCurrentItem();
         String cmdName = holder.getCommandName();
 
-        // 🟢 FIX: Allow REORDER menu to handle clicks on empty slots (for placing items)
-        if (holder.getType() == MenuType.ACTION_REORDER) {
+        // 🟢 FIX: Allow REORDER menu to handle clicks on empty slots (for placing
+        // items)
+        if (holder.getMenuType() == MenuType.ACTION_REORDER) {
             handleActionReorderMenu(event, player, clicked, cmdName);
             return;
         }
@@ -137,7 +142,7 @@ public class InventoryListener implements Listener {
 
         ItemMeta meta = clicked.getItemMeta();
 
-        switch (holder.getType()) {
+        switch (holder.getMenuType()) {
             case MAIN:
                 handleMainMenu(event, player, clicked, meta, holder);
                 break;
@@ -178,10 +183,15 @@ public class InventoryListener implements Listener {
                 handleGiveMenu(event, player, clicked, cmdName, holder.getActionIndex());
                 break;
             case TELEPORT_MENU:
+                handleTeleportMenu(event, player, clicked, cmdName, holder.getActionIndex());
+                break;
             case EFFECT_MENU:
+                handleEffectMenu(event, player, clicked, cmdName, holder.getActionIndex());
+                break;
             case PARTICLE_MENU:
-                // These menus don't have handlers yet, just cancel the event
-                event.setCancelled(true);
+                handleParticleMenu(event, player, clicked, cmdName, holder.getActionIndex());
+                break;
+            default:
                 break;
         }
     }
@@ -192,7 +202,7 @@ public class InventoryListener implements Listener {
 
         // Navigation
         if (clicked.getType() == Material.ARROW) {
-            String itemName = ColorUtils.stripColor(meta.getDisplayName());
+            String itemName = ColorUtils.stripColor(BaseMenu.getItemDisplayName(meta));
             if (itemName.equals(plugin.getLanguageManager().getMessage("gui-main-prev"))
                     || itemName.equalsIgnoreCase("Anterior")) {
                 plugin.getInventoryManager().openMainMenu(player, page - 1);
@@ -376,7 +386,7 @@ public class InventoryListener implements Listener {
                 index = meta.getPersistentDataContainer().get(keyActionIndex, PersistentDataType.INTEGER);
             } else {
                 // Fallback for legacy/other items (though should not happen with new menu)
-                String displayName = ColorUtils.stripColor(meta.getDisplayName());
+                String displayName = ColorUtils.stripColor(BaseMenu.getItemDisplayName(meta));
                 if (displayName.startsWith("Acción #") || displayName.startsWith("Action #")) {
                     try {
                         // Simple heuristic for fallback
@@ -542,7 +552,7 @@ public class InventoryListener implements Listener {
 
         // Fallback to Display Name parsing (Legacy method)
         if (tag == null) {
-            tag = ColorUtils.stripColor(meta.getDisplayName()).toUpperCase().replace(" ", "_");
+            tag = ColorUtils.stripColor(BaseMenu.getItemDisplayName(meta)).toUpperCase().replace(" ", "_");
             // Map legacy localized names to tags
             if (tag.equals("DAR_ITEM"))
                 tag = "GIVE";
@@ -586,7 +596,7 @@ public class InventoryListener implements Listener {
     }
 
     @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
+    public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         ChatInputRequest request = chatInputs.get(player.getUniqueId());
 
@@ -594,7 +604,7 @@ public class InventoryListener implements Listener {
             return;
 
         event.setCancelled(true);
-        String input = event.getMessage();
+        String input = PlainTextComponentSerializer.plainText().serialize(event.message());
         chatInputs.remove(player.getUniqueId());
 
         if (input.equalsIgnoreCase("cancelar") || input.equalsIgnoreCase("cancel")) {
@@ -754,6 +764,113 @@ public class InventoryListener implements Listener {
                     // Reopen title menu
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         new TitleMenu(plugin).open(player, request.commandName, request.actionIndex);
+                    }, 1L);
+                    return;
+
+                case TELEPORT_WORLD:
+                case TELEPORT_COORDS:
+                    CustomCommandExecutor tpExec = plugin.getCommandManager().getCustomCommands()
+                            .get(request.commandName.toLowerCase());
+                    if (tpExec != null && request.actionIndex >= 0
+                            && request.actionIndex < tpExec.getActions().size()) {
+                        String action = tpExec.getActions().get(request.actionIndex);
+                        String content = action.contains("]") ? action.substring(action.indexOf("]") + 1).trim() : "";
+                        String[] parts = content.split(";");
+                        String world = parts.length > 0 ? parts[0] : "world";
+                        String x = parts.length > 1 ? parts[1] : "0";
+                        String y = parts.length > 2 ? parts[2] : "64";
+                        String z = parts.length > 3 ? parts[3] : "0";
+
+                        if (request.type == InputType.TELEPORT_WORLD) {
+                            world = input;
+                        } else if (request.type == InputType.TELEPORT_COORDS) {
+                            String[] coords = input.split(" ");
+                            if (coords.length >= 3) {
+                                x = coords[0];
+                                y = coords[1];
+                                z = coords[2];
+                            }
+                        }
+
+                        String newAction = "[TELEPORT] " + world + ";" + x + ";" + y + ";" + z;
+                        plugin.getCommandManager().editAction(request.commandName, request.actionIndex, newAction);
+                        plugin.getCommandManager().markDirty(request.commandName);
+                        player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
+                    }
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        new TeleportMenu(plugin).open(player, request.commandName, request.actionIndex);
+                    }, 1L);
+                    return;
+
+                case EFFECT_TYPE:
+                case EFFECT_DURATION:
+                case EFFECT_AMPLIFIER:
+                    CustomCommandExecutor effExec = plugin.getCommandManager().getCustomCommands()
+                            .get(request.commandName.toLowerCase());
+                    if (effExec != null && request.actionIndex >= 0
+                            && request.actionIndex < effExec.getActions().size()) {
+                        String action = effExec.getActions().get(request.actionIndex);
+                        String content = action.contains("]") ? action.substring(action.indexOf("]") + 1).trim() : "";
+                        String[] parts = content.split(";");
+                        String type = parts.length > 0 ? parts[0] : "SPEED";
+                        String duration = parts.length > 1 ? parts[1] : "60";
+                        String amplifier = parts.length > 2 ? parts[2] : "1";
+
+                        if (request.type == InputType.EFFECT_TYPE) {
+                            type = input.toUpperCase().replace(" ", "_");
+                        } else if (request.type == InputType.EFFECT_DURATION) {
+                            duration = input;
+                        } else if (request.type == InputType.EFFECT_AMPLIFIER) {
+                            amplifier = input;
+                        }
+
+                        String newAction = "[EFFECT] " + type + ";" + duration + ";" + amplifier;
+                        plugin.getCommandManager().editAction(request.commandName, request.actionIndex, newAction);
+                        plugin.getCommandManager().markDirty(request.commandName);
+                        player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
+                    }
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        new EffectMenu(plugin).open(player, request.commandName, request.actionIndex);
+                    }, 1L);
+                    return;
+
+                case PARTICLE_TYPE:
+                case PARTICLE_COORDS:
+                case PARTICLE_COUNT:
+                    CustomCommandExecutor partExec = plugin.getCommandManager().getCustomCommands()
+                            .get(request.commandName.toLowerCase());
+                    if (partExec != null && request.actionIndex >= 0
+                            && request.actionIndex < partExec.getActions().size()) {
+                        String action = partExec.getActions().get(request.actionIndex);
+                        String content = action.contains("]") ? action.substring(action.indexOf("]") + 1).trim() : "";
+                        // example: [PARTICLE] <particle> <x> <y> <z> <count>
+                        String[] spaceParts = content.split(" ");
+                        String type = spaceParts.length > 0 ? spaceParts[0] : "FLAME";
+                        String px = spaceParts.length > 1 ? spaceParts[1] : "~";
+                        String py = spaceParts.length > 2 ? spaceParts[2] : "~";
+                        String pz = spaceParts.length > 3 ? spaceParts[3] : "~";
+                        String count = spaceParts.length > 4 ? spaceParts[4] : "10";
+
+                        if (request.type == InputType.PARTICLE_TYPE) {
+                            type = input.toUpperCase().replace(" ", "_");
+                        } else if (request.type == InputType.PARTICLE_COORDS) {
+                            String[] coords = input.split(" ");
+                            if (coords.length >= 3) {
+                                px = coords[0];
+                                py = coords[1];
+                                pz = coords[2];
+                            }
+                        } else if (request.type == InputType.PARTICLE_COUNT) {
+                            count = input;
+                        }
+
+                        String newAction = "[PARTICLE] " + type + " " + px + " " + py + " " + pz + " " + count;
+                        plugin.getCommandManager().editAction(request.commandName, request.actionIndex, newAction);
+                        plugin.getCommandManager().markDirty(request.commandName);
+                        player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
+                    }
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        new ParticleMenu(plugin).open(player, request.commandName, request.actionIndex);
                     }, 1L);
                     return;
 
@@ -927,7 +1044,7 @@ public class InventoryListener implements Listener {
                         PersistentDataType.STRING);
                 meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "numeric_value"),
                         PersistentDataType.DOUBLE, 0.0);
-                meta.setDisplayName(ColorUtils.translate("&e" + actionType + ": &f0"));
+                meta.displayName(BaseMenu.LEGACY.deserialize(ColorUtils.translate("&e" + actionType + ": &f0")));
                 centerItem.setItemMeta(meta);
                 event.getView().getTopInventory().setItem(13, centerItem);
                 player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
@@ -937,7 +1054,7 @@ public class InventoryListener implements Listener {
 
         // Add buttons
         if (clicked.getType() == Material.EMERALD) {
-            String displayName = ColorUtils.stripColor(clicked.getItemMeta().getDisplayName());
+            String displayName = ColorUtils.stripColor(BaseMenu.getItemDisplayName(clicked.getItemMeta()));
             if (displayName.startsWith("+")) {
                 try {
                     int addValue = Integer.parseInt(displayName.substring(1));
@@ -951,7 +1068,7 @@ public class InventoryListener implements Listener {
                         double newValue = currentValue + addValue;
                         meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "numeric_value"),
                                 PersistentDataType.DOUBLE, newValue);
-                        meta.setDisplayName(ColorUtils.translate("&e" + actionType + ": &f" + (int) newValue));
+                        meta.displayName(BaseMenu.LEGACY.deserialize(ColorUtils.translate("&e" + actionType + ": &f" + (int) newValue)));
                         centerItem.setItemMeta(meta);
                         event.getView().getTopInventory().setItem(13, centerItem);
                         player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
@@ -1081,7 +1198,8 @@ public class InventoryListener implements Listener {
                     newActions.add(action);
                 } else {
                     // Fallback to display name stripping if PDC fails
-                    ColorUtils.stripColor(item.getItemMeta().getDisplayName());
+                    String strippedName = ColorUtils.stripColor(BaseMenu.getItemDisplayName(item.getItemMeta()));
+                    newActions.add(strippedName);
                 }
             }
         }
@@ -1103,7 +1221,74 @@ public class InventoryListener implements Listener {
         COMMAND_NAME, COMMAND_DESCRIPTION, COMMAND_PERMISSION, COMMAND_COOLDOWN, COMMAND_INTERVAL, COMMAND_ALIAS,
         ALIAS_NEW, ALIAS_EDIT,
         ACTION_CONTENT, CREATE_COMMAND,
-        TITLE_MAIN, TITLE_SUB, TITLE_FADEIN, TITLE_STAY, TITLE_FADEOUT
+        TITLE_MAIN, TITLE_SUB, TITLE_FADEIN, TITLE_STAY, TITLE_FADEOUT,
+        TELEPORT_WORLD, TELEPORT_COORDS,
+        EFFECT_TYPE, EFFECT_DURATION, EFFECT_AMPLIFIER,
+        PARTICLE_TYPE, PARTICLE_COORDS, PARTICLE_COUNT
+    }
+
+    private void handleTeleportMenu(InventoryClickEvent event, Player player, ItemStack clicked, String cmdName, int actionIndex) {
+        if (event.getClickedInventory() != event.getView().getTopInventory()) return;
+        event.setCancelled(true);
+        if (clicked == null || !clicked.hasItemMeta()) return;
+        int slot = event.getSlot();
+
+        if (slot == 11) {
+            // Current location
+            String world = player.getLocation().getWorld().getName();
+            int x = player.getLocation().getBlockX();
+            int y = player.getLocation().getBlockY();
+            int z = player.getLocation().getBlockZ();
+            String newAction = "[TELEPORT] " + world + ";" + x + ";" + y + ";" + z;
+            plugin.getCommandManager().editAction(cmdName, actionIndex, newAction);
+            plugin.getCommandManager().markDirty(cmdName);
+            player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
+            scheduleTransition(player, () -> new TeleportMenu(plugin).open(player, cmdName, actionIndex));
+        } else if (slot == 13) {
+            requestChatInput(player, cmdName, InputType.TELEPORT_COORDS, actionIndex);
+        } else if (slot == 15) {
+            requestChatInput(player, cmdName, InputType.TELEPORT_WORLD, actionIndex);
+        } else if (slot == 25) {
+            scheduleTransition(player, () -> plugin.getInventoryManager().openActionsMenu(player, cmdName));
+        } else if (slot == 18) {
+            scheduleTransition(player, () -> plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex));
+        }
+    }
+
+    private void handleEffectMenu(InventoryClickEvent event, Player player, ItemStack clicked, String cmdName, int actionIndex) {
+        if (event.getClickedInventory() != event.getView().getTopInventory()) return;
+        event.setCancelled(true);
+        if (clicked == null || !clicked.hasItemMeta()) return;
+        int slot = event.getSlot();
+
+        if (slot == 11) {
+            requestChatInput(player, cmdName, InputType.EFFECT_TYPE, actionIndex);
+        } else if (slot == 13) {
+            requestChatInput(player, cmdName, InputType.EFFECT_DURATION, actionIndex);
+        } else if (slot == 15) {
+            requestChatInput(player, cmdName, InputType.EFFECT_AMPLIFIER, actionIndex);
+        } else if (slot == 25) {
+            scheduleTransition(player, () -> plugin.getInventoryManager().openActionsMenu(player, cmdName));
+        } else if (slot == 18) {
+            scheduleTransition(player, () -> plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex));
+        }
+    }
+
+    private void handleParticleMenu(InventoryClickEvent event, Player player, ItemStack clicked, String cmdName, int actionIndex) {
+        if (event.getClickedInventory() != event.getView().getTopInventory()) return;
+        event.setCancelled(true);
+        if (clicked == null || !clicked.hasItemMeta()) return;
+        int slot = event.getSlot();
+
+        if (slot == 11) {
+            requestChatInput(player, cmdName, InputType.PARTICLE_TYPE, actionIndex);
+        } else if (slot == 15) {
+            requestChatInput(player, cmdName, InputType.PARTICLE_COUNT, actionIndex);
+        } else if (slot == 25) {
+            scheduleTransition(player, () -> plugin.getInventoryManager().openActionsMenu(player, cmdName));
+        } else if (slot == 18) {
+            scheduleTransition(player, () -> plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex));
+        }
     }
 
     private void handleGiveMenu(InventoryClickEvent event, Player player, ItemStack clicked, String cmdName,

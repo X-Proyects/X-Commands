@@ -4,7 +4,6 @@ import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -32,7 +31,7 @@ public class TeleportMenu extends BaseMenu {
         String y = parts[2];
         String z = parts[3];
 
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.TELEPORT_MENU, commandName, actionIndex),
                 27,
                 lang.getMessage("gui-teleport-menu-title", commandName));

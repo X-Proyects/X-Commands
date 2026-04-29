@@ -3,7 +3,6 @@ package com.fabian.managers.menus;
 import com.fabian.XCommands;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -18,7 +17,7 @@ public class ConfirmDeleteMenu extends BaseMenu {
     }
 
     public void open(Player player, String commandName) {
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.CONFIRM_DELETE, commandName),
                 27,
                 lang.getMessage("gui-confirm-delete-title", commandName));

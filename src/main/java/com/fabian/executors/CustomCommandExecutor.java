@@ -118,6 +118,10 @@ public class CustomCommandExecutor implements CommandExecutor {
         return world;
     }
 
+    public void setWorld(String world) {
+        this.world = world;
+    }
+
     public List<String> getActions() {
         return actions;
     }

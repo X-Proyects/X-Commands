@@ -4,7 +4,6 @@ import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -31,7 +30,7 @@ public class AliasMenu extends BaseMenu {
         if (executor == null)
             return;
 
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.ALIAS_MENU, commandName),
                 36,
                 lang.getMessage("gui-alias-title", commandName));

@@ -41,7 +41,7 @@ public class UpdateListener implements Listener {
 
         if (plugin.getUpdateChecker().isUpdateAvailable()) {
             String latestVersion = plugin.getUpdateChecker().getLatestVersion();
-            String currentVersion = plugin.getDescription().getVersion();
+            String currentVersion = plugin.getPluginMeta().getVersion();
 
             player.sendMessage(
                     plugin.getLanguageManager().getMessage("update-available", currentVersion, latestVersion));

@@ -30,7 +30,8 @@ public class PlaceholderUtils {
         // Internal replacements (Fallback or additional)
         if (player != null) {
             message = message.replace("%player%", player.getName());
-            message = message.replace("%player_display%", player.getDisplayName());
+            message = message.replace("%player_display%", net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                    .legacySection().serialize(player.displayName()));
             message = message.replace("%player_uuid%", player.getUniqueId().toString());
             message = message.replace("%player_world%", player.getWorld().getName());
             message = message.replace("%player_gamemode%", player.getGameMode().name());

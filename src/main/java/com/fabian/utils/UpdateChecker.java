@@ -30,7 +30,7 @@ public class UpdateChecker {
     public void checkForUpdates(CommandSender sender) {
         SchedulerUtils.runTaskAsynchronously(plugin, () -> {
             try {
-                String currentVersion = plugin.getDescription().getVersion();
+                String currentVersion = plugin.getPluginMeta().getVersion();
 
                 // Spigot API for resource versions
                 URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId);

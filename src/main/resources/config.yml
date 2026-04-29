@@ -16,13 +16,27 @@
 # Note: Filenames are case-insensitive (e.g., 'en' will load 'EN.yml').
 language: EN
 
+# [prefix]
+# The prefix shown before all plugin messages in the chat.
+# Supports color codes using '&'. This is universal and not tied to any language file.
+prefix: "&8[&bX-Commands&8]&r"
+
 # [check-updates]
 # When set to true, the plugin will check for new versions on SpigotMC at startup.
 # If an update is found, admins will receive a notification in the console.
 check-updates: true
 
+# [metrics]
+# When set to true, the plugin will send anonymous statistics to bStats.org.
+# This helps the author know how many servers are using the plugin.
+metrics: true
+
+# [hide-namespaced-commands]
 # This ensures that players only see the clean, primary version of commands.
-hide-minecraft-commands: false
+# You can hide 'minecraft:' commands, other 'plugin:' commands, or both.
+hide-namespaced-commands:
+  hide-minecraft: false
+  hide-plugins: false
 
 # [debug]
 # If enabled (true), the plugin will log additional technical information to the console.
@@ -33,4 +47,4 @@ debug: false
 # INTERNAL SETTINGS - DO NOT MODIFY THESE
 # ------------------------------------------------------------------------------
 # 'code' tracks the configuration version for automatic updates.
-code: 6
+code: 7

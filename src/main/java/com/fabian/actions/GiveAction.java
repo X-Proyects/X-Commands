@@ -30,7 +30,8 @@ public class GiveAction implements Action {
             if (parts.length > 2) {
                 org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
                 if (meta != null) {
-                    meta.setDisplayName(com.fabian.utils.ColorUtils.translate(parts[2].trim()));
+                    meta.displayName(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                            .legacySection().deserialize(com.fabian.utils.ColorUtils.translate(parts[2].trim())));
                     item.setItemMeta(meta);
                 }
             }

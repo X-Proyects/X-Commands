@@ -4,7 +4,6 @@ import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -30,7 +29,7 @@ public class ParticleMenu extends BaseMenu {
         String type = parts[0];
         String amount = parts[1];
 
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.PARTICLE_MENU, commandName, actionIndex),
                 27,
                 lang.getMessage("gui-particle-menu-title", commandName));

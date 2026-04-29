@@ -29,7 +29,8 @@ public class CommandHideListener implements Listener {
         if (event.getCommands() == null)
             return;
 
-        boolean hideAllColon = XCommands.getInstance().getConfigManager().isHideMinecraftCommands();
+        boolean hideMinecraft = XCommands.getInstance().getConfigManager().isHideMinecraftCommands();
+        boolean hidePlugins = XCommands.getInstance().getConfigManager().isHidePluginCommands();
 
         // Use removeIf to aggressively filter commands containing colons
         event.getCommands().removeIf(command -> {
@@ -43,9 +44,15 @@ public class CommandHideListener implements Listener {
                 return true;
             }
 
-            // 2. OPTIONAL HIDE: All commands containing a colon (e.g., minecraft:tp)
-            if (hideAllColon && command.contains(":")) {
-                return true;
+            // 2. OPTIONAL HIDE: Check based on namespace
+            int colonIndex = lowerCommand.indexOf(":");
+            if (colonIndex != -1) {
+                String namespace = lowerCommand.substring(0, colonIndex);
+                if (namespace.equals("minecraft") || namespace.equals("bukkit")) {
+                    return hideMinecraft;
+                } else {
+                    return hidePlugins;
+                }
             }
 
             return false;

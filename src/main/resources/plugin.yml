@@ -1,5 +1,5 @@
 name: X-Commands
-version: 2.2
+version: 2.3
 main: com.fabian.XCommands
 api-version: 1.18
 folia-supported: true
@@ -11,7 +11,7 @@ commands:
   xc:
     description: Main X-Commands command
     usage: /xc [-gui|command|reload|update]
-    aliases: [x]
+    aliases: [x, xcommands, x-commands]
     permission: xcommands.admin
 
 permissions:

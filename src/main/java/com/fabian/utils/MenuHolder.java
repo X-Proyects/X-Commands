@@ -55,7 +55,7 @@ public class MenuHolder implements InventoryHolder {
         return null;
     }
 
-    public MenuType getType() {
+    public MenuType getMenuType() {
         return type;
     }
 

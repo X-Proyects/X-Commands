@@ -5,7 +5,6 @@ import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.ColorUtils;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import org.bukkit.entity.Player;
@@ -41,7 +40,7 @@ public class MainMenu extends BaseMenu {
 
         int currentPage = Math.max(0, Math.min(page, totalPages - 1));
 
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.MAIN, currentPage),
                 54,
                 lang.getMessage("gui-main-title"));
@@ -86,15 +85,15 @@ public class MainMenu extends BaseMenu {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ColorUtils.translate(executor.getDisplayName()));
+            meta.displayName(LEGACY.deserialize(ColorUtils.translate(executor.getDisplayName())));
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ColorUtils.translate(executor.getDescription()));
-            lore.add("");
-            lore.add(lang.getMessage("gui-main-click-left", "&7Click Izquierdo: &bEditar"));
-            lore.add(lang.getMessage("gui-main-click-right", "&7Click Derecho: &eVer acciones"));
+            List<net.kyori.adventure.text.Component> lore = new ArrayList<>();
+            lore.add(LEGACY.deserialize(ColorUtils.translate(executor.getDescription())));
+            lore.add(net.kyori.adventure.text.Component.empty());
+            lore.add(LEGACY.deserialize(lang.getMessage("gui-main-click-left", "&7Click Izquierdo: &bEditar")));
+            lore.add(LEGACY.deserialize(lang.getMessage("gui-main-click-right", "&7Click Derecho: &eVer acciones")));
 
-            meta.setLore(lore);
+            meta.lore(lore);
 
             // Store command name in PDC
             meta.getPersistentDataContainer().set(keyCommandName, PersistentDataType.STRING, executor.getCommandName());

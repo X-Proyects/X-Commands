@@ -2,7 +2,6 @@ package com.fabian.managers;
 
 import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
-import com.fabian.utils.ColorUtils;
 import com.fabian.utils.SchedulerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -544,91 +543,19 @@ public class CommandManager {
                 }
 
                 File commandFile = new File(commandsFolder, currentName.toLowerCase() + ".yml");
-                if (!commandFile.exists()) {
-                    // Standard save for new files: Create a fresh YAML structure
-                    // Since it's a new file, there are no user comments to preserve.
-                    YamlConfiguration fresh = new YamlConfiguration();
-                    fresh.set("name", executor.getCommandName());
-                    fresh.set("register", executor.isRegistered());
-                    fresh.set("permission", executor.getPermission());
-                    fresh.set("aliases", executor.getAliases());
-                    fresh.set("world", executor.getWorld());
-                    fresh.set("description", executor.getDescription());
-                    fresh.set("cooldown", executor.getCooldown());
-                    fresh.set("interval", executor.getInterval());
-                    fresh.set("actions", executor.getActions());
-                    fresh.set("item.material", executor.getMaterial());
-                    fresh.set("item.display-name", executor.getDisplayName());
-                    fresh.save(commandFile);
-                } else {
-                    // "Smart Edit" logic: Preserves user comments and custom formatting by
-                    // reading the file line-by-line and only replacing the specific values.
-                    List<String> lines = Files.readAllLines(commandFile.toPath(), StandardCharsets.UTF_8);
-                    List<String> newLines = new java.util.ArrayList<>();
-                    boolean skipping = false; // Flag to skip lines within list blocks (aliases/actions)
-
-                    for (String line : lines) {
-                        String trimmed = line.trim();
-
-                        // Block skipping logic: If we are inside an 'actions:' or 'aliases:' block,
-                        // we skip its items (lines starting with '-' or indented) until we find a new
-                        // key.
-                        if (skipping) {
-                            if (trimmed.isEmpty()) {
-                                newLines.add(line); // Preserve empty lines for formatting
-                                continue;
-                            }
-                            if (trimmed.startsWith("-") || line.startsWith("  ") || line.startsWith("    ")) {
-                                continue; // Skip existing list items to replace them later
-                            }
-                            skipping = false; // Next key found, stop skipping
-                        }
-
-                        // Replace specific keys while maintaining the rest of the file structure
-                        if (trimmed.startsWith("actions:")) {
-                            newLines.add("actions:");
-                            for (String action : executor.getActions()) {
-                                // Escape single quotes for YAML compliance
-                                newLines.add("  - '" + action.replace("'", "''") + "'");
-                            }
-                            skipping = true; // Start skipping old actions
-                        } else if (trimmed.startsWith("aliases:")) {
-                            newLines.add("aliases:");
-                            for (String alias : executor.getAliases()) {
-                                newLines.add("  - " + alias);
-                            }
-                            skipping = true; // Start skipping old aliases
-                        } else if (trimmed.startsWith("name:")) {
-                            newLines.add("name: " + executor.getCommandName());
-                        } else if (trimmed.startsWith("register:")) {
-                            newLines.add("register: " + executor.isRegistered());
-                        } else if (trimmed.startsWith("permission:")) {
-                            newLines.add("permission: " + executor.getPermission());
-                        } else if (trimmed.startsWith("world:")) {
-                            newLines.add("world: " + executor.getWorld());
-                        } else if (trimmed.startsWith("description:")) {
-                            newLines.add("description: \"" + ColorUtils.translate(executor.getDescription()) + "\"");
-                        } else if (trimmed.startsWith("cooldown:")) {
-                            newLines.add("cooldown: " + executor.getCooldown());
-                        } else if (trimmed.startsWith("interval:")) {
-                            newLines.add("interval: " + executor.getInterval());
-                        } else if (trimmed.startsWith("material:")
-                                && (line.contains("item") || line.startsWith("  "))) {
-                            // Only replace 'material' if it's likely inside the 'item' section (indented)
-                            int indent = line.indexOf("material:");
-                            newLines.add(line.substring(0, indent) + "material: " + executor.getMaterial());
-                        } else if (trimmed.startsWith("display-name:")
-                                && (line.contains("item") || line.startsWith("  "))) {
-                            int indent = line.indexOf("display-name:");
-                            newLines.add(
-                                    line.substring(0, indent) + "display-name: \"" + executor.getDisplayName() + "\"");
-                        } else {
-                            newLines.add(line); // Preserve comments and unknown keys
-                        }
-                    }
-                    // Write back using UTF-8 to prevent character corruption
-                    Files.write(commandFile.toPath(), newLines, StandardCharsets.UTF_8);
-                }
+                YamlConfiguration conf = YamlConfiguration.loadConfiguration(commandFile);
+                conf.set("name", executor.getCommandName());
+                conf.set("register", executor.isRegistered());
+                conf.set("permission", executor.getPermission());
+                conf.set("aliases", executor.getAliases());
+                conf.set("world", executor.getWorld());
+                conf.set("description", executor.getDescription());
+                conf.set("cooldown", executor.getCooldown());
+                conf.set("interval", executor.getInterval());
+                conf.set("actions", executor.getActions());
+                conf.set("item.material", executor.getMaterial());
+                conf.set("item.display-name", executor.getDisplayName());
+                conf.save(commandFile);
 
                 // Finalize updates on the Main Thread to ensure thread safety with Bukkit API
                 SchedulerUtils.runTask(plugin, () -> {

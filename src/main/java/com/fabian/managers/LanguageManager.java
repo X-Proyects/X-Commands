@@ -229,7 +229,8 @@ public class LanguageManager {
      * @return The message with prefix and colors translated
      */
     public String getMessageWithPrefix(String key) {
-        return getMessage("prefix") + " " + getMessage(key);
+        String prefix = ColorUtils.translate(plugin.getConfigManager().getPrefix());
+        return prefix + " " + getMessage(key);
     }
 
     /**
@@ -240,7 +241,8 @@ public class LanguageManager {
      * @return The formatted message with prefix and colors translated
      */
     public String getMessageWithPrefix(String key, Object... args) {
-        return getMessage("prefix") + " " + getMessage(key, args);
+        String prefix = ColorUtils.translate(plugin.getConfigManager().getPrefix());
+        return prefix + " " + getMessage(key, args);
     }
 
     /**

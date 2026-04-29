@@ -4,7 +4,6 @@ import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -31,7 +30,7 @@ public class EffectMenu extends BaseMenu {
         String duration = parts[1];
         String amplifier = parts[2];
 
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.EFFECT_MENU, commandName, actionIndex),
                 27,
                 lang.getMessage("gui-effect-menu-title", commandName));

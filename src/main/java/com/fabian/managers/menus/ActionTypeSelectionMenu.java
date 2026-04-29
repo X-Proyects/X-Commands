@@ -3,7 +3,6 @@ package com.fabian.managers.menus;
 import com.fabian.XCommands;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,7 +22,7 @@ public class ActionTypeSelectionMenu extends BaseMenu {
         }
 
         public void open(Player player, String commandName, int actionIndex) {
-                Inventory inv = Bukkit.createInventory(
+                Inventory inv = createInventory(
                                 new MenuHolder(MenuType.ACTION_TYPE_SELECTION, commandName, actionIndex),
                                 27,
                                 lang.getMessage("gui-type-title", (actionIndex + 1)));
@@ -65,12 +64,12 @@ public class ActionTypeSelectionMenu extends BaseMenu {
                 ItemStack item = new ItemStack(mat);
                 ItemMeta meta = item.getItemMeta();
                 if (meta != null) {
-                        meta.setDisplayName(lang.getMessage(nameKey));
-                        List<String> lore = Arrays.asList(
-                                        lang.getMessage(descKey),
-                                        "",
-                                        lang.getMessage("gui-type-select"));
-                        meta.setLore(lore);
+                        meta.displayName(LEGACY.deserialize(lang.getMessage(nameKey)));
+                        List<net.kyori.adventure.text.Component> lore = Arrays.asList(
+                                        LEGACY.deserialize(lang.getMessage(descKey)),
+                                        net.kyori.adventure.text.Component.empty(),
+                                        LEGACY.deserialize(lang.getMessage("gui-type-select")));
+                        meta.lore(lore);
 
                         // Store action type tag
                         org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(plugin, "action_type");

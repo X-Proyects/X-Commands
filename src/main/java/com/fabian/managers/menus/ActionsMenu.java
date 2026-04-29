@@ -5,7 +5,6 @@ import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.ColorUtils;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -32,7 +31,7 @@ public class ActionsMenu extends BaseMenu {
         if (executor == null)
             return;
 
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.ACTIONS, commandName),
                 54,
                 lang.getMessage("gui-actions-title", commandName));
@@ -66,14 +65,14 @@ public class ActionsMenu extends BaseMenu {
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(lang.getMessage("gui-actions-item-name", (index + 1)));
+            meta.displayName(LEGACY.deserialize(lang.getMessage("gui-actions-item-name", (index + 1))));
 
             String[] lore = lang.getMessage("gui-actions-item-lore", action).split("\\|");
-            List<String> loreList = new ArrayList<>();
+            List<net.kyori.adventure.text.Component> loreList = new ArrayList<>();
             for (String line : lore) {
-                loreList.add(ColorUtils.translate(line));
+                loreList.add(LEGACY.deserialize(ColorUtils.translate(line)));
             }
-            meta.setLore(loreList);
+            meta.lore(loreList);
 
             // Store index in PersistentDataContainer
             meta.getPersistentDataContainer().set(keyActionIndex, PersistentDataType.INTEGER, index);

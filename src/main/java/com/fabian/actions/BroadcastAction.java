@@ -1,6 +1,8 @@
 package com.fabian.actions;
 
+import com.fabian.utils.ColorUtils;
 import com.fabian.utils.PlaceholderUtils;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.util.Map;
@@ -16,7 +18,8 @@ public class BroadcastAction implements Action {
         String params = (String) context.get("params");
         if (params == null) return;
 
-        Bukkit.broadcastMessage(PlaceholderUtils.process(params, player));
+        String processed = ColorUtils.translate(PlaceholderUtils.process(params, player));
+        Bukkit.broadcast(LegacyComponentSerializer.legacySection().deserialize(processed));
     }
 
     @Override

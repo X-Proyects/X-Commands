@@ -4,7 +4,6 @@ import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -31,7 +30,7 @@ public class GiveMenu extends BaseMenu {
         String amount = parts[1];
         String customName = parts[2];
 
-        Inventory inv = Bukkit.createInventory(
+        Inventory inv = createInventory(
                 new MenuHolder(MenuType.GIVE_MENU, commandName, actionIndex),
                 27,
                 lang.getMessage("gui-give-menu-title", commandName));

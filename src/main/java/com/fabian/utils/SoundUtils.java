@@ -1,6 +1,8 @@
 package com.fabian.utils;
 
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import java.util.HashMap;
@@ -45,9 +47,8 @@ public class SoundUtils {
         if (sound != null) {
             player.playSound(player.getLocation(), sound, volume, pitch);
         } else {
-            // Fallback for custom sounds or newer sounds not in Enum
+            // Fallback for custom sounds or newer sounds not in Registry
             try {
-                // String-based playSound is useful for 1.18+ custom sounds/resource packs
                 String cleanName = soundName.toLowerCase(Locale.ROOT).replace(" ", "_");
                 player.playSound(player.getLocation(), cleanName, volume, pitch);
             } catch (Exception ignored) {
@@ -76,10 +77,9 @@ public class SoundUtils {
     }
 
     /**
-     * Resolves a sound name by trying the original name and its modern/legacy
-     * counterparts. Uses a cache for performance.
+     * Resolves a sound name using the Paper Registry API (1.20.5+).
+     * Falls back through legacy name mappings. Uses a cache for performance.
      */
-    @SuppressWarnings("deprecation")
     public static Sound resolveSound(String soundName) {
         if (soundName == null || soundName.isEmpty())
             return null;
@@ -94,35 +94,47 @@ public class SoundUtils {
 
         Sound sound = null;
 
-        // 1. Try the name as provided (Modern)
-        try {
-            sound = Sound.valueOf(key);
-        } catch (IllegalArgumentException ignored) {
-        }
+        // 1. Try Registry lookup with the key as provided (modern, non-deprecated)
+        sound = tryRegistryLookup(key);
 
-        // 2. Try the mapped name (Legacy to Modern)
+        // 2. Try mapped legacy name
         if (sound == null) {
             String mapped = LEGACY_MAP.get(key);
             if (mapped != null) {
-                try {
-                    sound = Sound.valueOf(mapped);
-                } catch (IllegalArgumentException ignored) {
-                }
+                sound = tryRegistryLookup(mapped);
             }
         }
 
-        // 3. Try fallback fix (stripping namespaced key prefix if it failed above)
+        // 3. Try stripping namespace prefix (e.g. "minecraft:entity_player_levelup")
         if (sound == null && key.contains(":")) {
-            try {
-                String stripped = key.split(":")[1];
-                sound = Sound.valueOf(stripped);
-            } catch (Exception ignored) {
-            }
+            sound = tryRegistryLookup(key.split(":")[1]);
         }
 
-        // Cache the result (even if null to avoid re-resolution)
+        // Cache result
         SOUND_CACHE.put(key, sound != null ? sound : NULL_MARKER);
-
         return sound;
     }
+
+    /**
+     * Looks up a Sound from the Bukkit Registry by name key.
+     * Converts ENUM_STYLE_NAME to minecraft:enum_style_name format.
+     */
+    private static Sound tryRegistryLookup(String enumKey) {
+        // Registry keys are lowercase with dots, e.g. "entity.player.levelup"
+        String registryKey = enumKey.toLowerCase(Locale.ROOT).replace("_", ".");
+        try {
+            Sound s = Registry.SOUNDS.get(NamespacedKey.minecraft(registryKey));
+            if (s != null) return s;
+        } catch (Exception ignored) {
+        }
+        // Also try with underscores (some keys use them)
+        try {
+            String underscoreKey = enumKey.toLowerCase(Locale.ROOT);
+            return Registry.SOUNDS.get(NamespacedKey.minecraft(underscoreKey));
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
 }
+
+

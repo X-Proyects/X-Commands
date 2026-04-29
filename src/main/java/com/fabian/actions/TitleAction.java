@@ -1,6 +1,10 @@
 package com.fabian.actions;
 
+import com.fabian.utils.ColorUtils;
 import com.fabian.utils.PlaceholderUtils;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -20,13 +24,23 @@ public class TitleAction implements Action {
         try {
             String[] parts = params.split(";");
 
-            String title = parts.length > 0 ? PlaceholderUtils.process(parts[0], player) : "";
-            String subtitle = parts.length > 1 ? PlaceholderUtils.process(parts[1], player) : "";
-            int fadeIn = parts.length > 2 ? Integer.parseInt(parts[2]) : 10;
-            int stay = parts.length > 3 ? Integer.parseInt(parts[3]) : 70;
-            int fadeOut = parts.length > 4 ? Integer.parseInt(parts[4]) : 20;
+            String titleStr    = parts.length > 0 ? ColorUtils.translate(PlaceholderUtils.process(parts[0], player)) : "";
+            String subtitleStr = parts.length > 1 ? ColorUtils.translate(PlaceholderUtils.process(parts[1], player)) : "";
+            int fadeIn  = parts.length > 2 ? Integer.parseInt(parts[2].trim()) : 10;
+            int stay    = parts.length > 3 ? Integer.parseInt(parts[3].trim()) : 70;
+            int fadeOut = parts.length > 4 ? Integer.parseInt(parts[4].trim()) : 20;
 
-            player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+            LegacyComponentSerializer ser = LegacyComponentSerializer.legacySection();
+            Title title = Title.title(
+                    ser.deserialize(titleStr),
+                    ser.deserialize(subtitleStr),
+                    Title.Times.times(
+                            Ticks.duration(fadeIn),
+                            Ticks.duration(stay),
+                            Ticks.duration(fadeOut)
+                    )
+            );
+            player.showTitle(title);
         } catch (Exception ignored) {
         }
     }
