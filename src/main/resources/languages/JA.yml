@@ -1,36 +1,54 @@
-# 言語ファイル (日本語)
-prefix: "&8[&bX-Comands&8]&r"
+# ============================================
+# X-COMMANDS - JAPANESE LANGUAGE FILE (日本語)
+# ============================================
 
-# 一般メッセージ
+# ============================================
+# GENERAL MESSAGES
+# ============================================
 no-permission: "&cこのコマンドを使用する権限がありません。"
 player-only: "&cこのコマンドはプレイヤーのみが実行できます。"
 reload-success: "&aプラグインが正常に再読み込みされました！"
 reload-error: "&cプラグインの再読み込み中にエラーが発生しました。詳細はコンソールを確認してください。"
 upcoming-feature: "&c近日公開予定..."
 
-# コマンド管理
-command-usage: "&c使用法: /xc command [create|delete|edit]"
-create-usage: "&c使用法: /xc command create <名前>"
+# ============================================
+# COMMAND MANAGEMENT
+# ============================================
+command-usage: "&c使用法: /xc [create|delete|edit|list|info]"
+create-usage: "&c使用法: /xc create <名前>"
 create-success: "&aコマンド '&e{0}&a' が正常に作成されました！"
 create-exists: "&cコマンド '&e{0}&c' は既に存在します。"
-delete-usage: "&c使用法: /xc command delete <名前>"
+delete-usage: "&c使用法: /xc delete <名前>"
 delete-success: "&aコマンド '&e{0}&a' が正常に削除されました。"
 delete-not-found: "&cコマンド '&e{0}&c' が見つかりませんでした。"
-edit-usage: "&c使用法: /xc command edit <コマンド> <行> <内容>"
-edit-success: "&aコマンド '&e{0}&a' のアクションが更新されました。"
-edit-invalid-line: "&c無効なアクション行です。数値である必要があります。"
+edit-usage: "&c使用法: /xc edit <コマンド> <属性> [値...]"
+edit-success: "&a{0} が更新されました。"
+edit-renamed: "&aコマンド名が &e{0} に変更されました"
+edit-invalid-number: "&c無効な数値です。"
+edit-unknown-attribute: "&c不明な属性です。使用可能: name, permission, description, cooldown, interval, world, material, displayname, register, alias, action"
+command-not-found: "&cコマンドが見つかりません。"
+action-invalid-index: "&c無効なアクションインデックスです。"
+list-empty: "&cカスタムコマンドが存在しません。"
+list-header: "&aコマンド一覧 ({0}): &e"
+info-usage: "&c使用法: /xc info <名前>"
 
-# カスタムコマンドエラー
+# ============================================
+# CUSTOM COMMAND ERRORS
+# ============================================
 command-no-permission: "&cこのコマンドを使用する権限がありません。"
 command-wrong-world: "&cこのコマンドはこのワールドでは使用できません。"
 command-cooldown: "&cこのコマンドを再度使用するには、あと %time% 秒待つ必要があります。"
 command-error: "&cコマンド実行中にエラーが発生しました。詳細はコンソールを確認してください。"
 
-# アクションエラー
+# ============================================
+# ACTION ERRORS
+# ============================================
 action-invalid: "&c無効なアクション: {0}"
 action-parse-error: "&cアクションの解析エラー: {0}"
 
-# 更新メッセージ
+# ============================================
+# UPDATE MESSAGES
+# ============================================
 update-checking: "&7アップデートを確認中..."
 update-no-new: "&a最新バージョンを使用しています！"
 update-new: "&a新しいアップデートが利用可能です: &e{0}&a! ダウンロード: &b{1}"
@@ -43,11 +61,278 @@ update-available: "&a新しいアップデートが利用可能です！ 現在:
 update-download: "&aダウンロード: &b{0}"
 update-current: "&a最新バージョンを使用しています！"
 
-# ヘルプメニュー
-help-header: "&8&m----------&r &bX-Comands ヘルプ &8&m----------"
+# ============================================
+# HELP MENU
+# ============================================
+help-header: "&8&m----------&r &bX-Commands ヘルプ &8&m----------"
 help-gui: "&e/xc -gui &7- ビジュアルエディタを開く"
 help-reload: "&e/xc reload &7- プラグインを再読み込み"
 help-update: "&e/xc update &7- アップデートを確認"
 help-footer: "&8&m--------------------------------"
 
+# ============================================
+# GUI - MAIN MENU
+# ============================================
+gui-main-title: "&3&lX-Commands &8- &7リスト"
+gui-main-create: "&a&lコマンド作成"
+gui-main-create-lore: "&7クリックして新しいコマンドを作成| |&eクリックして開始"
+gui-main-prev: "&e前へ"
+gui-main-next: "&e次へ"
+gui-main-page: "&7{0}ページ目へ"
+gui-main-click-left: "&7左クリック: &b編集"
+gui-main-click-right: "&7右クリック: &eアクションを表示"
 
+# ============================================
+# GUI - COMMAND EDIT MENU
+# ============================================
+gui-edit-title: "&8編集中のコマンド: &3/{0}"
+gui-edit-name: "&e名前を変更"
+gui-edit-name-lore: "&7現在: &f{0}| |&bクリックして変更"
+gui-edit-desc: "&e説明を変更"
+gui-edit-desc-lore: "&7現在: &f{0}| |&bクリックして変更"
+gui-edit-reg: "&e登録状態を変更"
+gui-edit-reg-lore: "&7状態: {0}| |&bクリックして切り替え"
+gui-edit-reg-on: "&a有効"
+gui-edit-reg-off: "&c無効"
+gui-edit-perm: "&e権限を変更"
+gui-edit-perm-lore: "&7現在: &f{0}| |&bクリックして変更"
+gui-edit-cooldown: "&eクールダウンを変更"
+gui-edit-cooldown-lore: "&7現在: &f{0}秒| |&bクリックして変更"
+gui-edit-interval: "&eインターバルを変更"
+gui-edit-interval-lore: "&7現在: &f{0}秒| |&bクリックして変更"
+gui-edit-alias: "&eエイリアスを変更"
+gui-edit-alias-lore: "&7現在: &f{0}| |&bクリックして変更"
+gui-edit-actions: "&bアクションを編集"
+gui-edit-actions-lore: "&7このコマンドが実行するステップを|&7管理します。| |&eクリックして開く"
+gui-edit-reorder: "&6順番を並べ替え"
+gui-edit-reorder-lore: "&7実行されるアクションの|&7順番を変更します。| |&eクリックして開く"
+gui-edit-save: "&a&l変更を保存"
+gui-edit-save-lore: "&7変更を永久に保存します。| |&eクリックして保存"
+gui-edit-delete: "&c&lコマンドを削除"
+gui-edit-delete-lore: "&7このファイルを永久に削除します。| |&4クリックして削除"
+gui-edit-back: "&7戻る"
+
+# ============================================
+# GUI - ALIAS MENU
+# ============================================
+gui-alias-title: "&8エイリアス: &3/{0}"
+gui-alias-add: "&aエイリアスを追加"
+gui-alias-add-lore: "&7クリックして新しいエイリアスを追加"
+gui-alias-edit-lore: "&7現在: &f{0}| |&b右クリックで編集|&cShift + 左クリックで削除"
+
+# ============================================
+# GUI - ACTIONS MENU
+# ============================================
+gui-actions-title: "&8アクション: &3/{0}"
+gui-actions-order: "&e実行順序"
+gui-actions-order-lore: "&7シーケンス管理"
+gui-actions-add: "&aアクションを追加"
+gui-actions-add-lore: "&7クリックして追加"
+gui-actions-item-name: "&eアクション #{0}"
+gui-actions-item-lore: "&7内容:|&f{0}| |&7右クリック: &b編集|&7左クリック: &e移動|&7Shift + 右: &c削除"
+gui-actions-reorder: "&6順番を並べ替え"
+gui-actions-reorder-lore: "&7ドラッグ＆ドロップで並べ替え| |&eクリックして開く"
+
+# ============================================
+# GUI - ACTION EDIT MENU
+# ============================================
+gui-action-edit-title: "&8アクション編集: &3{0}"
+gui-action-edit-type: "&eタイプを編集"
+gui-action-edit-type-lore: "&7現在: &f{0}| |&bクリックして変更"
+gui-action-edit-value: "&e内容を編集"
+gui-action-edit-value-lore: "&7現在: &f{0}| |&bクリックして変更"
+
+# ============================================
+# GUI - ACTION TYPE SELECTION MENU
+# ============================================
+gui-type-title: "&8タイプ選択: &3アクション #{0}"
+gui-type-select: "&bクリックして選択"
+
+# ============================================
+# GUI - ACTION REORDER MENU
+# ============================================
+gui-reorder-title: "&8並べ替え: &3/{0}"
+gui-reorder-lore: "&7ドラッグして並べ替え|&7ゴミ箱にドロップして削除"
+gui-reorder-trash: "&c&lアクションを削除"
+gui-reorder-trash-lore: "&7ここにアクションをドラッグして|&7永久に削除します。"
+
+# ============================================
+# GUI - NUMERIC ACTION MENU
+# ============================================
+gui-numeric-title: "&8数値編集: &3{0}"
+gui-numeric-current: "&7現在の値"
+gui-numeric-add: "&7クリックして追加"
+gui-numeric-reset: "&c数値をリセット"
+gui-numeric-reset-lore: "&70に設定"
+gui-numeric-confirm: "&a確認して保存"
+
+# ============================================
+# GUI - TITLE ACTION MENU
+# ============================================
+gui-title-menu-title: "&8タイトルアクション: &3{0}"
+gui-title-main: "&eメインタイトル"
+gui-title-main-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-title-sub: "&eサブタイトル"
+gui-title-sub-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-title-fadein: "&eフェードイン (Ticks)"
+gui-title-fadein-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-title-stay: "&e表示時間 (Ticks)"
+gui-title-stay-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-title-fadeout: "&eフェードアウト (Ticks)"
+gui-title-fadeout-lore: "&7現在: &f{0}| |&bクリックして編集"
+
+# ============================================
+# GUI - TELEPORT ACTION MENU
+# ============================================
+gui-teleport-menu-title: "&8テレポートアクション: &3{0}"
+gui-teleport-current: "&e現在地を使用"
+gui-teleport-current-lore: "&7クリックして現在地に設定"
+gui-teleport-coords: "&e手動座標"
+gui-teleport-coords-lore: "&7X: &f{0}|&7Y: &f{1}|&7Z: &f{2}| |&bクリックして編集"
+gui-teleport-world: "&eワールド"
+gui-teleport-world-lore: "&7現在: &f{0}| |&bクリックして編集"
+
+# ============================================
+# GUI - EFFECT ACTION MENU
+# ============================================
+gui-effect-menu-title: "&8エフェクトアクション: &3{0}"
+gui-effect-type: "&eエフェクトタイプ"
+gui-effect-type-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-effect-duration: "&e持続時間 (秒)"
+gui-effect-duration-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-effect-amplifier: "&e増幅レベル"
+gui-effect-amplifier-lore: "&7現在: &f{0}| |&bクリックして編集"
+
+# ============================================
+# GUI - GIVE ITEM ACTION MENU
+# ============================================
+gui-give-menu-title: "&8アイテム付与アクション: &3{0}"
+gui-give-material: "&eアイテム名"
+gui-give-material-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-give-amount: "&e個数"
+gui-give-amount-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-give-name: "&eカスタム名"
+gui-give-name-lore: "&7現在: &f{0}| |&bクリックして編集"
+
+# ============================================
+# GUI - PARTICLE ACTION MENU
+# ============================================
+gui-particle-menu-title: "&8パーティクルアクション: &3{0}"
+gui-particle-type: "&eパーティクルタイプ"
+gui-particle-type-lore: "&7現在: &f{0}| |&bクリックして編集"
+gui-particle-amount: "&e個数"
+gui-particle-amount-lore: "&7現在: &f{0}| |&bクリックして編集"
+
+# ============================================
+# GUI - CONFIRMATION MENU
+# ============================================
+gui-confirm-delete-title: "&4削除の確認: &0/{0}"
+gui-confirm-yes: "&a&l確認"
+gui-confirm-yes-lore: "&7永久に削除します。"
+gui-confirm-no: "&c&lキャンセル"
+gui-confirm-no-lore: "&7前のメニューに戻ります。"
+
+# ============================================
+# COMMON GUI ELEMENTS
+# ============================================
+gui-back: "&7戻る"
+gui-back-lore: "&7前のメニューに戻る"
+gui-none: "なし"
+
+# ============================================
+# SYSTEM MESSAGES
+# ============================================
+command-saved: "&a正常に保存されました。"
+command-deleted-success: "&aコマンドが削除されました。"
+command-name-updated: "&a名前が {0} に更新されました。"
+command-description-updated: "&a説明が更新されました。"
+command-permission-updated: "&a権限が {0} に更新されました。"
+command-cooldown-updated: "&aクールダウンが {0} 秒に更新されました。"
+command-interval-updated: "&aインターバルが {0} 秒に更新されました。"
+command-alias-updated: "&aエイリアスが更新されました！"
+alias-added: "&aエイリアスが追加されました！"
+alias-updated: "&aエイリアスが更新されました！"
+alias-deleted: "&cエイリアスが削除されました！"
+chat-alias-new: "&eチャットに新しいエイリアスを入力してください（または 'cancel'）:"
+chat-alias-edit: "&eチャットにエイリアスの新しい名前を入力してください（または 'cancel'）:"
+create-success-msg: "&aコマンドが正常に作成されました。"
+changes-discarded: "&c&l変更が破棄されました。"
+unsaved-changes-warning: "&e⚠ &c注意: 保存されていない変更があります。5秒以内にもう一度閉じると変更が失われます。"
+
+# ============================================
+# ACTION MESSAGES
+# ============================================
+action-updated: "&aアクションが更新されました。"
+action-type-changed: "&aタイプが &e{0} に変更されました"
+action-added: "&aアクションが追加されました。"
+action-deleted: "&cアクションが削除されました。"
+actions-reordered: "&aアクションの並べ替えが完了しました。"
+
+# ============================================
+# INPUT MESSAGES
+# ============================================
+input-wait: "&b&l入力を待機中"
+input-instructions: "&7チャットに新しい値を入力するか、&ccancel &7でキャンセルしてください。"
+input-cancelled: "&c操作がキャンセルされました。"
+input-invalid-name: "&c無効な名前です。英数字とアンダースコアのみ使用できます。"
+input-command-exists: "&cそのコマンドは既に存在します。"
+chat-input-name: "&eコマンド名をチャットに入力してください（または 'cancel'）:"
+chat-input-desc: "&eコマンドの説明をチャットに入力してください（または 'cancel'）:"
+chat-input-perm: "&e権限をチャットに入力してください（または 'cancel'）:"
+chat-input-world: "&eワールド名をチャットに入力してください（または 'cancel'）:"
+chat-input-material: "&eアイテム名をチャットに入力してください（または 'cancel'）:"
+chat-input-displayname: "&e表示名をチャットに入力してください（または 'cancel'）:"
+chat-input-alias: "&eエイリアスをチャットに入力してください（または 'cancel'）:"
+chat-input-action-content: "&eアクションの内容をチャットに入力してください（または 'cancel'）:"
+chat-input-cancel: "cancel"
+chat-input-timeout: "&c入力がタイムアウトしました。"
+chat-input-invalid-material: "&c無効なアイテム名です！"
+chat-input-invalid-world: "&cワールドが見つかりません！"
+
+# ============================================
+# ACTION TYPES - NAMES
+# ============================================
+action-name-message: "&aメッセージ"
+action-name-broadcast: "&6ブロードキャスト"
+action-name-actionbar: "&eアクションバー"
+action-name-title: "&bタイトル"
+action-name-sound: "&dサウンド"
+action-name-effect: "&5エフェクト"
+action-name-give: "&9アイテム付与"
+action-name-teleport: "&3テレポート"
+action-name-delay: "&7待機 (Ticks)"
+action-name-heal: "&c回復"
+action-name-feed: "&6満腹度回復"
+action-name-damage: "&4ダメージ"
+action-name-console: "&cコンソール"
+action-name-player: "&aプレイヤー"
+action-name-kick: "&4キック"
+action-name-close: "&7インベントリを閉じる"
+action-name-particle: "&eパーティクル"
+action-name-bungee: "&5Bungee"
+action-name-give-money: "&6お金を与える"
+action-name-take-money: "&cお金を取る"
+
+# ============================================
+# ACTION TYPES - DESCRIPTIONS
+# ============================================
+action-desc-message: "&7プレイヤーにメッセージを送信します。"
+action-desc-broadcast: "&7サーバー全員にメッセージを送信します。"
+action-desc-actionbar: "&7ヘルスバーの上にテキストを表示します。"
+action-desc-title: "&7画面に大きなタイトルを表示します。"
+action-desc-sound: "&7効果音を再生します。"
+action-desc-effect: "&7ポーション効果を付与します。"
+action-desc-give: "&7プレイヤーにアイテムを渡します。"
+action-desc-teleport: "&7プレイヤーを場所に移動させます。"
+action-desc-delay: "&7アクションの間に遅延を追加します。"
+action-desc-heal: "&7プレイヤーの体力を回復します。"
+action-desc-feed: "&7プレイヤーの空腹度を回復します。"
+action-desc-damage: "&7プレイヤーにダメージを与えます。"
+action-desc-console: "&7コンソールコマンドを実行します。"
+action-desc-player: "&7プレイヤーにコマンドを強制実行させます。"
+action-desc-kick: "&7プレイヤーをサーバーからキックします。"
+action-desc-close: "&7現在のインベントリを閉じます。"
+action-desc-particle: "&7視覚的なパーティクル効果を生成します。"
+action-desc-bungee: "&7プレイヤーを別のサーバーに送信します。"
+action-desc-give-money: "&7プレイヤーにお金を与えます (Vault)。"
+action-desc-take-money: "&7プレイヤーからお金を取ります (Vault)。"

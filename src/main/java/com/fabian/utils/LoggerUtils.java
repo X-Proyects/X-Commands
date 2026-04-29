@@ -9,7 +9,7 @@ import org.bukkit.command.ConsoleCommandSender;
  */
 public class LoggerUtils {
 
-    private static final String PREFIX = "&8[&bX-Commands&8] ";
+    private static final String PREFIX = XCommands.INTERNAL_PREFIX + " ";
     private static final ConsoleCommandSender console = Bukkit.getConsoleSender();
 
     /**
