@@ -17,7 +17,7 @@ public class UpdateCommand {
 
     public boolean execute(CommandSender sender, String[] args) {
         if (!sender.hasPermission("xcommands.admin.update")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+            com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
             return true;
         }
 
@@ -31,7 +31,7 @@ public class UpdateCommand {
             // But usually it's initialized in onEnable.
         }
 
-        sender.sendMessage(plugin.getLanguageManager().getMessage("update-checking"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("update-checking"));
         checker.checkForUpdates(sender);
 
         return true;

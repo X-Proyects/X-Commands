@@ -19,7 +19,8 @@ public class DelayAction implements Action {
 
         try {
             delayTicks = Integer.parseInt(params.trim());
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [DELAY]: " + params);
         }
     }
 

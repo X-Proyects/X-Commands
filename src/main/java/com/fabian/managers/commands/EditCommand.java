@@ -132,7 +132,7 @@ public class EditCommand {
                 if (args.length < 4) return sendUsage(sender, "register <true/false>");
                 boolean reg = Boolean.parseBoolean(args[3]);
                 cmd.setRegistered(reg);
-                save(cmd, sender, "Registration status updated. §e(Requires restart/reload to apply to server)");
+                save(cmd, sender, "Registration status updated.");
                 break;
 
             case "alias":

@@ -1,9 +1,9 @@
 name: X-Commands
-version: 2.3
+version: 2.4
 main: com.fabian.XCommands
 api-version: 1.18
 folia-supported: true
-author: Fabián
+authors: [Fabián ツ]
 description: Custom commands plugin
 softdepend: [Vault, PlaceholderAPI]
 
@@ -25,6 +25,7 @@ permissions:
       xcommands.admin.edit: true
       xcommands.admin.reload: true
       xcommands.admin.update: true
+      xcommands.admin.version: true
   xcommands.admin.gui:
     description: Permission to open the GUI editor
     default: op
@@ -42,4 +43,7 @@ permissions:
     default: op
   xcommands.admin.update:
     description: Permission to check for updates
+    default: op
+  xcommands.admin.version:
+    description: Permission to see plugin and server version info
     default: op

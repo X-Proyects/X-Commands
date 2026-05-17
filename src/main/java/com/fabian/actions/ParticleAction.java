@@ -28,7 +28,8 @@ public class ParticleAction implements Action {
             int count = args.length > 4 ? Integer.parseInt(args[4]) : 1;
 
             player.getWorld().spawnParticle(particle, player.getLocation(), count, offsetX, offsetY, offsetZ, 0.1);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [PARTICLE]: " + params);
         }
     }
 

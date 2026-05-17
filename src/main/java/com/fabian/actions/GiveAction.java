@@ -24,20 +24,31 @@ public class GiveAction implements Action {
             String materialName = parts[0].toUpperCase().trim();
             int amount = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 1;
 
-            Material material = Material.valueOf(materialName);
+            Material material = Material.matchMaterial(materialName);
+            if (material == null) {
+                com.fabian.utils.LoggerUtils.warn("Invalid material in [GIVE] action: " + materialName);
+                return;
+            }
+
             ItemStack item = new ItemStack(material, amount);
 
             if (parts.length > 2) {
                 org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
                 if (meta != null) {
-                    meta.displayName(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                            .legacySection().deserialize(com.fabian.utils.ColorUtils.translate(parts[2].trim())));
+                    com.fabian.utils.CompatibilityUtils.setDisplayName(meta, parts[2].trim());
                     item.setItemMeta(meta);
                 }
             }
 
-            player.getInventory().addItem(item);
-        } catch (Exception ignored) {
+            // Add to inventory and drop if full
+            java.util.HashMap<Integer, ItemStack> remaining = player.getInventory().addItem(item);
+            if (!remaining.isEmpty()) {
+                remaining.values().forEach(remainingItem -> 
+                    player.getWorld().dropItemNaturally(player.getLocation(), remainingItem)
+                );
+            }
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.severe("Error executing [GIVE] action with params: " + params, e);
         }
     }
 

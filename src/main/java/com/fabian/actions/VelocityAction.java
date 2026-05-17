@@ -7,10 +7,10 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 
 /**
- * Sends a player to another BungeeCord server
- * Format: [BUNGEE] lobby
+ * Sends a player to another server (Velocity/Bungee)
+ * Format: [VELOCITY] server
  */
-public class BungeeAction implements Action {
+public class VelocityAction implements Action {
 
     @Override
     public void execute(Player player, Map<String, Object> context) {
@@ -21,15 +21,15 @@ public class BungeeAction implements Action {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Connect");
             out.writeUTF(params.trim());
-            com.fabian.utils.LoggerUtils.debug("Attempting to send player " + player.getName() + " to server: " + params.trim());
+            com.fabian.utils.LoggerUtils.debug("Attempting to send player " + player.getName() + " to server (Velocity): " + params.trim());
             player.sendPluginMessage(XCommands.getInstance(), "BungeeCord", out.toByteArray());
         } catch (Exception e) {
-            com.fabian.utils.LoggerUtils.severe("Failed to send player to server: " + params, e);
+            com.fabian.utils.LoggerUtils.severe("Failed to send player to velocity server: " + params, e);
         }
     }
 
     @Override
     public String getTag() {
-        return "BUNGEE";
+        return "VELOCITY";
     }
 }

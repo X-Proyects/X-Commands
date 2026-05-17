@@ -8,6 +8,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +44,12 @@ public class CommandManager {
         this.plugin = plugin;
         this.customCommands = new HashMap<>();
         initCommandMap();
+    }
+
+    public void clearPlayerCooldowns(java.util.UUID uuid) {
+        for (CustomCommandExecutor executor : customCommands.values()) {
+            executor.clearCooldown(uuid);
+        }
     }
 
     /**
@@ -96,7 +104,7 @@ public class CommandManager {
         if (firstRun && commandsFolder.mkdirs()) {
 
             // Save default commands only on very first install
-            String[] defaults = { "ejemplo.yml", "admin.yml", "welcome.yml" };
+            String[] defaults = { "ejemplo.yml", "admin.yml", "welcome.yml", "aviso.yml" };
             for (String def : defaults) {
                 plugin.saveResource("commands/" + def, false);
             }
@@ -182,18 +190,32 @@ public class CommandManager {
             return;
         }
 
+        // Register permission dynamically for LuckPerms auto-completion
+        String permNode = executor.getPermission();
+        if (permNode != null && !permNode.isEmpty()) {
+            if (Bukkit.getPluginManager().getPermission(permNode) == null) {
+                try {
+                    Permission perm = new Permission(permNode, "Custom permission for " + name, PermissionDefault.OP);
+                    Bukkit.getPluginManager().addPermission(perm);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
         Command command = new Command(name.toLowerCase()) {
             @Override
             public boolean execute(org.bukkit.command.CommandSender sender, String label, String[] args) {
-                return executor.onCommand(sender, this, label, args);
+                CustomCommandExecutor currentExecutor = customCommands.get(name.toLowerCase());
+                if (currentExecutor != null) {
+                    return currentExecutor.onCommand(sender, this, label, args);
+                }
+                return true; // Command was deleted but unregister failed
             }
 
             @Override
             public java.util.List<String> tabComplete(org.bukkit.command.CommandSender sender, String alias,
                     String[] args) throws IllegalArgumentException {
                 if (sender instanceof org.bukkit.entity.Player) {
-                    // Default behavior: return list of players
-                    // If we want more complex logic later, we can delegate to executor
                     return null; // returning null in Bukkit defaults to online players
                 }
                 return java.util.Collections.emptyList();
@@ -213,15 +235,9 @@ public class CommandManager {
             return;
         }
 
-        for (String cmdName : customCommands.keySet()) {
-            try {
-                Command command = commandMap.getCommand(cmdName);
-                if (command != null) {
-                    command.unregister(commandMap);
-                }
-            } catch (Exception e) {
-                plugin.logWarning("Error unregistering command " + cmdName + ": " + e.getMessage());
-            }
+        // Create a copy of keys to avoid ConcurrentModificationException if any
+        for (String cmdName : new java.util.HashSet<>(customCommands.keySet())) {
+            unregisterCommand(cmdName);
         }
 
         unregisterAllTimers();
@@ -268,6 +284,7 @@ public class CommandManager {
      */
     public void reload() {
         loadCommands();
+        refreshCommands();
     }
 
     /**
@@ -345,8 +362,9 @@ public class CommandManager {
         stopTimer(commandName);
 
         // Async file deletion
+        String originalName = executor.getOriginalName();
         SchedulerUtils.runTaskAsynchronously(plugin, () -> {
-            File commandFile = new File(new File(plugin.getDataFolder(), "commands"), commandName + ".yml");
+            File commandFile = new File(new File(plugin.getDataFolder(), "commands"), (originalName != null ? originalName : commandName) + ".yml");
             if (commandFile.exists()) {
                 commandFile.delete();
             }
@@ -457,7 +475,6 @@ public class CommandManager {
             try {
                 int interval = Integer.parseInt(value.toString());
                 executor.setInterval(interval);
-                startTimer(commandName, executor);
                 markDirty(commandName);
             } catch (NumberFormatException e) {
                 // Ignore invalid numbers
@@ -480,6 +497,9 @@ public class CommandManager {
                 executor.getAliases().addAll(listValue);
             }
             markDirty(commandName);
+        } else if (path.equals("material")) {
+            executor.setMaterial(value.toString().toUpperCase());
+            markDirty(commandName);
         }
         // Config path 'item.display-name' etc is not handled generically well here
         // without accessors.
@@ -501,6 +521,9 @@ public class CommandManager {
         // This is tricky in memory. We need to remove old, add new.
         CustomCommandExecutor executor = customCommands.remove(oldName.toLowerCase());
         if (executor != null) {
+            // Unregister old command from Bukkit to avoid duplication
+            unregisterCommand(oldName);
+            
             stopTimer(oldName);
             // Update internal name
             executor.setCommandName(newName);
@@ -508,11 +531,18 @@ public class CommandManager {
             executor.setDisplayName("&b" + newName);
 
             customCommands.put(newName.toLowerCase(), executor);
-            markDirty(newName); // Mark dirty on rename
+            
+            // Transfer dirty status
+            if (dirtyCommands.remove(oldName.toLowerCase())) {
+                markDirty(newName);
+            } else {
+                markDirty(newName); // Renaming itself is a change
+            }
 
             // Re-register Bukkit command
             registerCommand(newName, executor);
             startTimer(newName, executor);
+            refreshCommands();
         }
     }
 
@@ -561,9 +591,9 @@ public class CommandManager {
                 SchedulerUtils.runTask(plugin, () -> {
                     executor.setOriginalName(currentName);
                     dirtyCommands.remove(currentName.toLowerCase());
-                    if (executor.isRegistered()) {
-                        syncRegistration(currentName);
-                    }
+                    syncRegistration(currentName);
+                    // Refresh commands for all online players so tab-complete updates immediately
+                    org.bukkit.Bukkit.getOnlinePlayers().forEach(org.bukkit.entity.Player::updateCommands);
                 });
             } catch (Exception e) {
                 plugin.logSevere("Error saving command " + commandName + ": " + e.getMessage());
@@ -600,16 +630,24 @@ public class CommandManager {
         File commandFile = new File(commandsFolder, fileName + ".yml");
 
         if (commandFile.exists()) {
-            // Unregister first if it was registered (use current name in memory for unreg)
+            // Unregister and stop timer first to clear live state
             unregisterCommand(commandName);
+            stopTimer(commandName);
+            
+            // If it was renamed in memory, remove the new name from map to avoid ghost duplication
+            if (executor != null && !executor.getCommandName().equalsIgnoreCase(fileName)) {
+                customCommands.remove(executor.getCommandName().toLowerCase());
+                dirtyCommands.remove(executor.getCommandName().toLowerCase());
+            }
+            
             // Load from file (this replaces the memory entry with stored data)
             loadCommand(commandFile);
-            // Clear dirty flag for BOTH potential names
-            dirtyCommands.remove(commandName.toLowerCase());
-            CustomCommandExecutor newExec = customCommands.get(fileName.toLowerCase());
-            if (newExec != null) {
-                dirtyCommands.remove(newExec.getCommandName().toLowerCase());
-            }
+            
+            // Clear dirty flag for the name loaded from disk
+            dirtyCommands.remove(fileName.toLowerCase());
+            
+            // Refresh commands for all online players
+            refreshCommands();
         }
     }
 
@@ -639,21 +677,20 @@ public class CommandManager {
     public void toggleCommandRegistration(String commandName) {
         CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
         if (executor != null) {
-            boolean current = executor.isRegistered();
-            executor.setRegistered(!current); // Update memory
-
-            if (!current) {
-                // Was disabled, now enabling
-                registerCommand(commandName, executor);
-                startTimer(commandName, executor);
-            } else {
-                // Was enabled, now disabling
-                unregisterCommand(commandName);
-                stopTimer(commandName);
-            }
-
+            executor.setRegistered(!executor.isRegistered());
             markDirty(commandName);
+            syncRegistration(commandName);
+            refreshCommands();
         }
+    }
+
+    /**
+     * Forces all online players to refresh their command lists (tab-complete)
+     */
+    public void refreshCommands() {
+        SchedulerUtils.runTask(plugin, () -> {
+            org.bukkit.Bukkit.getOnlinePlayers().forEach(org.bukkit.entity.Player::updateCommands);
+        });
     }
 
     /**

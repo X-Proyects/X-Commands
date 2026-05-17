@@ -1,6 +1,7 @@
 package com.fabian.listeners;
 
 import com.fabian.XCommands;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,11 +42,11 @@ public class UpdateListener implements Listener {
 
         if (plugin.getUpdateChecker().isUpdateAvailable()) {
             String latestVersion = plugin.getUpdateChecker().getLatestVersion();
-            String currentVersion = plugin.getPluginMeta().getVersion();
+            String currentVersion = CompatibilityUtils.getVersion(plugin);
 
-            player.sendMessage(
+            CompatibilityUtils.sendMessage(player, 
                     plugin.getLanguageManager().getMessage("update-available", currentVersion, latestVersion));
-            player.sendMessage(plugin.getLanguageManager().getMessage("update-download",
+            CompatibilityUtils.sendMessage(player, plugin.getLanguageManager().getMessage("update-download",
                     plugin.getUpdateChecker().getDownloadUrl()));
         }
     }

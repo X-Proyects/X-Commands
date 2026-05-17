@@ -23,7 +23,8 @@ public class SoundAction implements Action {
             float pitch = parts.length > 2 ? Float.parseFloat(parts[2]) : 1.0f;
 
             com.fabian.utils.SoundUtils.playSound(player, soundName, volume, pitch);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [SOUND]: " + params);
         }
     }
 

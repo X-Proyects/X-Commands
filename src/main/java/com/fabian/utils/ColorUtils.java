@@ -3,109 +3,133 @@ package com.fabian.utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for handling color codes in messages.
- * Supports:
- *   - Legacy codes:  &amp;a, &amp;b, &amp;l, etc.
- *   - Hex RGB:       &amp;#RRGGBB  (e.g. &amp;#FF5500)
- *   - MiniMessage:   &lt;red&gt;, &lt;#FF5500&gt;, &lt;gradient:red:blue&gt;, etc.
+ * Utility class for color translation and component management.
+ * Supports MiniMessage, Legacy (&, §) and Hex (&#RRGGBB) formats.
  */
-public class ColorUtils {
-
-    private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
-
-    // Detects likely MiniMessage tags to avoid the heavier parsing path for plain messages.
-    private static final Pattern MINI_MESSAGE_PATTERN =
-            Pattern.compile("<[a-zA-Z#!/][^>]*>");
+public final class ColorUtils {
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
-    private static final LegacyComponentSerializer LEGACY_SERIALIZER =
+    private static final LegacyComponentSerializer LEGACY_SECTION =
             LegacyComponentSerializer.builder()
                     .character('§')
                     .hexColors()
                     .useUnusualXRepeatedCharacterHexFormat()
                     .build();
 
+    private static final PlainTextComponentSerializer PLAIN =
+            PlainTextComponentSerializer.plainText();
+
+    private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
+
+    private ColorUtils() {}
+
     /**
-     * Translates color codes in a message.
-     * Supports legacy codes (&amp;a, &amp;b…), hex (&amp;#RRGGBB), and MiniMessage tags.
-     *
-     * @param message The message to translate
-     * @return The translated message with color codes applied
+     * Translates MiniMessage, legacy (&) or hex formats into § formatted text.
      */
-    public static String translate(String message) {
-        if (message == null) {
+    public static String translate(String input) {
+        if (input == null || input.isEmpty()) {
             return "";
         }
-
-        // Fast path: if there are no '<' characters, use the lightweight legacy pipeline.
-        if (!MINI_MESSAGE_PATTERN.matcher(message).find()) {
-            return translateLegacy(message);
-        }
-
-        // Slow path: MiniMessage detected.
-        // First convert &#RRGGBB → <#RRGGBB> so MiniMessage understands them,
-        // and convert legacy &x codes to <color_name> equivalents.
-        // The simplest bridge: convert &<legacy> to their MiniMessage tag form.
-        String preprocessed = convertLegacyToMiniMessage(message);
-
-        Component component = MINI_MESSAGE.deserialize(preprocessed);
-        return LEGACY_SERIALIZER.serialize(component);
+        return LEGACY_SECTION.serialize(component(input));
     }
 
     /**
-     * Translates legacy &amp; codes and &amp;#RRGGBB hex only (no MiniMessage parsing).
+     * Translates a list of strings into § formatted text.
      */
-    @SuppressWarnings("deprecation")
-    private static String translateLegacy(String message) {
-        message = translateHexColors(message);
-        return ChatColor.translateAlternateColorCodes('&', message);
+    public static List<String> translate(List<String> input) {
+        if (input == null || input.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> translated = new ArrayList<>(input.size());
+        for (String line : input) {
+            translated.add(translate(line));
+        }
+        return translated;
     }
 
     /**
-     * Converts &amp;#RRGGBB hex codes and &amp;[0-9a-fk-or] legacy codes
-     * into their MiniMessage equivalents so they can be mixed with MiniMessage tags.
+     * Strips all formatting and returns plain text.
      */
-    private static String convertLegacyToMiniMessage(String message) {
-        // Convert &#RRGGBB → <#RRGGBB>
-        Matcher hexMatcher = HEX_PATTERN.matcher(message);
-        StringBuffer hexBuffer = new StringBuffer();
-        while (hexMatcher.find()) {
-            hexMatcher.appendReplacement(hexBuffer, "<#" + hexMatcher.group(1) + ">");
+    public static String stripColor(String input) {
+        if (input == null || input.isEmpty()) {
+            return "";
         }
-        hexMatcher.appendTail(hexBuffer);
-        message = hexBuffer.toString();
+        return PLAIN.serialize(component(input));
+    }
 
-        // Convert &<code> legacy codes → MiniMessage equivalents
-        StringBuilder sb = new StringBuilder(message.length() + 16);
-        for (int i = 0; i < message.length(); i++) {
-            char c = message.charAt(i);
-            if ((c == '&') && i + 1 < message.length()) {
-                char next = message.charAt(i + 1);
-                String tag = legacyCodeToMiniMessage(next);
+    /**
+     * Safely converts mixed format text into an Adventure Component.
+     */
+    public static Component component(String input) {
+        if (input == null || input.isEmpty()) {
+            return Component.empty();
+        }
+
+        // Optimization: return plain text if no formatting tags are present
+        if (!input.contains("<") && !input.contains("&") && !input.contains("§")) {
+            return Component.text(input);
+        }
+
+        String processed = input;
+
+        // 1. Normalizar formato hexadecimal heredado &#RRGGBB a <#RRGGBB>
+        if (processed.contains("&#")) {
+            Matcher matcher = HEX_PATTERN.matcher(processed);
+            processed = matcher.replaceAll("<#$1>");
+        }
+
+        // 2. Convertir codigos legacy a tags MiniMessage si hay tags MiniMessage
+        // Esto permite mezclar gradientes con códigos como &l
+        if (processed.contains("<")) {
+            String miniMessageString = convertLegacyToMiniMessageTags(processed);
+            try {
+                return MINI_MESSAGE.deserialize(miniMessageString);
+            } catch (Exception e) {
+                // Fallback a legacy en caso de error de parseo
+            }
+        }
+
+        // 3. Normalizar ampersand a section para el parser legacy
+        if (processed.contains("&")) {
+            processed = translateLegacy(processed);
+        }
+
+        return LEGACY_SECTION.deserialize(processed);
+    }
+
+    /**
+     * Convierte codigos legacy (&a, &l, etc) a tags de MiniMessage (<green>, <bold>, etc).
+     */
+    private static String convertLegacyToMiniMessageTags(String input) {
+        char[] b = input.toCharArray();
+        StringBuilder sb = new StringBuilder(b.length + 32);
+        for (int i = 0; i < b.length; i++) {
+            if ((b[i] == '&' || b[i] == '§') && i < b.length - 1) {
+                char next = Character.toLowerCase(b[i + 1]);
+                String tag = getMiniMessageTag(next);
                 if (tag != null) {
                     sb.append(tag);
-                    i++; // skip the code character
+                    i++; // Saltamos el codigo de color
                     continue;
                 }
             }
-            sb.append(c);
+            sb.append(b[i]);
         }
         return sb.toString();
     }
 
-    /**
-     * Maps a single legacy color code character to its MiniMessage tag.
-     * Returns null if not a known code.
-     */
-    private static String legacyCodeToMiniMessage(char code) {
-        switch (Character.toLowerCase(code)) {
+    private static String getMiniMessageTag(char c) {
+        switch (c) {
             case '0': return "<black>";
             case '1': return "<dark_blue>";
             case '2': return "<dark_green>";
@@ -128,40 +152,32 @@ public class ColorUtils {
             case 'n': return "<underlined>";
             case 'o': return "<italic>";
             case 'r': return "<reset>";
-            default:  return null;
+            default: return null;
         }
     }
 
     /**
-     * Translates hex color codes (&amp;#RRGGBB) to Minecraft legacy format.
-     * Used in the legacy-only fast path.
+     * Converts a list of strings into a list of Adventure Components.
      */
-    private static String translateHexColors(String message) {
-        Matcher matcher = HEX_PATTERN.matcher(message);
-        StringBuilder buffer = new StringBuilder(message.length() + 32);
-        while (matcher.find()) {
-            String hexCode = matcher.group(1);
-            matcher.appendReplacement(buffer, "");
-            buffer.append("§x");
-            for (int i = 0; i < 6; i++) {
-                buffer.append('§').append(hexCode.charAt(i));
+    public static List<Component> component(List<String> input) {
+        if (input == null || input.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Component> components = new ArrayList<>(input.size());
+        for (String line : input) {
+            components.add(component(line));
+        }
+        return components;
+    }
+
+    private static String translateLegacy(String input) {
+        char[] b = input.toCharArray();
+        for (int i = 0; i < b.length - 1; i++) {
+            if (b[i] == '&' && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
+                b[i] = '§';
+                b[i + 1] = Character.toLowerCase(b[i + 1]);
             }
         }
-        matcher.appendTail(buffer);
-        return buffer.toString();
-    }
-
-    /**
-     * Strips all color codes from a message.
-     *
-     * @param message The message to strip
-     * @return The message without color codes
-     */
-    @SuppressWarnings("deprecation")
-    public static String stripColor(String message) {
-        if (message == null) {
-            return "";
-        }
-        return ChatColor.stripColor(translate(message));
+        return new String(b);
     }
 }

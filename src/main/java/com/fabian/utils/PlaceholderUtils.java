@@ -30,8 +30,7 @@ public class PlaceholderUtils {
         // Internal replacements (Fallback or additional)
         if (player != null) {
             message = message.replace("%player%", player.getName());
-            message = message.replace("%player_display%", net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                    .legacySection().serialize(player.displayName()));
+            message = message.replace("%player_display%", CompatibilityUtils.getPlayerDisplayName(player));
             message = message.replace("%player_uuid%", player.getUniqueId().toString());
             message = message.replace("%player_world%", player.getWorld().getName());
             message = message.replace("%player_gamemode%", player.getGameMode().name());
@@ -44,6 +43,33 @@ public class PlaceholderUtils {
                 message = message.replace("%player_money%", "0.00");
             }
         }
+
+        return message;
+    }
+
+    /**
+     * Replaces argument placeholders in a message
+     * 
+     * @param message The message containing placeholders
+     * @param args    The command arguments
+     * @return The message with replaced placeholders
+     */
+    public static String replaceArgs(String message, String[] args) {
+        if (message == null) return "";
+        if (args == null || args.length == 0) {
+            // Remove placeholders if no args provided
+            return message.replace("{args}", "").replaceAll("\\{\\d+\\}", "");
+        }
+
+        String fullArgs = String.join(" ", args);
+        message = message.replace("{args}", fullArgs);
+
+        for (int i = 0; i < args.length; i++) {
+            message = message.replace("{" + i + "}", args[i]);
+        }
+
+        // Remove any remaining numeric placeholders that weren't provided
+        message = message.replaceAll("\\{\\d+\\}", "");
 
         return message;
     }

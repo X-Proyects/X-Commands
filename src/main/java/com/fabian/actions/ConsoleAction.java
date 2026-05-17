@@ -16,6 +16,8 @@ public class ConsoleAction implements Action {
         if (params == null) return;
 
         String command = PlaceholderUtils.process(params, player);
+        if (command == null || command.trim().isEmpty()) return;
+        
         org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), command);
     }
 

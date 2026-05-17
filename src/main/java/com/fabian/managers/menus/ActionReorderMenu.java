@@ -42,21 +42,7 @@ public class ActionReorderMenu extends BaseMenu {
         List<String> actions = executor.getActions();
         for (int i = 0; i < actions.size() && i < 36; i++) {
             String action = actions.get(i);
-            Material mat = Material.PAPER;
-
-            // Try to guess material based on type
-            if (action.contains("[GIVE]"))
-                mat = Material.CHEST;
-            else if (action.contains("[MESSAGE]"))
-                mat = Material.PAPER;
-            else if (action.contains("[SOUND]"))
-                mat = Material.JUKEBOX;
-            else if (action.contains("[TITLE]"))
-                mat = Material.FEATHER;
-            else if (action.contains("[TELEPORT]"))
-                mat = Material.ENDER_PEARL;
-            else if (action.contains("[GIVE_MONEY]"))
-                mat = Material.GOLD_INGOT;
+            Material mat = getActionMaterial(action);
 
             ItemStack item = createItem(mat, "&e" + action,
                     lang.getMessage("gui-reorder-lore").split("\\|"));

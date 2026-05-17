@@ -25,7 +25,7 @@ public class CommandEditMenu extends BaseMenu {
 
                 Inventory inv = createInventory(
                                 new MenuHolder(MenuType.EDIT, commandName),
-                                36,
+                                45,
                                 lang.getMessage("gui-edit-title", commandName));
 
                 // Fill background
@@ -53,6 +53,7 @@ public class CommandEditMenu extends BaseMenu {
                 String toggleStatus = executor.isRegistered()
                                 ? lang.getMessage("gui-edit-reg-on")
                                 : lang.getMessage("gui-edit-reg-off");
+
                 inv.setItem(13, createItem(toggleMat,
                                 lang.getMessage("gui-edit-reg"),
                                 lang.getMessage("gui-edit-reg-lore", toggleStatus).split("\\|")));
@@ -73,12 +74,6 @@ public class CommandEditMenu extends BaseMenu {
                                 lang.getMessage("gui-edit-cooldown-lore", String.valueOf(executor.getCooldown()))
                                                 .split("\\|")));
 
-                // Change Interval (Under Permission)
-                inv.setItem(21, createItem(Material.COMPASS,
-                                lang.getMessage("gui-edit-interval"),
-                                lang.getMessage("gui-edit-interval-lore", String.valueOf(executor.getInterval()))
-                                                .split("\\|")));
-
                 // Change Aliases (Under Description)
                 String aliasesString = executor.getAliases().isEmpty() ? lang.getMessage("gui-none")
                                 : String.join(", ", executor.getAliases());
@@ -86,19 +81,36 @@ public class CommandEditMenu extends BaseMenu {
                                 lang.getMessage("gui-edit-alias"),
                                 lang.getMessage("gui-edit-alias-lore", aliasesString).split("\\|")));
 
+                // Change Interval (Under Permission)
+                inv.setItem(21, createItem(Material.COMPASS,
+                                lang.getMessage("gui-edit-interval"),
+                                lang.getMessage("gui-edit-interval-lore", String.valueOf(executor.getInterval()))
+                                                .split("\\|")));
+
+                // Change Material (Under Toggle Registration, next to Compass)
+                Material cmdMat;
+                try {
+                    cmdMat = Material.valueOf(executor.getMaterial().toUpperCase());
+                } catch (Exception e) {
+                    cmdMat = Material.PAPER;
+                }
+                inv.setItem(22, createItem(cmdMat,
+                                lang.getMessage("gui-edit-material"),
+                                lang.getMessage("gui-edit-material-lore", cmdMat.name()).split("\\|")));
+
                 // Save Changes
-                inv.setItem(31, createItem(Material.LIME_DYE,
+                inv.setItem(40, createItem(Material.LIME_DYE,
                                 lang.getMessage("gui-edit-save"),
                                 lang.getMessage("gui-edit-save-lore").split("\\|")));
 
                 // Delete Command
-                inv.setItem(35, createItem(Material.REDSTONE_BLOCK,
+                inv.setItem(44, createItem(Material.REDSTONE_BLOCK,
                                 lang.getMessage("gui-edit-delete"),
                                 lang.getMessage("gui-edit-delete-lore").split("\\|")));
 
                 // Back Button
-                addBackButton(inv, 27);
+                addBackButton(inv, 36);
 
-                player.openInventory(inv);
+                smartOpenInventory(player, inv);
         }
 }

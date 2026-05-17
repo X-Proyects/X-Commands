@@ -3,7 +3,6 @@ package com.fabian.managers.menus;
 import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
 import com.fabian.utils.MenuHolder;
-import com.fabian.utils.MenuHolder.MenuType;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,11 +22,6 @@ public class ActionEditMenu extends BaseMenu {
         if (executor == null || actionIndex < 0 || actionIndex >= executor.getActions().size()) {
             plugin.logWarning("Failed to open ActionEditMenu: Invalid command or index. Cmd: " + commandName + ", Idx: "
                     + actionIndex);
-            if (executor != null) {
-                plugin.logWarning("Actions size: " + executor.getActions().size());
-            } else {
-                plugin.logWarning("Executor is null");
-            }
             return;
         }
 
@@ -46,7 +40,7 @@ public class ActionEditMenu extends BaseMenu {
         }
 
         Inventory inv = createInventory(
-                new MenuHolder(MenuType.ACTION_EDIT, commandName, actionIndex),
+                new MenuHolder(MenuHolder.MenuType.ACTION_EDIT, commandName, actionIndex),
                 27,
                 lang.getMessage("gui-action-edit-title", (actionIndex + 1)));
 
@@ -61,12 +55,12 @@ public class ActionEditMenu extends BaseMenu {
         // Edit Value
         inv.setItem(15, createItem(Material.PAPER,
                 lang.getMessage("gui-action-edit-value"),
-                lang.getMessage("gui-action-edit-value-lore", (value.isEmpty() ? "(Vacío)" : value))
+                lang.getMessage("gui-action-edit-value-lore", (value.isEmpty() ? lang.getMessage("gui-empty") : value))
                         .split("\\|")));
 
         // Back Button
         addBackButton(inv, 18);
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 }

@@ -7,7 +7,10 @@ import com.fabian.utils.UpdateChecker;
 import com.fabian.listeners.UpdateListener;
 import com.fabian.listeners.InventoryListener;
 import com.fabian.listeners.CommandHideListener;
+import com.fabian.listeners.CommandInterceptorListener;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.byteflux.libby.BukkitLibraryManager;
+import net.byteflux.libby.Library;
 import java.io.File;
 
 /**
@@ -16,6 +19,8 @@ import java.io.File;
 public class XCommands extends JavaPlugin {
 
     public static final String INTERNAL_PREFIX = "&8[&bX-Commands&8]";
+    private static final int BSTATS_ID = 30996;
+    private static final int UPDATE_CHECKER_ID = 132155;
     private static XCommands instance;
 
     private ConfigManager configManager;
@@ -46,13 +51,17 @@ public class XCommands extends JavaPlugin {
         com.fabian.utils.LoggerUtils.severe(message, throwable);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onEnable() {
+        // Load libraries before anything else
+        loadLibraries();
+        
         try {
             instance = this;
 
             // Soporte temporal para nombre antiguo
-            if (getPluginMeta().getName().equalsIgnoreCase("X-Comands")) {
+            if (getDescription().getName().equalsIgnoreCase("X-Comands")) {
                 logWarning("Deprecated name detected, use X-Commands");
             }
 
@@ -92,16 +101,27 @@ public class XCommands extends JavaPlugin {
 
             // Register main command
             var xcCommand = new XCCommand(this);
-            var command = getCommand("xc");
-            if (command != null) {
-                command.setExecutor(xcCommand);
-                command.setTabCompleter(xcCommand);
+            try {
+                var command = getCommand("xc");
+                if (command != null) {
+                    command.setExecutor(xcCommand);
+                    command.setTabCompleter(xcCommand);
+                } else {
+                    logWarning("Failed to register /xc command! It might not be defined in plugin.yml.");
+                }
+            } catch (UnsupportedOperationException e) {
+                // This happens on modern Paper plugins that handle commands differently.
+                // Since we rely on CommandInterceptorListener as a fallback for custom commands,
+                // we only log this if it's truly unexpected. 
+                // For now, we ignore it to allow the plugin to enable.
+                logWarning("Paper detected: Legacy command registration skipped. /xc might not work if not registered via Paper API.");
             }
 
             // Register listeners
             getServer().getPluginManager().registerEvents(new UpdateListener(this), this);
             getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
             getServer().getPluginManager().registerEvents(new CommandHideListener(), this);
+            getServer().getPluginManager().registerEvents(new CommandInterceptorListener(this), this);
 
             // Load custom commands
             commandManager.loadCommands();
@@ -122,16 +142,15 @@ public class XCommands extends JavaPlugin {
 
             // Check for updates if enabled
             if (configManager.isCheckUpdates()) {
-                updateChecker = new UpdateChecker(this, 132155);
+                updateChecker = new UpdateChecker(this, UPDATE_CHECKER_ID);
             }
 
             // Initialize bStats Metrics if enabled
             if (getConfig().getBoolean("metrics", true)) {
-                int pluginId = 30996;
-                new com.fabian.metrics.Metrics(this, pluginId);
+                new com.fabian.metrics.Metrics(this, BSTATS_ID);
             }
 
-            logInfo("v" + getPluginMeta().getVersion() + " successfully started!");
+            logInfo("v" + getDescription().getVersion() + " successfully started!");
         } catch (Exception e) {
             com.fabian.utils.LoggerUtils
                     .severe("Failed to enable X-Commands! Please check your configuration and server version.", e);
@@ -184,6 +203,65 @@ public class XCommands extends JavaPlugin {
                 logInfo("Both 'comands' and 'commands' found. Proceeding with both (compatibility).");
             }
         }
+    }
+
+    /**
+     * Loads required libraries at runtime using Libby
+     */
+    private void loadLibraries() {
+        BukkitLibraryManager libraryManager = new BukkitLibraryManager(this);
+        libraryManager.addMavenCentral();
+
+        Library adventureApi = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("adventure-api")
+                .version("4.17.0")
+                .build();
+
+        Library adventureKey = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("adventure-key")
+                .version("4.17.0")
+                .build();
+
+        Library miniMessage = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("adventure-text-minimessage")
+                .version("4.17.0")
+                .build();
+
+        Library legacySerializer = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("adventure-text-serializer-legacy")
+                .version("4.17.0")
+                .build();
+
+        Library plainSerializer = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("adventure-text-serializer-plain")
+                .version("4.17.0")
+                .build();
+
+        Library examinationApi = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("examination-api")
+                .version("1.3.0")
+                .build();
+
+        Library examinationString = Library.builder()
+                .groupId("net.kyori")
+                .artifactId("examination-string")
+                .version("1.3.0")
+                .build();
+
+        // Load them
+        libraryManager.loadLibrary(adventureApi);
+        libraryManager.loadLibrary(adventureKey);
+        libraryManager.loadLibrary(miniMessage);
+        libraryManager.loadLibrary(legacySerializer);
+        libraryManager.loadLibrary(plainSerializer);
+        libraryManager.loadLibrary(examinationApi);
+        libraryManager.loadLibrary(examinationString);
     }
 
     public static XCommands getInstance() {

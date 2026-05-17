@@ -56,6 +56,6 @@ public class AliasMenu extends BaseMenu {
         // Back Button
         addBackButton(inv, 27);
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 }

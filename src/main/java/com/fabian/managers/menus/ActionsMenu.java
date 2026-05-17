@@ -2,22 +2,19 @@ package com.fabian.managers.menus;
 
 import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
-import com.fabian.utils.ColorUtils;
-import com.fabian.utils.MenuHolder;
-import com.fabian.utils.MenuHolder.MenuType;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Menu showing all actions for a command
+ * Menu to list and manage actions of a command
  */
 public class ActionsMenu extends BaseMenu {
 
@@ -26,24 +23,18 @@ public class ActionsMenu extends BaseMenu {
     }
 
     public void open(Player player, String commandName) {
-        CustomCommandExecutor executor = plugin.getCommandManager().getCustomCommands()
-                .get(commandName.toLowerCase());
-        if (executor == null)
-            return;
+        CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName);
+        if (cmd == null) return;
 
-        Inventory inv = createInventory(
-                new MenuHolder(MenuType.ACTIONS, commandName),
-                54,
+        Inventory inv = createInventory(new com.fabian.utils.MenuHolder(com.fabian.utils.MenuHolder.MenuType.ACTIONS, commandName, -1, 0), 54, 
                 lang.getMessage("gui-actions-title", commandName));
 
-        // Fill background
-        fillBackground(inv);
-
-        // Add action items
-        List<String> actions = executor.getActions();
+        List<String> actions = cmd.getActions();
         for (int i = 0; i < Math.min(actions.size(), 45); i++) {
             inv.setItem(i, createActionItem(i, actions.get(i)));
         }
+
+        fillBackground(inv);
 
         // Add Action button
         inv.setItem(49, createItem(Material.NETHER_STAR,
@@ -58,21 +49,21 @@ public class ActionsMenu extends BaseMenu {
                 lang.getMessage("gui-actions-reorder"),
                 lang.getMessage("gui-actions-reorder-lore")));
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 
     private ItemStack createActionItem(int index, String action) {
-        ItemStack item = new ItemStack(Material.PAPER);
+        ItemStack item = new ItemStack(getActionMaterial(action));
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(LEGACY.deserialize(lang.getMessage("gui-actions-item-name", (index + 1))));
+            CompatibilityUtils.setDisplayName(meta, lang.getMessage("gui-actions-item-name", (index + 1)));
 
-            String[] lore = lang.getMessage("gui-actions-item-lore", action).split("\\|");
-            List<net.kyori.adventure.text.Component> loreList = new ArrayList<>();
-            for (String line : lore) {
-                loreList.add(LEGACY.deserialize(ColorUtils.translate(line)));
+            String[] loreArr = lang.getMessage("gui-actions-item-lore", action).split("\\|");
+            List<String> loreList = new ArrayList<>();
+            for (String line : loreArr) {
+                loreList.add(line);
             }
-            meta.lore(loreList);
+            CompatibilityUtils.setLore(meta, loreList);
 
             // Store index in PersistentDataContainer
             meta.getPersistentDataContainer().set(keyActionIndex, PersistentDataType.INTEGER, index);

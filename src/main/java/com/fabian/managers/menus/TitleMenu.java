@@ -34,43 +34,43 @@ public class TitleMenu extends BaseMenu {
 
         Inventory inv = createInventory(
                 new MenuHolder(MenuType.TITLE_MENU, commandName, actionIndex),
-                54,
+                27,
                 lang.getMessage("gui-title-menu-title", commandName));
 
         fillBackground(inv);
 
-        // Main Title (Slot 11)
-        inv.setItem(11, createItem(Material.NAME_TAG,
+        // Main Title (Slot 10)
+        inv.setItem(10, createItem(Material.NAME_TAG,
                 lang.getMessage("gui-title-main"),
                 lang.getMessage("gui-title-main-lore", title).split("\\|")));
 
-        // Subtitle (Slot 13)
-        inv.setItem(13, createItem(Material.NAME_TAG,
+        // Subtitle (Slot 11)
+        inv.setItem(11, createItem(Material.NAME_TAG,
                 lang.getMessage("gui-title-sub"),
                 lang.getMessage("gui-title-sub-lore", subtitle).split("\\|")));
 
-        // Fade In (Slot 20)
-        inv.setItem(20, createItem(Material.CLOCK,
+        // Fade In (Slot 13)
+        inv.setItem(13, createItem(Material.CLOCK,
                 lang.getMessage("gui-title-fadein"),
                 lang.getMessage("gui-title-fadein-lore", fadeIn).split("\\|")));
 
-        // Stay (Slot 22)
-        inv.setItem(22, createItem(Material.CLOCK,
+        // Stay (Slot 14)
+        inv.setItem(14, createItem(Material.CLOCK,
                 lang.getMessage("gui-title-stay"),
                 lang.getMessage("gui-title-stay-lore", stay).split("\\|")));
 
-        // Fade Out (Slot 24)
-        inv.setItem(24, createItem(Material.CLOCK,
+        // Fade Out (Slot 15)
+        inv.setItem(15, createItem(Material.CLOCK,
                 lang.getMessage("gui-title-fadeout"),
                 lang.getMessage("gui-title-fadeout-lore", fadeOut).split("\\|")));
 
-        // Confirm (Slot 53)
-        inv.setItem(53, createItem(Material.LIME_DYE, lang.getMessage("gui-numeric-confirm")));
+        // Confirm (Slot 26)
+        inv.setItem(26, createItem(Material.LIME_DYE, lang.getMessage("gui-numeric-confirm")));
 
-        // Back (Slot 45)
-        addBackButton(inv, 45);
+        // Back (Slot 18)
+        addBackButton(inv, 18);
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 
     private String[] parseTitle(String action) {

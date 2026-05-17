@@ -5,10 +5,10 @@ import org.bukkit.inventory.InventoryHolder;
 
 public class MenuHolder implements InventoryHolder {
 
-    private final MenuType type;
-    private final String commandName;
-    private final int actionIndex;
-    private final int page;
+    private MenuType type;
+    private String commandName;
+    private int actionIndex;
+    private int page;
 
     public enum MenuType {
         MAIN,
@@ -24,7 +24,8 @@ public class MenuHolder implements InventoryHolder {
         EFFECT_MENU,
         GIVE_MENU,
         PARTICLE_MENU,
-        ALIAS_MENU
+        ALIAS_MENU,
+        SOUND_MENU
     }
 
     public MenuHolder(MenuType type) {
@@ -44,6 +45,13 @@ public class MenuHolder implements InventoryHolder {
     }
 
     public MenuHolder(MenuType type, String commandName, int actionIndex, int page) {
+        this.type = type;
+        this.commandName = commandName;
+        this.actionIndex = actionIndex;
+        this.page = page;
+    }
+
+    public void update(MenuType type, String commandName, int actionIndex, int page) {
         this.type = type;
         this.commandName = commandName;
         this.actionIndex = actionIndex;

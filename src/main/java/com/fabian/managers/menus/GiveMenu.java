@@ -52,13 +52,13 @@ public class GiveMenu extends BaseMenu {
                 lang.getMessage("gui-give-name"),
                 lang.getMessage("gui-give-name-lore", customName).split("\\|")));
 
-        // Confirm (Slot 25)
-        inv.setItem(25, createItem(Material.LIME_DYE, lang.getMessage("gui-numeric-confirm")));
+        // Confirm (Slot 26)
+        inv.setItem(26, createItem(Material.LIME_DYE, lang.getMessage("gui-numeric-confirm")));
 
         // Back (Slot 18)
         addBackButton(inv, 18);
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 
     private String[] parseGive(String action) {

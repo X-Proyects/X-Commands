@@ -1,7 +1,7 @@
 package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
-import org.bukkit.Bukkit;
+import com.fabian.utils.SchedulerUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,7 +44,7 @@ public class CreateCommand {
 
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                Bukkit.getScheduler().runTask(plugin, () -> {
+                SchedulerUtils.runForPlayer(plugin, player, () -> {
                     plugin.getInventoryManager().openCommandEditMenu(player, commandName);
                 });
             }

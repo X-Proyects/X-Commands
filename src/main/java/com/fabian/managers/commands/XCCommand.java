@@ -1,6 +1,8 @@
 package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
+import com.fabian.managers.LanguageManager;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,6 +25,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
     private final ListCommand listCommand;
     private final InfoCommand infoCommand;
     private final EditCommand editCommand;
+    private final LocateCommand locateCommand;
 
     public XCCommand(XCommands plugin) {
         this.plugin = plugin;
@@ -33,6 +36,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         this.listCommand = new ListCommand(plugin);
         this.infoCommand = new InfoCommand(plugin);
         this.editCommand = new EditCommand(plugin);
+        this.locateCommand = new LocateCommand(plugin);
     }
 
     @Override
@@ -46,11 +50,11 @@ public class XCCommand implements CommandExecutor, TabCompleter {
 
         if (subCommand.equals("-gui")) {
             if (!sender.hasPermission("xcommands.admin.gui")) {
-                sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+                com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
                 return true;
             }
             if (!(sender instanceof org.bukkit.entity.Player)) {
-                sender.sendMessage(plugin.getLanguageManager().getMessage("player-only"));
+                com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("player-only"));
                 return true;
             }
             plugin.getInventoryManager().openMainMenu((org.bukkit.entity.Player) sender);
@@ -82,6 +86,12 @@ public class XCCommand implements CommandExecutor, TabCompleter {
 
             case "edit":
                 return editCommand.execute(sender, args);
+            
+            case "locate":
+                return locateCommand.execute(sender, args);
+
+            case "version":
+                return sendVersionInfo(sender);
 
             default:
                 sendHelp(sender);
@@ -89,20 +99,21 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    /**
-     * Sends the help menu to the sender
-     */
+
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(plugin.getLanguageManager().getMessage("help-header"));
-        sender.sendMessage(plugin.getLanguageManager().getMessage("help-gui"));
-        sender.sendMessage(plugin.getLanguageManager().getMessage("help-reload"));
-        sender.sendMessage(plugin.getLanguageManager().getMessage("help-update"));
-        sender.sendMessage("§e/xc list §7- List all custom commands");
-        sender.sendMessage("§e/xc info <cmd> §7- Show info of a command");
-        sender.sendMessage("§e/xc create <cmd> §7- Create a new command");
-        sender.sendMessage("§e/xc delete <cmd> §7- Delete a command");
-        sender.sendMessage("§e/xc edit <cmd> ... §7- Edit a command");
-        sender.sendMessage(plugin.getLanguageManager().getMessage("help-footer"));
+        LanguageManager lang = plugin.getLanguageManager();
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-header"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-gui"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-locate"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-reload"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-update"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-list"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-info"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-create"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-delete"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-edit"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-version"));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-footer"));
     }
 
     @Override
@@ -110,7 +121,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            List<String> subCommands = Arrays.asList("-gui", "help", "reload", "update", "create", "delete", "list", "info", "edit");
+            List<String> subCommands = Arrays.asList("-gui", "help", "reload", "update", "create", "delete", "list", "info", "edit", "version", "locate");
             String input = args[0].toLowerCase();
             for (String sub : subCommands) {
                 if (sub.startsWith(input)) {
@@ -124,6 +135,13 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 for (String cmd : plugin.getCommandManager().getCustomCommands().keySet()) {
                     if (cmd.startsWith(input)) {
                         completions.add(cmd);
+                    }
+                }
+            } else if (sub.equals("locate")) {
+                String input = args[1].toLowerCase();
+                for (String lang : plugin.getLanguageManager().getAvailableLanguages()) {
+                    if (lang.startsWith(input)) {
+                        completions.add(lang);
                     }
                 }
             }
@@ -160,5 +178,25 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         }
 
         return completions;
+    }
+    /**
+     * Sends the version info to the sender
+     */
+    private boolean sendVersionInfo(CommandSender sender) {
+        if (!sender.hasPermission("xcommands.admin.version")) {
+            com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
+            return true;
+        }
+
+        String prefix = plugin.getLanguageManager().getPrefix();
+        String foliaStatus = com.fabian.utils.SchedulerUtils.isFolia() ? "§aFolia (Enabled)" : "§7Standard Bukkit";
+        
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, prefix + " §b§lPlugin Information:");
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Plugin Version: §e" + com.fabian.utils.CompatibilityUtils.getVersion(plugin));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Server Version: §e" + plugin.getServer().getName() + " " + plugin.getServer().getVersion());
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Server Platform: " + foliaStatus);
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Java Version: §e" + System.getProperty("java.version"));
+        
+        return true;
     }
 }

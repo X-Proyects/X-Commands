@@ -41,7 +41,7 @@ public class ConfigManager {
         config = plugin.getConfig();
 
         // Cache values
-        this.cachedLanguage = config.getString("language", "en").trim().toUpperCase();
+        this.cachedLanguage = config.getString("language", "en").trim().toLowerCase();
         this.cachedPrefix = config.getString("prefix", "&8[&bX-Commands&8]&r");
         this.cachedCheckUpdates = config.getBoolean("check-updates", true);
         this.cachedHideMinecraftCommands = config.getBoolean("hide-namespaced-commands.hide-minecraft", false);
@@ -131,6 +131,16 @@ public class ConfigManager {
      */
     public String getLanguage() {
         return cachedLanguage;
+    }
+
+    /**
+     * Sets and persists the language setting
+     */
+    public void setLanguage(String lang) {
+        this.cachedLanguage = lang.toLowerCase();
+        config.set("language", this.cachedLanguage);
+        plugin.saveConfig();
+        plugin.getLanguageManager().reload();
     }
 
     /**

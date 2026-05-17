@@ -1,8 +1,7 @@
 package com.fabian.actions;
 
-import com.fabian.utils.ColorUtils;
+import com.fabian.utils.CompatibilityUtils;
 import com.fabian.utils.PlaceholderUtils;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -19,8 +18,8 @@ public class ActionBarAction implements Action {
         String params = (String) context.get("params");
         if (params == null) return;
 
-        String message = ColorUtils.translate(PlaceholderUtils.process(params, player));
-        player.sendActionBar(LegacyComponentSerializer.legacySection().deserialize(message));
+        String message = PlaceholderUtils.process(params, player);
+        CompatibilityUtils.sendActionBar(player, message);
     }
 
     @Override

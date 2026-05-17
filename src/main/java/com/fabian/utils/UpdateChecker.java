@@ -27,10 +27,11 @@ public class UpdateChecker {
         checkForUpdates(null);
     }
 
+    @SuppressWarnings("deprecation")
     public void checkForUpdates(CommandSender sender) {
         SchedulerUtils.runTaskAsynchronously(plugin, () -> {
             try {
-                String currentVersion = plugin.getPluginMeta().getVersion();
+                String currentVersion = plugin.getDescription().getVersion();
 
                 // Spigot API for resource versions
                 URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId);
@@ -51,30 +52,25 @@ public class UpdateChecker {
                     this.updateAvailable = true;
 
                     if (sender != null) {
-                        sender.sendMessage(
-                                lang.getMessageWithPrefix("update-available", currentVersion, latestVersion));
-                        sender.sendMessage(lang.getMessageWithPrefix("update-download", getDownloadUrl()));
+                        CompatibilityUtils.sendMessage(sender, lang.getMessageWithPrefix("update-available", currentVersion, latestVersion));
+                        CompatibilityUtils.sendMessage(sender, lang.getMessageWithPrefix("update-download", getDownloadUrl()));
                     } else {
-                        Bukkit.getConsoleSender()
-                                .sendMessage(
-                                        lang.getMessageWithPrefix("update-available", currentVersion, latestVersion));
-                        Bukkit.getConsoleSender()
-                                .sendMessage(lang.getMessageWithPrefix("update-download", getDownloadUrl()));
+                        CompatibilityUtils.sendMessage(Bukkit.getConsoleSender(), lang.getMessageWithPrefix("update-available", currentVersion, latestVersion));
+                        CompatibilityUtils.sendMessage(Bukkit.getConsoleSender(), lang.getMessageWithPrefix("update-download", getDownloadUrl()));
                     }
                 } else {
                     if (sender != null) {
-                        sender.sendMessage(lang.getMessageWithPrefix("update-current"));
+                        CompatibilityUtils.sendMessage(sender, lang.getMessageWithPrefix("update-current"));
                     } else {
-                        Bukkit.getConsoleSender().sendMessage(lang.getMessageWithPrefix("update-current"));
+                        CompatibilityUtils.sendMessage(Bukkit.getConsoleSender(), lang.getMessageWithPrefix("update-current"));
                     }
                 }
 
             } catch (Exception e) {
                 if (sender != null) {
-                    sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("update-error"));
+                    CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("update-error"));
                 } else {
-                    Bukkit.getConsoleSender()
-                            .sendMessage(plugin.getLanguageManager().getMessageWithPrefix("update-error"));
+                    CompatibilityUtils.sendMessage(Bukkit.getConsoleSender(), plugin.getLanguageManager().getMessageWithPrefix("update-error"));
                 }
             }
         });

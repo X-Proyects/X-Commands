@@ -37,7 +37,8 @@ public class TeleportAction implements Action {
             
             // Safe asynchronous teleport for Folia and better performance
             SchedulerUtils.teleportAsync(player, loc);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [TELEPORT]: " + params);
         }
     }
 

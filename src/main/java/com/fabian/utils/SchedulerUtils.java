@@ -1,6 +1,7 @@
 package com.fabian.utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import java.util.function.Consumer;
@@ -19,13 +20,12 @@ public class SchedulerUtils {
     public static boolean isFolia() {
         if (isFolia == null) {
             try {
-                // Modern Folia package (2024-2026+)
-                Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
+                // Try several known Folia classes
+                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
                 isFolia = true;
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e1) {
                 try {
-                    // Legacy experimental Folia check
-                    Class.forName("io.papermc.paper.threadedregions.RegionScheduler");
+                    Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
                     isFolia = true;
                 } catch (ClassNotFoundException e2) {
                     isFolia = false;
@@ -127,7 +127,7 @@ public class SchedulerUtils {
     /**
      * Executes a task on a player's thread (region-aware on Folia).
      */
-    public static void runForPlayer(Plugin plugin, Player player, Runnable runnable) {
+    public static void runForPlayer(Plugin plugin, HumanEntity player, Runnable runnable) {
         if (player == null) {
             runTask(plugin, runnable);
             return;
@@ -145,6 +145,30 @@ public class SchedulerUtils {
             }
         } else {
             Bukkit.getScheduler().runTask(plugin, runnable);
+        }
+    }
+
+    /**
+     * Runs a delayed task for a specific player
+     */
+    public static void runTaskLaterForPlayer(Plugin plugin, HumanEntity player, Runnable runnable, long delayTicks) {
+        if (player == null) {
+            runTaskLater(plugin, runnable, delayTicks);
+            return;
+        }
+
+        if (isFolia()) {
+            try {
+                // Folia: player.getScheduler().runDelayed(...)
+                Object scheduler = player.getClass().getMethod("getScheduler").invoke(player);
+                scheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, Runnable.class, long.class)
+                         .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), null, delayTicks);
+            } catch (Exception e) {
+                LoggerUtils.debug("Folia EntityScheduler 'runDelayed' failed for " + player.getName() + ": " + e.getMessage());
+                runTaskLater(plugin, runnable, delayTicks);
+            }
+        } else {
+            Bukkit.getScheduler().runTaskLater(plugin, runnable, delayTicks);
         }
     }
 

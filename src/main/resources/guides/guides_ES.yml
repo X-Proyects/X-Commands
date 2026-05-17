@@ -102,10 +102,20 @@ actions:
     format: "[TAKE_MONEY] cantidad"
     example: "[TAKE_MONEY] 50"
 
+  VELOCITY:
+    description: "Envía al jugador a otro servidor en una red Velocity."
+    format: "[VELOCITY] servidor"
+    example: "[VELOCITY] lobby"
+
+  SENT_TO:
+    description: "Envía al jugador a cualquier servidor proxy (Bungee/Velocity)."
+    format: "[SENT_TO] servidor"
+    example: "[SENT_TO] skyblock"
+
   IF_PERMISSION:
-    description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador TIENE el permiso."
-    format: "[IF_PERMISSION] permiso"
-    example: "[IF_PERMISSION] rango.vip"
+    description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador TIENE el permiso. Soporta comodines usando % al final."
+    format: "[IF_PERMISSION] permiso.%"
+    example: "[IF_PERMISSION] meta.subname.%"
   
   IF_PERMISSION_NOT:
     description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador NO TIENE el permiso."
@@ -133,3 +143,46 @@ actions:
     description: "Condicional: Solo ejecuta la SIGUIENTE acción si el azar (0-100) tiene éxito."
     format: "[IF_CHANCE] porcentaje"
     example: "[IF_CHANCE] 50"
+
+# 🎨 Formatos de Color y Estilo
+# -----------------------------------------------------------
+# El plugin soporta múltiples formatos de color modernos:
+# -----------------------------------------------------------
+colors:
+  MINIMESSAGE:
+    description: "Usa el formato de Paper para colores y estilos avanzados."
+    example: "<red>Texto Rojo</red> <bold>Negrita</bold> <underlined>Subrayado</underlined>"
+  
+  GRADIENTS:
+    description: "Crea degradados espectaculares entre varios colores."
+    format: "<gradient:color1:color2>Texto</gradient>"
+    example: "<gradient:#FF1919:#EE1F1F:#C01414>TEXTO DEGRADADO</gradient>"
+  
+  HEX_RGB:
+    description: "Usa códigos hexadecimales exactos."
+    format: "&#RRGGBB o &x&R&R&G&G&B&B"
+    example: "&#E7C500Texto Dorado"
+  
+  HTML_TAGS:
+    description: "Etiquetas simples tipo HTML para mayor comodidad."
+    example: "<b>Negrita</b> <i>Cursiva</i> <u>Subrayado</u>"
+
+# -----------------------------------------------------------
+# 📊 Variables y Argumentos
+# -----------------------------------------------------------
+placeholders:
+  PLAYER:
+    description: "Información básica del jugador que ejecuta la acción."
+    placeholders:
+      - "%player%: Nombre del jugador."
+      - "%player_display%: Nombre visible (Nick)."
+      - "%player_uuid%: UUID único."
+      - "%player_money%: Saldo de economía."
+  
+  COMMAND_ARGS:
+    description: "Captura lo que el usuario escribe después del comando."
+    placeholders:
+      - "{args}: Todo el texto después del comando."
+      - "{0}: La primera palabra (argumento)."
+      - "{1}: La segunda palabra, etc."
+    example: "[BROADCAST] &b[Aviso] &f{args}"

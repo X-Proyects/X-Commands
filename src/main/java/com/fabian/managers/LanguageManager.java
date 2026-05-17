@@ -38,12 +38,24 @@ public class LanguageManager {
         String fileName = lang.endsWith(".yml") ? lang : lang + ".yml";
         String langBase = lang.endsWith(".yml") ? lang.substring(0, lang.length() - 4) : lang;
 
-        File languageFolder = new File(plugin.getDataFolder(), "languages");
-        File languageFile = new File(languageFolder, fileName);
+        File oldFolder = new File(plugin.getDataFolder(), "languages");
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        
+        // Migration: languages -> messages
+        if (oldFolder.exists() && !messagesFolder.exists()) {
+            plugin.logInfo("Migrating 'languages' folder to 'messages'...");
+            if (oldFolder.renameTo(messagesFolder)) {
+                plugin.logInfo("Migration successful.");
+            } else {
+                plugin.logSevere("Failed to migrate 'languages' folder to 'messages'. Please rename it manually.");
+            }
+        }
+
+        File languageFile = new File(messagesFolder, fileName);
 
         // Case-insensitive fallback for filenames (useful for Linux)
         if (!languageFile.exists()) {
-            File[] files = languageFolder.listFiles();
+            File[] files = messagesFolder.listFiles();
             if (files != null) {
                 for (File f : files) {
                     if (f.getName().equalsIgnoreCase(fileName)) {
@@ -55,19 +67,19 @@ public class LanguageManager {
             }
         }
 
-        // Create languages folder if it doesn't exist
-        if (!languageFolder.exists() && languageFolder.mkdirs()) {
-            // Optional: log success or do nothing, but result is consumed
+        // Create messages folder if it doesn't exist
+        if (!messagesFolder.exists() && messagesFolder.mkdirs()) {
+            // Optional: log success or do nothing
         }
 
         // Save default language files only if they don't exist
         // Optimized: Check known defaults once
         saveDefaultLanguageFiles();
 
-        // Update physical files on disk first (adds public keys only)
+        // Update physical files on disk first (adds missing keys)
         updateLanguageFile(fileName);
-        if (!langBase.equalsIgnoreCase("EN") && !langBase.equalsIgnoreCase("CUSTOM")) {
-            updateLanguageFile("EN.yml");
+        if (!langBase.equalsIgnoreCase("en") && !langBase.equalsIgnoreCase("custom")) {
+            updateLanguageFile("en.yml");
         }
 
         // Load the selected language file
@@ -84,33 +96,33 @@ public class LanguageManager {
             loadInternalFallbacks(langBase);
 
             // Fallback for missing keys in memory
-            if (!langBase.equalsIgnoreCase("EN") && !langBase.equalsIgnoreCase("CUSTOM")) {
-                loadFallbacks("EN.yml");
-                loadInternalFallbacks("EN");
+            if (!langBase.equalsIgnoreCase("en") && !langBase.equalsIgnoreCase("custom")) {
+                loadFallbacks("en.yml");
+                loadInternalFallbacks("en");
             }
         } else {
             plugin.logWarning("Target language file not found: " + fileName);
-            plugin.logInfo("Attempting to fallback to EN.yml...");
-            languageFile = new File(languageFolder, "EN.yml");
+            plugin.logInfo("Attempting to fallback to en.yml...");
+            languageFile = new File(messagesFolder, "en.yml");
             if (languageFile.exists()) {
                 languageConfig = YamlConfiguration.loadConfiguration(languageFile);
-                loadInternalFallbacks("EN");
-                plugin.logInfo("Successfully fell back to EN.yml");
+                loadInternalFallbacks("en");
+                plugin.logInfo("Successfully fell back to en.yml");
             } else {
-                plugin.logSevere("CRITICAL: EN.yml not found! Creating an empty configuration.");
-                loadInternalFallbacks("EN");
+                plugin.logSevere("CRITICAL: en.yml not found! Creating an empty configuration.");
+                loadInternalFallbacks("en");
             }
         }
     }
 
     private void saveDefaultLanguageFiles() {
-        String[] defaults = { "EN.yml", "ES.yml", "JA.yml", "PT.yml", "RU.yml", "CUSTOM.yml" };
-        File languageFolder = new File(plugin.getDataFolder(), "languages");
+        String[] defaults = { "en.yml", "es.yml", "ja.yml", "pt.yml", "ru.yml", "custom.yml" };
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
 
         for (String def : defaults) {
-            File file = new File(languageFolder, def);
+            File file = new File(messagesFolder, def);
             if (!file.exists()) {
-                saveResource("languages/" + def, file);
+                saveResource("messages/" + def, file);
             }
         }
     }
@@ -133,7 +145,7 @@ public class LanguageManager {
      * Loads fallback messages from a specified file (usually EN.yml)
      */
     private void loadFallbacks(String fallbackFileName) {
-        File fallbackFile = new File(new File(plugin.getDataFolder(), "languages"), fallbackFileName);
+        File fallbackFile = new File(new File(plugin.getDataFolder(), "messages"), fallbackFileName);
         if (!fallbackFile.exists())
             return;
 
@@ -157,12 +169,12 @@ public class LanguageManager {
      * resource
      */
     private void updateLanguageFile(String fileName) {
-        File languageFolder = new File(plugin.getDataFolder(), "languages");
-        File diskFile = new File(languageFolder, fileName);
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File diskFile = new File(messagesFolder, fileName);
         if (!diskFile.exists())
             return;
 
-        ConfigUpdater.update(plugin, "languages/" + fileName, diskFile);
+        ConfigUpdater.update(plugin, "messages/" + fileName, diskFile);
     }
 
     /**
@@ -170,6 +182,10 @@ public class LanguageManager {
      */
     public void reload() {
         loadLanguage();
+    }
+
+    public String getCurrentLanguage() {
+        return plugin.getConfigManager().getLanguage();
     }
 
     /**
@@ -196,9 +212,9 @@ public class LanguageManager {
             return missing;
         }
 
-        String translated = ColorUtils.translate(message);
-        messageCache.put(key, translated);
-        return translated;
+        String translatedMessage = ColorUtils.translate(message);
+        messageCache.put(key, translatedMessage);
+        return translatedMessage;
     }
 
     /**
@@ -229,8 +245,7 @@ public class LanguageManager {
      * @return The message with prefix and colors translated
      */
     public String getMessageWithPrefix(String key) {
-        String prefix = ColorUtils.translate(plugin.getConfigManager().getPrefix());
-        return prefix + " " + getMessage(key);
+        return getPrefix() + " " + getMessage(key);
     }
 
     /**
@@ -241,15 +256,14 @@ public class LanguageManager {
      * @return The formatted message with prefix and colors translated
      */
     public String getMessageWithPrefix(String key, Object... args) {
-        String prefix = ColorUtils.translate(plugin.getConfigManager().getPrefix());
-        return prefix + " " + getMessage(key, args);
+        return getPrefix() + " " + getMessage(key, args);
     }
 
     /**
      * Loads internal language strings from the JAR resources
      */
     private void loadInternalFallbacks(String langCode) {
-        try (InputStream resourceStream = plugin.getResource("languages/internal/" + langCode + ".yml")) {
+        try (InputStream resourceStream = plugin.getResource("messages/internal/" + langCode + ".yml")) {
             if (resourceStream == null)
                 return;
 
@@ -264,5 +278,36 @@ public class LanguageManager {
         } catch (Exception e) {
             // Silently fail if resource doesn't exist (e.g. for CUSTOM)
         }
+    }
+    /**
+     * Gets the universal prefix translated with colors
+     * 
+     * @return The translated prefix
+     */
+    public String getPrefix() {
+        return ColorUtils.translate(plugin.getConfigManager().getPrefix());
+    }
+
+    /**
+     * Returns a list of available languages on disk
+     */
+    public java.util.List<String> getAvailableLanguages() {
+        java.util.List<String> languages = new java.util.ArrayList<>();
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File[] files = messagesFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".yml"));
+        
+        if (files != null) {
+            for (File file : files) {
+                languages.add(file.getName().substring(0, file.getName().length() - 4));
+            }
+        }
+        return languages;
+    }
+    
+    public void setLanguage(String lang) {
+        plugin.getConfig().set("language", lang);
+        plugin.saveConfig();
+        plugin.getConfigManager().reload();
+        reload();
     }
 }

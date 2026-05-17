@@ -61,6 +61,8 @@ cooldown: 0
 # [TAKE_MONEY] <amount> - Withdraw money (Vault)
 # [KICK] <reason> - Kick the player
 # [BUNGEE] <server> - Send player to a Bungee server
+# [VELOCITY] <server> - Send player to a Velocity server
+# [SENT_TO] <server> - Send player to a proxy server
 # [CLOSE] - Close player's current inventory
 # [DELAY] <seconds> - Wait before next action
 #

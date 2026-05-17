@@ -1,11 +1,9 @@
 package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.command.CommandSender;
 
-/**
- * Handles the /xc reload command
- */
 public class ReloadCommand {
 
     private final XCommands plugin;
@@ -14,33 +12,29 @@ public class ReloadCommand {
         this.plugin = plugin;
     }
 
-    /**
-     * Executes the reload command
-     */
     public boolean execute(CommandSender sender, String[] args) {
-        // Check permission
         if (!sender.hasPermission("xcommands.admin.reload")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
             return true;
         }
 
         try {
-            // Reload configuration
+            // Reload all managers
             plugin.getConfigManager().reload();
-
-            // Reload language
             plugin.getLanguageManager().reload();
-
-            // Reload custom commands
+            plugin.getConditionManager().reload();
+            plugin.getActionManager().reload();
+            plugin.getCooldownManager().reload();
             plugin.getCommandManager().reload();
+            
+            // Re-load inventory manager if needed
+            plugin.getInventoryManager().reload();
 
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("reload-success"));
-            plugin.logInfo("Plugin reloaded by " + sender.getName());
-
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("reload-success"));
         } catch (Exception e) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("reload-error"));
-            plugin.logSevere("Error reloading plugin: " + e.getMessage());
+            plugin.getLogger().severe("Error reloading plugin: " + e.getMessage());
             e.printStackTrace();
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("reload-error"));
         }
 
         return true;

@@ -31,6 +31,13 @@ action-invalid-index: "&cÍndice de ação inválido."
 list-empty: "&cNão existem comandos personalizados."
 list-header: "&aComandos ({0}): &e"
 info-usage: "&cUso: /xc info <nome>"
+info-header: "&8&m----------------------------------"
+info-title: " &8» &7Info: &e{0}"
+info-perm: " &8» &7Permissão: &f{0}"
+info-cooldown: " &8» &7Cooldown: &f{0}s"
+info-actions: " &8» &7Ações: &f{0}"
+info-desc: " &8» &7Descrição: &f{0}"
+info-footer: "&8&m----------------------------------"
 
 # ============================================
 # ERROS DE COMANDOS PERSONALIZADOS
@@ -81,6 +88,66 @@ gui-main-next: "&ePróximo"
 gui-main-page: "&7Ir para a página {0}"
 gui-main-click-left: "&7Clique Esquerdo: &bEditar"
 gui-main-click-right: "&7Clique Direito: &eVer ações"
+gui-main-help: "&eAjuda & Comandos"
+gui-main-help-lore: "&7Clique para ver a lista de|&7comandos disponíveis.| |&eClique para ver"
+
+# ============================================
+# GUI - TIPOS DE AÇÃO (SELECTOR)
+# ============================================
+gui-type-message: "&aMensagem"
+gui-type-message-desc: "&7Envia uma mensagem privada ao jogador."
+gui-type-broadcast: "&6Broadcast"
+gui-type-broadcast-desc: "&7Envia una mensagem global para todo o servidor."
+gui-type-actionbar: "&eActionBar"
+gui-type-actionbar-desc: "&7Mostra texto acima da barra de ferramentas."
+gui-type-title: "&bTítulo"
+gui-type-title-desc: "&7Mostra um título grande na tela."
+gui-type-sound: "&dSom"
+gui-type-sound-desc: "&7Reproduz um efeito sonoro."
+gui-type-effect: "&5Efeito"
+gui-type-effect-desc: "&7Aplica um efeito de poção ao jogador."
+gui-type-give: "&9Dar Item"
+gui-type-give-desc: "&7Entrega objetos ao inventário."
+gui-type-teleport: "&3Teletransporte"
+gui-type-teleport-desc: "&7Move o jogador para outra localização."
+gui-type-delay: "&7Espera (Ticks)"
+gui-type-delay-desc: "&7Pausa a execução por alguns instantes."
+gui-type-heal: "&cCurar"
+gui-type-heal-desc: "&7Restaura a saúde ao máximo."
+gui-type-feed: "&6Alimentar"
+gui-type-feed-desc: "&7Restaura a fome ao máximo."
+gui-type-damage: "&4Dano"
+gui-type-damage-desc: "&7Tira uma quantidade de vida ao jogador."
+gui-type-console: "&cConsole"
+gui-type-console-desc: "&7Executa um comando a partir do console."
+gui-type-player: "&aJogador"
+gui-type-player-desc: "&7Obriga o jogador a executar um comando."
+gui-type-kick: "&4Expulsar"
+gui-type-kick-desc: "&7Expulsa o jogador do servidor."
+gui-type-close: "&7Fechar"
+gui-type-close-desc: "&7Fecha o inventário atual do jogador."
+gui-type-particle: "&ePartícula"
+gui-type-particle-desc: "&7Gera efeitos visuais de partículas."
+gui-type-bungee: "&5Bungee"
+gui-type-bungee-desc: "&7Envia o jogador para outro servidor (BungeeCord)."
+gui-type-give-money: "&6Dar Dinheiro"
+gui-type-give-money-desc: "&7Adiciona dinheiro ao saldo (Requer Vault)."
+gui-type-take-money: "&cTirar Dinheiro"
+gui-type-take-money-desc: "&7Tira dinheiro do saldo (Requer Vault)."
+gui-type-velocity: "&bVelocity"
+gui-type-velocity-desc: "&7Envia o jogador para um servidor (Velocity)."
+gui-type-sent-to: "&3Sent To"
+gui-type-sent-to-desc: "&7Envia o jogador para outro servidor via proxy."
+gui-type-if-permission: "&aSe tem Permissão"
+gui-type-if-permission-desc: "&7Condição: Apenas se tiver a permissão."
+gui-type-if-chance: "&eSe tem Sorte"
+gui-type-if-chance-desc: "&7Condición: Probabilidade de sucesso (0-100)."
+gui-type-if-op: "&4Se for OP"
+gui-type-if-op-desc: "&7Condição: Apenas se o jogador for operador."
+gui-type-if-world: "&9Se estiver no Mundo"
+gui-type-if-world-desc: "&7Condição: Apenas no mundo especificado."
+gui-type-if-money: "&aSe tiver Dinheiro"
+gui-type-if-money-desc: "&7Condição: Apenas se tiver dinheiro suficiente."
 
 # ============================================
 # GUI - MENU DE EDIÇÃO DE COMANDO
@@ -145,7 +212,7 @@ gui-action-edit-value-lore: "&7Atual: &f{0}| |&bClique para alterar"
 # ============================================
 # GUI - MENU DE SELEÇÃO DE TIPO
 # ============================================
-gui-type-title: "&8Tipo: &3Ação #{0}"
+gui-selector-title: "&8Tipo: &3Ação #{0}"
 gui-type-select: "&bClique para selecionar"
 
 # ============================================
@@ -312,6 +379,8 @@ action-name-particle: "&ePartícula"
 action-name-bungee: "&5Bungee"
 action-name-give-money: "&6Dar Dinheiro"
 action-name-take-money: "&cTirar Dinheiro"
+action-name-velocity: "&bVelocity"
+action-name-send-to: "&3Proxy (Sent To)"
 
 # ============================================
 # TIPOS DE AÇÃO - DESCRIÇÕES
@@ -336,3 +405,37 @@ action-desc-particle: "&7Gera efeitos visuais de partículas."
 action-desc-bungee: "&7Envia o jogador para outro servidor."
 action-desc-give-money: "&7Entrega dinheiro ao jogador (Vault)."
 action-desc-take-money: "&7Tira dinheiro do jogador (Vault)."
+action-desc-velocity: "&7Envia o jogador para um servidor (Velocity)."
+action-desc-send-to: "&7Envia o jogador para um servidor via Proxy."
+
+# ============================================
+# NOVAS CHAVES
+# ============================================
+help-locate: "&e/xc locate [lang] &7- Mudar ou listar idiomas"
+language-changed: "&aIdioma alterado para: &e{0}"
+language-list: "&7Idiomas disponíveis: &f{0}"
+language-not-found: "&cIdioma não encontrado! Disponíveis: &f{0}"
+
+action-name-if-perm: "&aPermissão"
+action-name-if-perm-not: "&cNo Permission"
+action-name-if-chance: "&eChance"
+action-name-if-op: "&4OP Only"
+action-name-if-world: "&9World"
+action-name-if-money: "&aMoney"
+
+action-desc-if-perm: "&7Executa o seguinte apenas se o jogador tiver a permissão."
+action-desc-if-perm-not: "&7Executa o seguinte apenas se o jogador NÃO tiver a permissão."
+action-desc-if-chance: "&7Executa o seguinte com base em uma chance (0-100)."
+action-desc-if-op: "&7Executa o seguinte apenas se o jogador for OP."
+action-desc-if-world: "&7Executa o seguinte apenas no mundo especificado."
+action-desc-if-money: "&7Executa o seguinte apenas se o jogador tiver dinheiro suficiente."
+
+# ============================================
+# HELP MESSAGES
+# ============================================
+help-list: "&e/xc list &7- Listar todos os comandos customizados"
+help-info: "&e/xc info <cmd> &7- Mostrar info de um comando"
+help-create: "&e/xc create <cmd> &7- Criar um novo comando"
+help-delete: "&e/xc delete <cmd> &7- Deletar um comando"
+help-edit: "&e/xc edit <cmd> ... &7- Editar um comando"
+help-version: "&e/xc version &7- Mostrar info do plugin e servidor"

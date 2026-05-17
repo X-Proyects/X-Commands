@@ -22,7 +22,8 @@ public class TakeMoneyAction implements Action {
             if (EconomyUtils.has(player, amount)) {
                 EconomyUtils.withdraw(player, amount);
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [TAKE_MONEY]: " + params);
         }
     }
 

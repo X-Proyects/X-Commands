@@ -2,10 +2,8 @@ package com.fabian.managers.menus;
 
 import com.fabian.XCommands;
 import com.fabian.managers.LanguageManager;
-import com.fabian.utils.ColorUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.Bukkit;
+import com.fabian.utils.CompatibilityUtils;
+import com.fabian.utils.MenuHolder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;
@@ -13,8 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Base class for all menu types providing common utility methods
@@ -27,8 +23,6 @@ public abstract class BaseMenu {
     protected final NamespacedKey keyActionIndex;
     protected final NamespacedKey keyActionType;
 
-    public static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
-
     public BaseMenu(XCommands plugin) {
         this.plugin = plugin;
         this.lang = plugin.getLanguageManager();
@@ -38,18 +32,15 @@ public abstract class BaseMenu {
     }
 
     /**
-     * Creates an item with name and lore using Adventure Components (non-deprecated).
+     * Creates an item with name and lore with cross-version compatibility.
      */
     protected ItemStack createItem(Material mat, String name, String... lore) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(LEGACY.deserialize(ColorUtils.translate(name)));
+            CompatibilityUtils.setDisplayName(meta, name);
             if (lore.length > 0) {
-                List<Component> loreList = Arrays.stream(lore)
-                        .map(l -> (Component) LEGACY.deserialize(ColorUtils.translate(l)))
-                        .collect(Collectors.toList());
-                meta.lore(loreList);
+                CompatibilityUtils.setLore(meta, Arrays.asList(lore));
             }
             item.setItemMeta(meta);
         }
@@ -77,19 +68,79 @@ public abstract class BaseMenu {
     }
 
     /**
-     * Creates an inventory using the non-deprecated Component title overload.
-     * Drop-in replacement for Bukkit.createInventory(holder, size, String).
+     * Creates an inventory with cross-version compatibility.
      */
     protected Inventory createInventory(org.bukkit.inventory.InventoryHolder holder, int size, String title) {
-        return Bukkit.createInventory(holder, size, LEGACY.deserialize(title));
+        return CompatibilityUtils.createInventory(holder, size, title);
     }
 
     /**
-     * Serializes a Component display name from ItemMeta back to a legacy String,
-     * to be compatible with string-based logic (e.g. action type detection).
+     * Gets the display name of an ItemMeta with cross-version compatibility.
      */
     public static String getItemDisplayName(ItemMeta meta) {
-        if (meta == null || meta.displayName() == null) return "";
-        return LEGACY.serialize(meta.displayName());
+        return CompatibilityUtils.getDisplayName(meta);
+    }
+
+    /**
+     * Gets the appropriate material for an action string based on its tag.
+     */
+    protected Material getActionMaterial(String action) {
+        if (action == null || action.isEmpty()) return Material.PAPER;
+        
+        String upper = action.toUpperCase();
+        
+        if (upper.contains("[MESSAGE]")) return Material.PAPER;
+        if (upper.contains("[BROADCAST]")) return Material.MAP;
+        if (upper.contains("[ACTIONBAR]")) return Material.ITEM_FRAME;
+        if (upper.contains("[TITLE]")) return Material.FEATHER;
+        if (upper.contains("[SOUND]")) return Material.JUKEBOX;
+        if (upper.contains("[EFFECT]")) return Material.POTION;
+        if (upper.contains("[GIVE]")) return Material.CHEST;
+        if (upper.contains("[TELEPORT]")) return Material.ENDER_PEARL;
+        if (upper.contains("[DELAY]")) return Material.CLOCK;
+        if (upper.contains("[HEAL]")) return Material.GOLDEN_APPLE;
+        if (upper.contains("[FEED]")) return Material.COOKED_BEEF;
+        if (upper.contains("[DAMAGE]")) return Material.IRON_SWORD;
+        if (upper.contains("[CONSOLE]")) return Material.COMMAND_BLOCK_MINECART;
+        if (upper.contains("[PLAYER]")) return Material.OAK_SIGN;
+        if (upper.contains("[KICK]")) return Material.BARRIER;
+        if (upper.contains("[CLOSE")) return Material.IRON_DOOR;
+        if (upper.contains("[PARTICLE]")) return Material.FIREWORK_STAR;
+        if (upper.contains("[BUNGEE]")) return Material.ENDER_EYE;
+        if (upper.contains("[GIVE_MONEY]")) return Material.GOLD_INGOT;
+        if (upper.contains("[TAKE_MONEY]")) return Material.GOLD_NUGGET;
+        if (upper.contains("[VELOCITY]")) return Material.BLUE_DYE;
+        if (upper.contains("[SENT_TO]")) return Material.CYAN_DYE;
+        if (upper.contains("[SOUND]")) return Material.JUKEBOX;
+        
+        // Conditionals
+        if (upper.contains("[IF_PERMISSION")) return Material.COMMAND_BLOCK_MINECART;
+        if (upper.contains("[IF_CHANCE]")) return Material.SUNFLOWER;
+        if (upper.contains("[IF_OP]")) return Material.NETHER_STAR;
+        if (upper.contains("[IF_WORLD]")) return Material.GLOBE_BANNER_PATTERN;
+        if (upper.contains("[IF_MONEY")) return Material.GOLD_BLOCK;
+        
+        return Material.PAPER;
+    }
+
+    protected void smartOpenInventory(org.bukkit.entity.Player player, Inventory newInv) {
+        Inventory currentInv = player.getOpenInventory().getTopInventory();
+        
+        if (currentInv.getHolder() instanceof MenuHolder && 
+            newInv.getHolder() instanceof MenuHolder &&
+            currentInv.getSize() == newInv.getSize()) {
+            
+            MenuHolder currentHolder = (MenuHolder) currentInv.getHolder();
+            MenuHolder newHolder = (MenuHolder) newInv.getHolder();
+            
+            // Only reuse if it's the same menu type to ensure title updates
+            if (currentHolder.getMenuType() == newHolder.getMenuType()) {
+                currentHolder.update(newHolder.getMenuType(), newHolder.getCommandName(), newHolder.getActionIndex(), newHolder.getPage());
+                currentInv.setContents(newInv.getContents());
+                return;
+            }
+        }
+
+        player.openInventory(newInv);
     }
 }

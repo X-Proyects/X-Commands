@@ -2,13 +2,10 @@ package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.command.CommandSender;
-
 import java.util.Map;
 
-/**
- * Handles the /xc list command
- */
 public class ListCommand {
 
     private final XCommands plugin;
@@ -18,33 +15,36 @@ public class ListCommand {
     }
 
     public boolean execute(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("xcommands.admin.gui")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+        if (!sender.hasPermission("xcommands.admin.list")) {
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
             return true;
         }
 
         Map<String, CustomCommandExecutor> commands = plugin.getCommandManager().getCustomCommands();
         if (commands.isEmpty()) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("list-empty"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("list-empty"));
             return true;
         }
 
-        String header = plugin.getLanguageManager().getMessageWithPrefix("list-header");
-        if (header.contains("{0}")) header = header.replace("{0}", String.valueOf(commands.size()));
-        
         StringBuilder sb = new StringBuilder();
-        sb.append(header);
-        
-        boolean first = true;
-        for (String name : commands.keySet()) {
-            if (!first) {
-                sb.append(", ");
-            }
-            sb.append(name);
-            first = false;
-        }
+        sb.append("§b§lX-Commands List: §f(").append(commands.size()).append(")\n");
+        sb.append("§8§m----------------------------------\n");
 
-        sender.sendMessage(sb.toString());
+        int count = 0;
+        for (String cmdName : commands.keySet()) {
+            sb.append(" §8» §e").append(cmdName);
+            count++;
+            if (count % 3 == 0) {
+                sb.append("\n");
+            } else if (count < commands.size()) {
+                sb.append("  ");
+            }
+        }
+        
+        if (count % 3 != 0) sb.append("\n");
+        sb.append("§8§m----------------------------------");
+
+        CompatibilityUtils.sendMessage(sender, sb.toString());
         return true;
     }
 }

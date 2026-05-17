@@ -77,4 +77,12 @@ public class ConditionManager {
     public Map<String, Condition> getConditions() {
         return new HashMap<>(conditions);
     }
+
+    /**
+     * Reloads the condition manager
+     */
+    public void reload() {
+        conditions.clear();
+        registerDefaults();
+    }
 }

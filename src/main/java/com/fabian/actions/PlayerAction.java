@@ -16,8 +16,10 @@ public class PlayerAction implements Action {
         
         String params = (String) context.get("params");
         if (params == null) return;
-
-        player.performCommand(PlaceholderUtils.process(params, player));
+        String command = PlaceholderUtils.process(params, player);
+        if (command == null || command.trim().isEmpty()) return;
+        
+        player.performCommand(command);
     }
 
     @Override

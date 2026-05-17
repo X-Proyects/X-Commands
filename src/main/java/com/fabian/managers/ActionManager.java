@@ -19,19 +19,21 @@ public class ActionManager {
     private final XCommands plugin;
     private final Map<String, Action> actions;
     private final Map<String, ActionEntry> actionCache = new HashMap<>();
-    private final Pattern actionPattern = Pattern.compile("\\[([A-Z_]+)\\]\\s*(.*)");
+    private final Pattern actionPattern = Pattern.compile("(!?)\\[([a-zA-Z_]+)\\]\\s*(.*)");
 
     private static class ActionEntry {
         final Action action;
         final String tag;
         final String params;
+        final boolean negated;
         final boolean isDelay;
         long parsedDelay = 0;
 
-        ActionEntry(Action action, String tag, String params) {
+        ActionEntry(Action action, String tag, String params, boolean negated) {
             this.action = action;
             this.tag = tag;
             this.params = params;
+            this.negated = negated;
             this.isDelay = tag.equals("DELAY");
             if (isDelay) {
                 try {
@@ -70,6 +72,8 @@ public class ActionManager {
         registerAction(new KickAction());
         registerAction(new ParticleAction());
         registerAction(new BungeeAction());
+        registerAction(new VelocityAction());
+        registerAction(new SendToAction());
         registerAction(new GiveMoneyAction());
         registerAction(new TakeMoneyAction());
     }
@@ -89,13 +93,24 @@ public class ActionManager {
      * @param actionStrings List of action strings to execute
      */
     public void executeActions(Player player, List<String> actionStrings) {
-        executeActionsLoop(player, actionStrings, 0);
+        executeActions(player, actionStrings, new String[0]);
+    }
+
+    /**
+     * Executes a list of action strings for a player with arguments
+     * 
+     * @param player        The player executing the actions (null if console)
+     * @param actionStrings List of action strings to execute
+     * @param args          The command arguments
+     */
+    public void executeActions(Player player, List<String> actionStrings, String[] args) {
+        executeActionsLoop(player, actionStrings, 0, args);
     }
 
     /**
      * Recursively executes actions via loop, scheduling only when needed
      */
-    private void executeActionsLoop(Player player, List<String> actionStrings, int startIndex) {
+    private void executeActionsLoop(Player player, List<String> actionStrings, int startIndex, String[] args) {
         if (actionStrings == null || startIndex >= actionStrings.size()) {
             return;
         }
@@ -105,14 +120,14 @@ public class ActionManager {
             ActionEntry entry = getByKeyOrParse(actionString);
 
             if (entry == null) {
-                continue; // Skip invalid actions
+                return; // Stop execution on invalid actions (safer)
             }
 
             if (entry.isDelay) {
                 final int nextIndex = i + 1;
                 // Schedule remainder of the list
-                SchedulerUtils.runTaskLater(plugin, () -> {
-                    executeActionsLoop(player, actionStrings, nextIndex);
+                SchedulerUtils.runTaskLaterForPlayer(plugin, player, () -> {
+                    executeActionsLoop(player, actionStrings, nextIndex, args);
                 }, entry.parsedDelay);
                 return; // Break current loop, remainder handled by task
             }
@@ -125,7 +140,7 @@ public class ActionManager {
                 continue;
             }
 
-            executeEntry(entry, player);
+            executeEntry(entry, player, args);
         }
     }
 
@@ -143,26 +158,30 @@ public class ActionManager {
             return null;
         }
 
-        String tag = matcher.group(1);
-        String params = matcher.group(2).trim();
+        boolean negated = !matcher.group(1).isEmpty();
+        String tag = matcher.group(2).toUpperCase();
+        String params = matcher.group(3).trim();
         Action action = actions.get(tag);
 
-        if (action == null) {
+        if (action == null && !tag.startsWith("IF_")) {
             plugin.logWarning("Unknown action type: " + tag);
             return null;
         }
 
-        entry = new ActionEntry(action, tag, params);
+        entry = new ActionEntry(action, tag, params, negated);
         actionCache.put(actionString, entry);
         return entry;
     }
 
-    private void executeEntry(ActionEntry entry, Player player) {
+    private void executeEntry(ActionEntry entry, Player player, String[] args) {
+        // Pre-process params with arguments
+        String params = com.fabian.utils.PlaceholderUtils.replaceArgs(entry.params, args);
+
         if (player == null) {
             // Console or Global execution
             try {
                 Map<String, Object> context = new HashMap<>();
-                context.put("params", entry.params);
+                context.put("params", params);
                 context.put("plugin", plugin);
                 entry.action.execute(null, context);
             } catch (Exception e) {
@@ -175,12 +194,12 @@ public class ActionManager {
         SchedulerUtils.runForPlayer(plugin, player, () -> {
             try {
                 Map<String, Object> context = new HashMap<>();
-                context.put("params", entry.params);
+                context.put("params", params);
                 context.put("plugin", plugin);
                 
                 entry.action.execute(player, context);
             } catch (Exception e) {
-                plugin.logSevere("Error executing action [" + entry.tag + "] for player " + player.getName() + " with params: " + entry.params, e);
+                plugin.logSevere("Error executing action [" + entry.tag + "] for player " + player.getName() + " with params: " + params, e);
             }
         });
     }
@@ -189,16 +208,23 @@ public class ActionManager {
      * Executes a single action string (Legacy public method)
      */
     public void executeSingleAction(Player player, String actionString) {
+        executeSingleAction(player, actionString, new String[0]);
+    }
+
+    /**
+     * Executes a single action string with arguments
+     */
+    public void executeSingleAction(Player player, String actionString, String[] args) {
         ActionEntry entry = getByKeyOrParse(actionString);
         if (entry != null) {
-            executeEntry(entry, player);
+            executeEntry(entry, player, args);
         }
     }
 
     private boolean evaluateCondition(Player player, ActionEntry entry) {
         Map<String, Object> context = new HashMap<>();
         // Wrap the tag in brackets so ConditionManager can parse it correctly
-        String formattedCondition = "[" + entry.tag + "]" + (entry.params.isEmpty() ? "" : " " + entry.params);
+        String formattedCondition = (entry.negated ? "!" : "") + "[" + entry.tag + "]" + (entry.params.isEmpty() ? "" : " " + entry.params);
         return plugin.getConditionManager().check(player, formattedCondition, context);
     }
 
@@ -209,5 +235,14 @@ public class ActionManager {
      */
     public Map<String, Action> getActions() {
         return new HashMap<>(actions);
+    }
+
+    /**
+     * Reloads the action manager
+     */
+    public void reload() {
+        actions.clear();
+        actionCache.clear();
+        registerActions();
     }
 }

@@ -2,13 +2,10 @@ package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
+import com.fabian.managers.LanguageManager;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.command.CommandSender;
 
-import java.util.List;
-
-/**
- * Handles the /xc info <name> command
- */
 public class InfoCommand {
 
     private final XCommands plugin;
@@ -18,42 +15,35 @@ public class InfoCommand {
     }
 
     public boolean execute(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("xcommands.admin.gui")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+        LanguageManager lang = plugin.getLanguageManager();
+        
+        if (!sender.hasPermission("xcommands.admin.info")) {
+            CompatibilityUtils.sendMessage(sender, lang.getMessage("no-permission"));
             return true;
         }
 
         if (args.length < 2) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("info-usage"));
+            CompatibilityUtils.sendMessage(sender, lang.getMessageWithPrefix("info-usage"));
             return true;
         }
 
-        String commandName = args[1].toLowerCase();
-        CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName);
+        String cmdName = args[1];
+        CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(cmdName);
 
         if (cmd == null) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("command-not-found"));
+            CompatibilityUtils.sendMessage(sender, lang.getMessageWithPrefix("command-not-found"));
             return true;
         }
 
-        sender.sendMessage("§8§m----------------------------------");
-        sender.sendMessage("§bX-Commands Info: §e" + cmd.getCommandName());
-        sender.sendMessage("§7Description: §f" + (cmd.getDescription().isEmpty() ? "None" : cmd.getDescription()));
-        sender.sendMessage("§7Permission: §f" + (cmd.getPermission().isEmpty() ? "None" : cmd.getPermission()));
-        sender.sendMessage("§7World: §f" + (cmd.getWorld().isEmpty() ? "All" : cmd.getWorld()));
-        sender.sendMessage("§7Cooldown: §f" + cmd.getCooldown() + "s");
-        sender.sendMessage("§7Interval: §f" + cmd.getInterval() + " ticks");
-        sender.sendMessage("§7Registered: §f" + (cmd.isRegistered() ? "§aYes" : "§cNo"));
-        
-        List<String> aliases = cmd.getAliases();
-        sender.sendMessage("§7Aliases: §f" + (aliases.isEmpty() ? "None" : String.join(", ", aliases)));
-        
-        List<String> actions = cmd.getActions();
-        sender.sendMessage("§7Actions (" + actions.size() + "):");
-        for (int i = 0; i < actions.size(); i++) {
-            sender.sendMessage("  §8" + (i + 1) + ". §e" + actions.get(i));
-        }
-        sender.sendMessage("§8§m----------------------------------");
+        String none = lang.getMessage("gui-none");
+
+        CompatibilityUtils.sendMessage(sender, lang.getMessage("info-header"));
+        CompatibilityUtils.sendMessage(sender, lang.getMessage("info-title", cmd.getCommandName()));
+        CompatibilityUtils.sendMessage(sender, lang.getMessage("info-perm", (cmd.getPermission().isEmpty() ? none : cmd.getPermission())));
+        CompatibilityUtils.sendMessage(sender, lang.getMessage("info-cooldown", cmd.getCooldown()));
+        CompatibilityUtils.sendMessage(sender, lang.getMessage("info-actions", cmd.getActions().size()));
+        CompatibilityUtils.sendMessage(sender, lang.getMessage("info-desc", (cmd.getDescription().isEmpty() ? none : cmd.getDescription())));
+        CompatibilityUtils.sendMessage(sender, lang.getMessage("info-footer"));
 
         return true;
     }

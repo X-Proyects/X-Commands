@@ -14,23 +14,44 @@ public class HealAction implements Action {
     public void execute(Player player, Map<String, Object> context) {
         if (player == null) return;
 
-        org.bukkit.attribute.AttributeInstance healthAttr = null;
-        try {
-            java.lang.reflect.Method valueOf = Attribute.class.getMethod("valueOf", String.class);
-            healthAttr = player.getAttribute((Attribute) valueOf.invoke(null, "GENERIC_MAX_HEALTH"));
-        } catch (Exception e) {
+        String params = (String) context.get("params");
+        Double amount = null;
+
+        if (params != null && !params.trim().isEmpty()) {
             try {
-                java.lang.reflect.Method valueOf = Attribute.class.getMethod("valueOf", String.class);
-                healthAttr = player.getAttribute((Attribute) valueOf.invoke(null, "MAX_HEALTH"));
-            } catch (Exception e2) {
-                return;
+                amount = Double.parseDouble(params.trim());
+            } catch (NumberFormatException ignored) {
             }
         }
 
-        if (healthAttr == null) return;
+        Attribute attribute = null;
+        
+        // 1. Try modern name (1.21.2+)
+        org.bukkit.NamespacedKey modernKey = org.bukkit.NamespacedKey.minecraft("max_health");
+        attribute = org.bukkit.Registry.ATTRIBUTE.get(modernKey);
+        
+        // 2. Try legacy name if modern name not found (1.18.2 - 1.21.1)
+        if (attribute == null) {
+            org.bukkit.NamespacedKey legacyKey = org.bukkit.NamespacedKey.minecraft("generic_max_health");
+            attribute = org.bukkit.Registry.ATTRIBUTE.get(legacyKey);
+        }
 
-        double maxHealth = healthAttr.getValue();
-        player.setHealth(maxHealth);
+        double maxHealth = 20.0;
+        if (attribute != null) {
+            org.bukkit.attribute.AttributeInstance instance = player.getAttribute(attribute);
+            if (instance != null) {
+                maxHealth = instance.getValue();
+            }
+        }
+
+        if (amount != null) {
+            // Heal specific amount
+            double newHealth = Math.min(maxHealth, player.getHealth() + amount);
+            player.setHealth(newHealth);
+        } else {
+            // Heal to full
+            player.setHealth(maxHealth);
+        }
     }
 
     @Override

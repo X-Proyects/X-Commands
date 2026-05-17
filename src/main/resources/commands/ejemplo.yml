@@ -69,6 +69,8 @@ interval: 0
 # [TAKE_MONEY] <amount> - Withdraw money (Vault)
 # [KICK] <reason> - Kick the player
 # [BUNGEE] <server> - Send player to a Bungee server
+# [VELOCITY] <server> - Send player to a Velocity server
+# [SENT_TO] <server> - Send player to a proxy server
 # [CLOSE] - Close player's current inventory
 # [DELAY] <seconds> - Wait (ticks) before next action
 # 
@@ -79,6 +81,11 @@ interval: 0
 # [IF_OP] - If player is server operator
 # [IF_WORLD] <world> - If player is in specific world
 # [IF_CHANCE] <percentage> - If random chance (0-100) succeeds
+# 
+# Argument Placeholders:
+# {args} - Full text after the command
+# {0} - First argument word
+# {1} - Second argument word, etc.
 # 
 # Note: You can use _NOT suffix as well: [IF_PERMISSION_NOT]
 #
@@ -93,4 +100,4 @@ actions:
   - "[GIVE] DIAMOND;1;&bDiamante de la Suerte"
   - "[DELAY] 40"
   - "[MESSAGE] &e¡Aquí tienes una propina!"
-  - "[GIVE_MONEY] 50"
+  - "[GIVE_MONEY] 50"

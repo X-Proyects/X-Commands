@@ -53,13 +53,13 @@ public class TeleportMenu extends BaseMenu {
                 lang.getMessage("gui-teleport-world"),
                 lang.getMessage("gui-teleport-world-lore", world).split("\\|")));
 
-        // Confirm (Slot 25)
-        inv.setItem(25, createItem(Material.LIME_DYE, lang.getMessage("gui-numeric-confirm")));
+        // Confirm (Slot 26)
+        inv.setItem(26, createItem(Material.LIME_DYE, lang.getMessage("gui-numeric-confirm")));
 
         // Back (Slot 18)
         addBackButton(inv, 18);
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 
     private String[] parseTeleport(String action) {

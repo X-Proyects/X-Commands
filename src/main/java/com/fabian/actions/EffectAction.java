@@ -11,7 +11,6 @@ import org.bukkit.potion.PotionEffectType;
  */
 public class EffectAction implements Action {
 
-    @SuppressWarnings("unchecked")
     @Override
     public void execute(Player player, Map<String, Object> context) {
         if (player == null) return;
@@ -27,32 +26,37 @@ public class EffectAction implements Action {
             int level = parts.length > 2 ? Integer.parseInt(parts[2]) - 1 : 0;
 
             PotionEffectType effectType = null;
+            org.bukkit.NamespacedKey key = org.bukkit.NamespacedKey.minecraft(effectName.toLowerCase());
+
+            // 1. Try modern Registry (1.21.2+)
             try {
-                java.lang.reflect.Field effectField = org.bukkit.Registry.class.getField("EFFECT");
-                org.bukkit.Registry<PotionEffectType> registry = (org.bukkit.Registry<PotionEffectType>) effectField
-                        .get(null);
-                effectType = registry.get(org.bukkit.NamespacedKey.minecraft(effectName.toLowerCase()));
-            } catch (Exception ex) {
+                @SuppressWarnings("unchecked")
+                org.bukkit.Registry<PotionEffectType> registry = (org.bukkit.Registry<PotionEffectType>) org.bukkit.Registry.class.getField("EFFECT").get(null);
+                effectType = registry.get(key);
+            } catch (Exception ignored) {}
+
+            // 2. Try legacy Registry (1.18.2 - 1.21.1)
+            if (effectType == null) {
                 try {
-                    java.lang.reflect.Field field = org.bukkit.Registry.class.getField("POTION_EFFECT_TYPE");
-                    org.bukkit.Registry<PotionEffectType> registry = (org.bukkit.Registry<PotionEffectType>) field
-                            .get(null);
-                    effectType = registry.get(org.bukkit.NamespacedKey.minecraft(effectName.toLowerCase()));
-                } catch (Exception ex2) {
-                    try {
-                        java.lang.reflect.Method getByName = PotionEffectType.class.getMethod("getByName",
-                                String.class);
-                        effectType = (PotionEffectType) getByName.invoke(null, effectName);
-                    } catch (Exception reflectiveEx) {
-                        effectType = null;
-                    }
-                }
+                    effectType = org.bukkit.Registry.POTION_EFFECT_TYPE.get(key);
+                } catch (Exception ignored) {}
             }
 
-            if (effectType == null) return;
+            // 3. Last resort fallback
+            if (effectType == null) {
+                @SuppressWarnings("deprecation")
+                PotionEffectType legacy = PotionEffectType.getByName(effectName);
+                effectType = legacy;
+            }
+
+            if (effectType == null) {
+                com.fabian.utils.LoggerUtils.warn("Unknown effect type: " + effectName);
+                return;
+            }
 
             player.addPotionEffect(new PotionEffect(effectType, duration, level));
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [EFFECT]: " + params);
         }
     }
 

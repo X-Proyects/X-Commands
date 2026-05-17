@@ -20,7 +20,8 @@ public class GiveMoneyAction implements Action {
         try {
             double amount = Double.parseDouble(params.trim());
             EconomyUtils.deposit(player, amount);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [GIVE_MONEY]: " + params);
         }
     }
 

@@ -19,7 +19,8 @@ public class DamageAction implements Action {
         try {
             double damage = Double.parseDouble(params.trim());
             player.damage(damage);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [DAMAGE]: " + params);
         }
     }
 

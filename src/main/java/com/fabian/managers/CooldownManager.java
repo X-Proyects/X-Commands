@@ -68,4 +68,11 @@ public class CooldownManager {
     public void clearPlayerCooldowns(UUID uuid) {
         cooldowns.values().forEach(map -> map.remove(uuid));
     }
+
+    /**
+     * Reloads the cooldown manager (clears all)
+     */
+    public void reload() {
+        cooldowns.clear();
+    }
 }

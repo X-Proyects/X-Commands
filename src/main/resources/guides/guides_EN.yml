@@ -102,6 +102,16 @@ actions:
     format: "[TAKE_MONEY] amount"
     example: "[TAKE_MONEY] 50"
 
+  VELOCITY:
+    description: "Sends the player to another server in a Velocity network."
+    format: "[VELOCITY] server"
+    example: "[VELOCITY] lobby"
+
+  SENT_TO:
+    description: "Sends the player to any proxy server (Bungee/Velocity)."
+    format: "[SENT_TO] server"
+    example: "[SENT_TO] skyblock"
+
   IF_PERMISSION:
     description: "Conditional: Only executes the NEXT action if the player HAS the permission."
     format: "[IF_PERMISSION] permission"
@@ -133,3 +143,26 @@ actions:
     description: "Conditional: Only executes the NEXT action if the random CHANCE (0-100) succeeds."
     format: "[IF_CHANCE] percentage"
     example: "[IF_CHANCE] 50"
+
+# 🎨 Color and Style Formats
+# -----------------------------------------------------------
+# The plugin supports multiple modern color formats:
+# -----------------------------------------------------------
+colors:
+  MINIMESSAGE:
+    description: "Uses Paper's format for advanced colors and styles."
+    example: "<red>Red Text</red> <bold>Bold</bold> <underlined>Underlined</underlined>"
+  
+  GRADIENTS:
+    description: "Create spectacular gradients between multiple colors."
+    format: "<gradient:color1:color2>Text</gradient>"
+    example: "<gradient:#FF1919:#EE1F1F:#C01414>GRADIENT TEXT</gradient>"
+  
+  HEX_RGB:
+    description: "Use exact hexadecimal codes."
+    format: "&#RRGGBB or &x&R&R&G&G&B&B"
+    example: "&#E7C500Golden Text"
+  
+  HTML_TAGS:
+    description: "Simple HTML-like tags for convenience."
+    example: "<b>Bold</b> <i>Italic</i> <u>Underlined</u>"

@@ -74,4 +74,11 @@ public class InventoryManager {
         public void openActionEditMenu(Player player, String commandName, int actionIndex) {
                 actionEditMenu.open(player, commandName, actionIndex);
         }
+
+        /**
+         * Reloads the inventory manager (placeholder)
+         */
+        public void reload() {
+            // Nothing to reload here as menus are dynamic
+        }
 }

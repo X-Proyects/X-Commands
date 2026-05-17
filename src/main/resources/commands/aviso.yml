@@ -5,28 +5,26 @@
 # [name]
 # The primary name of the command. Players will use this as /<name>
 # Example: /admin
-name: admin
+name: announce
 
 # [aliases]
 # A list of alternative names for this command.
 # These work exactly like the primary name.
 aliases:
-  - adm
-  - xadmin
-  - tools
+  - announcement
 
 # [item]
 # Defines the icon for this command if it's displayed in a GUI menu.
 item:
   # Material name from Spigot (e.g., DIAMOND, IRON_SWORD, GOLDEN_APPLE)
-  material: GOLDEN_APPLE
+  material: NOTE_BLOCK
   # Display name with color code support
-  display-name: "&6Admin Tools"
+  display-name: "&6Announcements"
 
 # [description]
 # A brief explanation of what the command does. 
 # This is used in the plugin's help menus and tooltips.
-description: "&7Comandos administrativos listos para usar."
+description: "Example of dynamic arguments {args}"
 
 # [register]
 # If true, the command is automatically registered in the server's command map.
@@ -37,7 +35,7 @@ register: true
 # The permission node required to execute this command.
 # If a player doesn't have this permission, they will receive an error message.
 # Leave empty ("") if you want everyone to be able to use it.
-permission: xcommands.admin
+permission: xcommands.staff.announce
 
 # [world]
 # Restricts the command to specific worlds.
@@ -84,16 +82,15 @@ interval: 0
 # [DELAY] <seconds> - Wait before next action
 # 
 # Conditionals (Skips next action if false):
-# [IF_PERMISSION] <node> - If player has permission
+# [IF_PERMISSION] <node> - If player has permission (Use % for wildcard prefix, e.g. meta.vip.%)
 # ![IF_PERMISSION] <node> - If player lacks permission
 # [IF_MONEY] <amount> - If player has enough money
 # [IF_OP] - If player is server operator
 # [IF_CHANCE] <percentage> - Random chance (0-100)
+
 actions:
-  - "[MESSAGE] &6[Admin] &fHas sido curado y alimentado."
-  - "[HEAL]"
-  - "[FEED]"
-  - "[SOUND] ENTITY_PLAYER_LEVELUP;1.0;1.5"
-  - "[EFFECT] SPEED;1200;1"
-  - "[ACTIONBAR] &6&lADMIN MODO ACTIVADO"
-  - "[BROADCAST] &c[!] &e%player% &7ha entrado en modo administrativo."
+  # Verificamos si escribió algo (si {args} no está vacío)
+  - "[IF_CHANCE] 100" # Truco para asegurar que se ejecute si queremos lógica compleja
+  - "[BROADCAST] &8&l[&6&lAVISO&8&l] &f{args}"
+  - "[SOUND] BLOCK_NOTE_BLOCK_PLING;1.0;1.5"
+  - "[MESSAGE] &a¡Aviso enviado correctamente!"

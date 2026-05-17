@@ -96,7 +96,7 @@ public class CustomCommandExecutor implements CommandExecutor {
 
         // Execute actions
         try {
-            plugin.getActionManager().executeActions(player, actions);
+            plugin.getActionManager().executeActions(player, actions, args);
         } catch (Exception e) {
             String message = plugin.getLanguageManager().getMessage("command-error");
             sender.sendMessage(message);
@@ -200,5 +200,9 @@ public class CustomCommandExecutor implements CommandExecutor {
 
     public void setAliases(List<String> aliases) {
         this.aliases = aliases;
+    }
+
+    public void clearCooldown(java.util.UUID uuid) {
+        cooldowns.remove(uuid);
     }
 }

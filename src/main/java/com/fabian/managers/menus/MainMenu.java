@@ -2,11 +2,9 @@ package com.fabian.managers.menus;
 
 import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
-import com.fabian.utils.ColorUtils;
+import com.fabian.utils.CompatibilityUtils;
 import com.fabian.utils.MenuHolder;
-import com.fabian.utils.MenuHolder.MenuType;
 import org.bukkit.Material;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,88 +12,62 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Main menu showing all custom commands
+ * Main menu of the plugin GUI
  */
 public class MainMenu extends BaseMenu {
-
-    private static final int ITEMS_PER_PAGE = 45;
 
     public MainMenu(XCommands plugin) {
         super(plugin);
     }
 
     public void open(Player player, int page) {
+        Inventory inv = createInventory(new MenuHolder(MenuHolder.MenuType.MAIN, null, -1, page), 54, lang.getMessage("gui-main-title"));
+
         Map<String, CustomCommandExecutor> commands = plugin.getCommandManager().getCustomCommands();
-        List<CustomCommandExecutor> sortedCommands = new ArrayList<>(commands.values());
-        sortedCommands.sort(Comparator.comparingLong(CustomCommandExecutor::getCreationTime));
-
-        int totalPages = (int) Math.ceil((double) sortedCommands.size() / ITEMS_PER_PAGE);
-        if (totalPages == 0)
-            totalPages = 1;
-
-        int currentPage = Math.max(0, Math.min(page, totalPages - 1));
-
-        Inventory inv = createInventory(
-                new MenuHolder(MenuType.MAIN, currentPage),
-                54,
-                lang.getMessage("gui-main-title"));
-
-        // Add command items
-        int start = currentPage * ITEMS_PER_PAGE;
-        int end = Math.min(start + ITEMS_PER_PAGE, sortedCommands.size());
-
-        for (int i = start; i < end; i++) {
-            CustomCommandExecutor executor = sortedCommands.get(i);
-            inv.setItem(i - start, createCommandItem(executor));
+        List<CustomCommandExecutor> executorList = new ArrayList<>(commands.values());
+        
+        int start = page * 45;
+        for (int i = 0; i < 45 && (start + i) < executorList.size(); i++) {
+            inv.setItem(i, createCommandItem(executorList.get(start + i)));
         }
 
-        // Navigation buttons
-        if (currentPage > 0) {
-            inv.setItem(45, createItem(Material.ARROW, lang.getMessage("gui-main-prev")));
-        }
+        fillBackground(inv);
 
-        if (currentPage < totalPages - 1) {
-            inv.setItem(53, createItem(Material.ARROW, lang.getMessage("gui-main-next")));
-        }
-
-        // Create command button
-        inv.setItem(49, createItem(Material.EMERALD,
+        // Add Command button
+        inv.setItem(49, createItem(Material.NETHER_STAR,
                 lang.getMessage("gui-main-create"),
                 lang.getMessage("gui-main-create-lore").split("\\|")));
 
-        // Fill background
-        fillBackground(inv);
+        // Help Button
+        inv.setItem(53, createItem(Material.BOOK,
+                lang.getMessage("gui-main-help"),
+                lang.getMessage("gui-main-help-lore").split("\\|")));
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 
     private ItemStack createCommandItem(CustomCommandExecutor executor) {
-        Material mat;
-        try {
-            mat = Material.valueOf(executor.getMaterial().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            mat = Material.PAPER;
-        }
+        Material mat = Material.matchMaterial(executor.getMaterial());
+        if (mat == null) mat = Material.COMMAND_BLOCK;
 
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(LEGACY.deserialize(ColorUtils.translate(executor.getDisplayName())));
+            CompatibilityUtils.setDisplayName(meta, executor.getDisplayName());
 
-            List<net.kyori.adventure.text.Component> lore = new ArrayList<>();
-            lore.add(LEGACY.deserialize(ColorUtils.translate(executor.getDescription())));
-            lore.add(net.kyori.adventure.text.Component.empty());
-            lore.add(LEGACY.deserialize(lang.getMessage("gui-main-click-left", "&7Click Izquierdo: &bEditar")));
-            lore.add(LEGACY.deserialize(lang.getMessage("gui-main-click-right", "&7Click Derecho: &eVer acciones")));
+            List<String> lore = new ArrayList<>();
+            lore.add("§7" + executor.getDescription());
+            lore.add("");
+            lore.add(lang.getMessage("gui-main-click-left"));
+            lore.add(lang.getMessage("gui-main-click-right"));
+            
+            CompatibilityUtils.setLore(meta, lore);
 
-            meta.lore(lore);
-
-            // Store command name in PDC
+            // Store command name in PersistentDataContainer
             meta.getPersistentDataContainer().set(keyCommandName, PersistentDataType.STRING, executor.getCommandName());
 
             item.setItemMeta(meta);

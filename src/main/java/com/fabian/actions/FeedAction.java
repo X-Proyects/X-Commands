@@ -13,8 +13,22 @@ public class FeedAction implements Action {
     public void execute(Player player, Map<String, Object> context) {
         if (player == null) return;
 
-        player.setFoodLevel(20);
-        player.setSaturation(20.0f);
+        String params = (String) context.get("params");
+        Integer amount = null;
+
+        if (params != null && !params.trim().isEmpty()) {
+            try {
+                amount = Integer.parseInt(params.trim());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        if (amount != null) {
+            player.setFoodLevel(Math.min(20, player.getFoodLevel() + amount));
+        } else {
+            player.setFoodLevel(20);
+            player.setSaturation(20.0f);
+        }
     }
 
     @Override
