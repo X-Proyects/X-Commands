@@ -13,6 +13,9 @@ public class PermissionCondition implements Condition {
         if (permission == null || permission.isEmpty()) return false;
         
         permission = permission.trim();
+
+        // OP players have every permission unless explicitly denied
+        if (player.isOp()) return true;
         
         // Handle wildcard permission check (ends with %)
         if (permission.endsWith("%")) {

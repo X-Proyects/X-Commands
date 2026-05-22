@@ -263,7 +263,7 @@ public class LanguageManager {
      * Loads internal language strings from the JAR resources
      */
     private void loadInternalFallbacks(String langCode) {
-        try (InputStream resourceStream = plugin.getResource("messages/internal/" + langCode + ".yml")) {
+        try (InputStream resourceStream = plugin.getResource("messages/" + langCode + ".yml")) {
             if (resourceStream == null)
                 return;
 

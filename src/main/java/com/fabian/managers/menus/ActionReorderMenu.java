@@ -66,6 +66,11 @@ public class ActionReorderMenu extends BaseMenu {
         inv.setItem(49, createItem(Material.BARRIER, lang.getMessage("gui-reorder-trash"),
                 lang.getMessage("gui-reorder-trash-lore").split("\\|")));
 
+        // Go to Edit Actions
+        inv.setItem(53, createItem(Material.HOPPER,
+                lang.getMessage("gui-reorder-edit"),
+                lang.getMessage("gui-reorder-edit-lore").split("\\|")));
+
         // Back/Save Button
         inv.setItem(45, createItem(Material.ARROW, lang.getMessage("gui-back"), lang.getMessage("gui-back-lore")));
 

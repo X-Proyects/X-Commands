@@ -1,8 +1,7 @@
 # ============================================
 # X-COMMANDS - CUSTOM LANGUAGE TEMPLATE
 # ============================================
-# You can use this file as a base for your own translations.
-# The 'prefix' is defined in config.yml and is universal.
+# Use this template to create your own translation files.
 
 # ============================================
 # GENERAL MESSAGES
@@ -31,7 +30,9 @@ edit-unknown-attribute: "&cUnknown attribute. Use: name, permission, description
 command-not-found: "&cCommand not found."
 action-invalid-index: "&cInvalid action index."
 list-empty: "&cNo custom commands exist."
-list-header: "&aCommands ({0}): &e"
+list-header: "&b&lX-Commands List: &f({0})"
+list-separator: "&8&m----------------------------------"
+list-item: " &8» &e{0}"
 info-usage: "&cUsage: /xc info <name>"
 info-header: "&8&m----------------------------------"
 info-title: " &8» &7Info: &e{0}"
@@ -77,6 +78,13 @@ help-header: "&8&m----------&r &bX-Commands Help &8&m----------"
 help-gui: "&e/xc -gui &7- Open visual editor"
 help-reload: "&e/xc reload &7- Reload the plugin"
 help-update: "&e/xc update &7- Check for updates"
+help-locate: "&e/xc locate [lang] &7- Change or list languages"
+help-list: "&e/xc list &7- List all custom commands"
+help-info: "&e/xc info <cmd> &7- Show info of a command"
+help-create: "&e/xc create <cmd> &7- Create a new command"
+help-delete: "&e/xc delete <cmd> &7- Delete a command"
+help-edit: "&e/xc edit <cmd> ... &7- Edit a command"
+help-version: "&e/xc version &7- Show plugin and server info"
 help-footer: "&8&m--------------------------------"
 
 # ============================================
@@ -150,6 +158,10 @@ gui-type-if-world: "&9If in World"
 gui-type-if-world-desc: "&7Condition: Only in the specified world."
 gui-type-if-money: "&aIf has Money"
 gui-type-if-money-desc: "&7Condition: Only if player has enough money."
+gui-type-bracket: "&bAction Block"
+gui-type-bracket-desc: "&7Groups actions under a condition."
+gui-type-bracket-right: "&7Right Click: &eAdd &8&l["
+gui-type-bracket-left: "&7Left Click: &eAdd &8&l]"
 
 # ============================================
 # GUI - COMMAND EDIT MENU
@@ -161,6 +173,8 @@ gui-edit-desc: "&eChange Description"
 gui-edit-desc-lore: "&7Current: &f{0}| |&bClick to change"
 gui-edit-reg: "&eToggle Registration"
 gui-edit-reg-lore: "&7Status: {0}| |&bClick to toggle"
+gui-edit-material: "&eChange Icon"
+gui-edit-material-lore: "&7Current icon: &b{0}| |&bClick to change"
 gui-edit-reg-on: "&aEnabled"
 gui-edit-reg-off: "&cDisabled"
 gui-edit-perm: "&eChange Permission"
@@ -216,6 +230,7 @@ gui-action-edit-value-lore: "&7Current: &f{0}| |&bClick to change"
 # ============================================
 gui-selector-title: "&8Type: &3Action #{0}"
 gui-type-select: "&bClick to select"
+gui-type-select-not: "&7Right Click: &cNOT condition"
 
 # ============================================
 # GUI - ACTION REORDER MENU
@@ -224,6 +239,8 @@ gui-reorder-title: "&8Order: &3/{0}"
 gui-reorder-lore: "&7Drag to reorder|&7Drop in trash to delete"
 gui-reorder-trash: "&c&lDELETE ACTION"
 gui-reorder-trash-lore: "&7Drag an action here|&7to delete it permanently."
+gui-reorder-edit: "&bEdit Actions"
+gui-reorder-edit-lore: "&7Manage the list of steps|&7that this command executes.| |&eClick to enter"
 
 # ============================================
 # GUI - NUMERIC ACTION MENU
@@ -231,6 +248,7 @@ gui-reorder-trash-lore: "&7Drag an action here|&7to delete it permanently."
 gui-numeric-title: "&8Numeric Edit: &3{0}"
 gui-numeric-current: "&7Current value"
 gui-numeric-add: "&7Click to add"
+gui-numeric-subtract: "&7Click to subtract"
 gui-numeric-reset: "&cReset Value"
 gui-numeric-reset-lore: "&7Set to 0"
 gui-numeric-confirm: "&aConfirm and Save"
@@ -293,6 +311,17 @@ gui-particle-amount: "&eAmount"
 gui-particle-amount-lore: "&7Current: &f{0}| |&bClick to change"
 
 # ============================================
+# GUI - SOUND ACTION MENU
+# ============================================
+gui-sound-title: "&8Sound Action: &3{0}"
+gui-sound-select: "&eSelect Sound"
+gui-sound-select-lore: "&7Current: &f{0}| |&bClick to change"
+gui-sound-volume: "&eChange Volume"
+gui-sound-volume-lore: "&7Current: &f{0}| |&bClick to change"
+gui-sound-pitch: "&eChange Pitch"
+gui-sound-pitch-lore: "&7Current: &f{0}| |&bClick to change"
+
+# ============================================
 # GUI - CONFIRMATION MENU
 # ============================================
 gui-confirm-delete-title: "&4Confirm Delete: &0/{0}"
@@ -317,6 +346,7 @@ command-name-updated: "&aName updated to: {0}"
 command-description-updated: "&aDescription updated."
 command-permission-updated: "&aPermission updated to: {0}"
 command-cooldown-updated: "&aCooldown updated to: {0}s."
+command-material-updated: "&aCommand icon updated to: &b{0}"
 command-interval-updated: "&aInterval updated to: {0}s."
 command-alias-updated: "&aAliases updated!"
 alias-added: "&aAlias added successfully!"
@@ -327,6 +357,9 @@ chat-alias-edit: "&eEnter the new name for the alias in chat (or 'cancel'):"
 create-success-msg: "&aCommand created successfully."
 changes-discarded: "&c&lChanges discarded."
 unsaved-changes-warning: "&e⚠ &cWarning: You have unsaved changes. Exit again within 5s to discard."
+language-changed: "&aLanguage changed to: &e{0}"
+language-list: "&7Available languages: &f{0}"
+language-not-found: "&cLanguage not found! Available: &f{0}"
 
 # ============================================
 # ACTION MESSAGES
@@ -360,9 +393,6 @@ chat-input-invalid-world: "&cWorld not found!"
 
 # ============================================
 # ACTION TYPES - NAMES
-# [BUNGEE] <server> - Send player to a Bungee server
-# [VELOCITY] <server> - Send player to a Velocity server
-# [SENT_TO] <server> - Send player to a proxy server
 # ============================================
 action-name-message: "&aMessage"
 action-name-broadcast: "&6Broadcast"
@@ -386,6 +416,12 @@ action-name-give-money: "&6Give Money"
 action-name-take-money: "&cTake Money"
 action-name-velocity: "&bVelocity"
 action-name-send-to: "&3Proxy (Sent To)"
+action-name-if-perm: "&aPermission"
+action-name-if-perm-not: "&cNo Permission"
+action-name-if-chance: "&eChance"
+action-name-if-op: "&4OP Only"
+action-name-if-world: "&9World"
+action-name-if-money: "&aMoney"
 
 # ============================================
 # ACTION TYPES - DESCRIPTIONS
@@ -412,35 +448,21 @@ action-desc-give-money: "&7Gives money to player (Vault)."
 action-desc-take-money: "&7Takes money from player (Vault)."
 action-desc-velocity: "&7Sends player to a server (Velocity)."
 action-desc-send-to: "&7Sends player to a server via Proxy."
-
-# ============================================
-# NEW KEYS
-# ============================================
-help-locate: "&e/xc locate [lang] &7- Change or list languages"
-language-changed: "&aLanguage changed to: &e{0}"
-language-list: "&7Available languages: &f{0}"
-language-not-found: "&cLanguage not found! Available: &f{0}"
-
-action-name-if-perm: "&aPermission"
-action-name-if-perm-not: "&cNo Permission"
-action-name-if-chance: "&eChance"
-action-name-if-op: "&4OP Only"
-action-name-if-world: "&9World"
-action-name-if-money: "&aMoney"
-
 action-desc-if-perm: "&7Executes the following only if player has permission."
 action-desc-if-perm-not: "&7Executes the following only if player DOES NOT have permission."
 action-desc-if-chance: "&7Executes the following based on a chance (0-100)."
 action-desc-if-op: "&7Executes the following only if player is OP."
 action-desc-if-world: "&7Executes the following only in the specified world."
 action-desc-if-money: "&7Executes the following only if player has enough money."
+action-no-value-needed: "&eThis action does not require any additional value."
 
 # ============================================
-# HELP MESSAGES
+# VERSION INFO
 # ============================================
-help-list: "&e/xc list &7- List all custom commands"
-help-info: "&e/xc info <cmd> &7- Show info of a command"
-help-create: "&e/xc create <cmd> &7- Create a new command"
-help-delete: "&e/xc delete <cmd> &7- Delete a command"
-help-edit: "&e/xc edit <cmd> ... &7- Edit a command"
-help-version: "&e/xc version &7- Show plugin and server info"
+version-folia-on: "&aFolia (Enabled)"
+version-folia-off: "&7Standard Bukkit"
+version-header: "{0} &b&lPlugin Information:"
+version-plugin: " &8» &7Plugin Version: &e{0}"
+version-server: " &8» &7Server Version: &e{0}"
+version-platform: " &8» &7Server Platform: {0}"
+version-java: " &8» &7Java Version: &e{0}"

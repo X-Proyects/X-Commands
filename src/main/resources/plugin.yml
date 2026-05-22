@@ -1,5 +1,5 @@
 name: X-Commands
-version: 2.4
+version: 2.5
 main: com.fabian.XCommands
 api-version: 1.18
 folia-supported: true

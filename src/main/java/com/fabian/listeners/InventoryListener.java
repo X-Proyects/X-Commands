@@ -72,6 +72,20 @@ public class InventoryListener implements Listener {
         // Clear cursor to prevent ghost items
         if (event.getPlayer().getItemOnCursor() != null
                 && event.getPlayer().getItemOnCursor().getType() != Material.AIR) {
+            
+            MenuHolder holder = (MenuHolder) event.getInventory().getHolder();
+            // If in ACTION_REORDER, handle cursor item BEFORE clearing it
+            if (holder.getMenuType() == MenuType.ACTION_REORDER) {
+                ItemStack cursor = event.getPlayer().getItemOnCursor();
+                org.bukkit.inventory.Inventory topInv = event.getInventory();
+                for (int i = 0; i < 36; i++) {
+                    if (topInv.getItem(i) == null || topInv.getItem(i).getType() == Material.AIR) {
+                        topInv.setItem(i, cursor);
+                        break;
+                    }
+                }
+            }
+            
             event.getPlayer().setItemOnCursor(null);
         }
 
@@ -97,6 +111,11 @@ public class InventoryListener implements Listener {
 
         String cmdName = holder.getCommandName();
 
+        // Automatically save reordered actions on close, so that changes are tracked
+        if (holder.getMenuType() == MenuType.ACTION_REORDER) {
+            saveReorderedActions((Player) event.getPlayer(), event.getInventory(), cmdName);
+        }
+
         if (cmdName != null && plugin.getCommandManager().isDirty(cmdName)) {
             long currentTime = System.currentTimeMillis();
 
@@ -120,6 +139,13 @@ public class InventoryListener implements Listener {
             });
             
             event.getPlayer().sendMessage(plugin.getLanguageManager().getMessage("unsaved-changes-warning"));
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(org.bukkit.event.inventory.InventoryDragEvent event) {
+        if (event.getInventory().getHolder() instanceof MenuHolder) {
+            event.setCancelled(true);
         }
     }
 
@@ -184,7 +210,7 @@ public class InventoryListener implements Listener {
                 break;
 
             case ACTION_TYPE_SELECTION:
-                handleActionTypeSelection(player, clicked, meta, cmdName, holder.getActionIndex());
+                handleActionTypeSelection(event, player, clicked, meta, cmdName, holder.getActionIndex());
                 break;
 
             case NUMERIC_ACTION:
@@ -389,17 +415,14 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        if (clicked.getType() == Material.NETHER_STAR) {
+        if (clicked.getType() == Material.NETHER_STAR && !meta.getPersistentDataContainer().has(keyActionIndex, PersistentDataType.INTEGER)) {
             if (!hasPermission(player, "xcommands.admin.edit"))
                 return;
 
             CustomCommandExecutor exec = plugin.getCommandManager().getCustomCommands().get(cmdName.toLowerCase());
             if (exec != null) {
-                List<String> actions = exec.getActions();
-                actions.add("[MESSAGE] Nueva acción");
-                plugin.getCommandManager().markDirty(cmdName);
                 scheduleTransition(player, () -> {
-                    plugin.getInventoryManager().openActionTypeSelectionMenu(player, cmdName, actions.size() - 1);
+                    plugin.getInventoryManager().openActionTypeSelectionMenu(player, cmdName, -1);
                 });
             }
             return;
@@ -460,10 +483,13 @@ public class InventoryListener implements Listener {
                 String action = exec.getActions().get(actionIdx);
                 String actionType = "MESSAGE";
 
-                if (action.startsWith("[")) {
+                if (action.trim().equals("[") || action.trim().equals("]")) {
+                    actionType = action.trim();
+                } else if (action.startsWith("[") || action.startsWith("![")) {
+                    int start = action.indexOf("[") + 1;
                     int end = action.indexOf("]");
                     if (end != -1) {
-                        actionType = action.substring(1, end);
+                        actionType = action.substring(start, end);
                     }
                 }
 
@@ -534,6 +560,14 @@ public class InventoryListener implements Listener {
                         });
                         break;
 
+                    case "IF_OP":
+                    case "CLOSE":
+                    case "[":
+                    case "]":
+                        // IF_OP and CLOSE do not take values
+                        player.sendMessage(plugin.getLanguageManager().getMessage("action-no-value-needed"));
+                        break;
+                        
                     // For simple text actions, use chat input
                     case "MESSAGE":
                     case "BROADCAST":
@@ -550,11 +584,20 @@ public class InventoryListener implements Listener {
         }
     }
 
-    private void handleActionTypeSelection(Player player, ItemStack clicked, ItemMeta meta, String cmdName,
+    private void handleActionTypeSelection(org.bukkit.event.inventory.InventoryClickEvent event, Player player, ItemStack clicked, ItemMeta meta, String cmdName,
             int actionIndex) {
         if (clicked.getType() == Material.ARROW) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                if (actionIndex == -1) {
+                    plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                } else {
+                    CustomCommandExecutor executor = plugin.getCommandManager().getCustomCommands().get(cmdName.toLowerCase());
+                    if (executor != null && actionIndex >= executor.getActions().size()) {
+                        plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                    } else {
+                        plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                    }
+                }
             });
             return;
         }
@@ -586,26 +629,67 @@ public class InventoryListener implements Listener {
         }
 
         CustomCommandExecutor exec = plugin.getCommandManager().getCustomCommands().get(cmdName.toLowerCase());
-        if (exec != null && actionIndex >= 0 && actionIndex < exec.getActions().size()) {
-            String oldAction = exec.getActions().get(actionIndex);
-            String params = "";
-            if (oldAction.contains("]")) {
-                params = oldAction.substring(oldAction.indexOf("]") + 1).trim();
-            } else {
-                // If old action was plain text (MESSAGE), allow keeping it as params if
-                // plausible
-                if (!oldAction.startsWith("[")) {
-                    params = oldAction;
+        if (exec != null) {
+            if ("BRACKET".equals(tag)) {
+                String newAction = event.isLeftClick() ? "[" : "]";
+                if (actionIndex == -1) {
+                    exec.getActions().add(newAction);
+                } else if (actionIndex >= 0 && actionIndex < exec.getActions().size()) {
+                    plugin.getCommandManager().editAction(cmdName, actionIndex, newAction);
                 }
+                plugin.getCommandManager().markDirty(cmdName);
+                scheduleTransition(player, () -> {
+                    plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                });
+                return;
             }
 
-            String newAction = "[" + tag + "] " + params;
-            plugin.getCommandManager().editAction(cmdName, actionIndex, newAction);
-            plugin.getCommandManager().markDirty(cmdName);
-            player.sendMessage(plugin.getLanguageManager().getMessage("action-type-changed", tag));
+            String newAction;
+            int finalActionIndex;
+
+            if (actionIndex == -1) {
+                // Adding a new action
+                newAction = "[" + tag + "] ";
+                if (tag.startsWith("IF_") && event.isRightClick()) {
+                    newAction = "!" + newAction;
+                }
+                exec.getActions().add(newAction.trim());
+                finalActionIndex = exec.getActions().size() - 1;
+                plugin.getCommandManager().markDirty(cmdName);
+                // We don't have a specific language key for action added in this context, but dirty is marked
+            } else if (actionIndex >= 0 && actionIndex < exec.getActions().size()) {
+                // Editing existing action
+                String oldAction = exec.getActions().get(actionIndex);
+                String params = "";
+                if (oldAction.contains("]")) {
+                    params = oldAction.substring(oldAction.indexOf("]") + 1).trim();
+                } else {
+                    if (!oldAction.startsWith("[") && !oldAction.startsWith("![")) {
+                        params = oldAction;
+                    }
+                }
+
+                if (tag.equalsIgnoreCase("IF_OP") || tag.equalsIgnoreCase("CLOSE")) {
+                    params = "";
+                }
+
+                newAction = "[" + tag + "] " + params;
+                
+                // Negate condition if right-clicked
+                if (tag.startsWith("IF_") && event.isRightClick()) {
+                    newAction = "!" + newAction;
+                }
+                
+                plugin.getCommandManager().editAction(cmdName, actionIndex, newAction.trim());
+                plugin.getCommandManager().markDirty(cmdName);
+                player.sendMessage(plugin.getLanguageManager().getMessage("action-type-changed", tag));
+                finalActionIndex = actionIndex;
+            } else {
+                return;
+            }
 
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                plugin.getInventoryManager().openActionEditMenu(player, cmdName, finalActionIndex);
             });
         }
     }
@@ -645,8 +729,13 @@ public class InventoryListener implements Listener {
                     break;
 
                 case COMMAND_PERMISSION:
-                    plugin.getCommandManager().updateConfigValue(request.commandName, "permission", input);
-                    player.sendMessage(plugin.getLanguageManager().getMessage("command-permission-updated", input));
+                    String permInput = input;
+                    if (permInput.equalsIgnoreCase("none") || permInput.equalsIgnoreCase(plugin.getLanguageManager().getMessage("gui-none"))) {
+                        permInput = "";
+                    }
+                    plugin.getCommandManager().updateConfigValue(request.commandName, "permission", permInput);
+                    player.sendMessage(plugin.getLanguageManager().getMessage("command-permission-updated",
+                            permInput.isEmpty() ? plugin.getLanguageManager().getMessage("gui-none") : permInput));
                     break;
 
                 case COMMAND_COOLDOWN:
@@ -711,7 +800,7 @@ public class InventoryListener implements Listener {
 
                     String newContent = input;
                     // Scan for [TYPE]
-                    if (currentAction.startsWith("[")) {
+                    if (currentAction.startsWith("[") || currentAction.startsWith("![")) {
                         int endIdx = currentAction.indexOf("]");
                         if (endIdx != -1) {
                             String type = currentAction.substring(0, endIdx + 1);
@@ -962,11 +1051,24 @@ public class InventoryListener implements Listener {
         }, 1L);
     }
 
+    @SuppressWarnings("deprecation")
     private void handleActionReorderMenu(InventoryClickEvent event, Player player, ItemStack clicked, String cmdName) {
-        // Allow drag and drop in the top inventory
+        // Block interaction with anything other than the top inventory
         if (event.getClickedInventory() != event.getView().getTopInventory()) {
-            // Allow clicking and shifting items from bottom to top for reordering
-            event.setCancelled(false);
+            event.setCancelled(true);
+            return;
+        }
+
+        // Prevent taking items out using Hotbar keys, Drop, shift-click, etc.
+        org.bukkit.event.inventory.InventoryAction action = event.getAction();
+        if (action == org.bukkit.event.inventory.InventoryAction.MOVE_TO_OTHER_INVENTORY || 
+            action == org.bukkit.event.inventory.InventoryAction.HOTBAR_SWAP || 
+            action == org.bukkit.event.inventory.InventoryAction.HOTBAR_MOVE_AND_READD ||
+            action == org.bukkit.event.inventory.InventoryAction.DROP_ALL_SLOT ||
+            action == org.bukkit.event.inventory.InventoryAction.DROP_ONE_SLOT ||
+            action == org.bukkit.event.inventory.InventoryAction.DROP_ALL_CURSOR ||
+            action == org.bukkit.event.inventory.InventoryAction.DROP_ONE_CURSOR) {
+            event.setCancelled(true);
             return;
         }
 
@@ -985,7 +1087,7 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        // 2. Handle Back Button (Slot 45)
+        // 2. Handle Back Button (Slot 45) → CommandEditMenu
         if (slot == 45) {
             event.setCancelled(true);
             // Clear cursor if user is holding an item while clicking back
@@ -995,6 +1097,19 @@ public class InventoryListener implements Listener {
             saveReorderedActions(player, event.getView().getTopInventory(), cmdName);
             scheduleTransition(player, () -> {
                 plugin.getInventoryManager().openCommandEditMenu(player, cmdName);
+            });
+            return;
+        }
+
+        // Handle Hopper (Slot 53) → ActionsMenu
+        if (slot == 53) {
+            event.setCancelled(true);
+            if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
+                event.getView().setCursor(null);
+            }
+            saveReorderedActions(player, event.getView().getTopInventory(), cmdName);
+            scheduleTransition(player, () -> {
+                plugin.getInventoryManager().openActionsMenu(player, cmdName);
             });
             return;
         }
@@ -1106,8 +1221,8 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        // Add buttons
-        if (clicked.getType() == Material.EMERALD) {
+        // Add buttons (LIME_WOOL)
+        if (clicked.getType() == Material.LIME_WOOL) {
             String displayName = com.fabian.utils.ColorUtils.stripColor(com.fabian.utils.CompatibilityUtils.getDisplayName(clicked.getItemMeta()));
             if (displayName.startsWith("+")) {
                 try {
@@ -1122,11 +1237,53 @@ public class InventoryListener implements Listener {
                         double newValue = currentValue + addValue;
                         meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "numeric_value"),
                                 PersistentDataType.DOUBLE, newValue);
-                        String displayValue = (actionType.startsWith("SOUND_") || actionType.equals("HEAL") || actionType.equals("FEED") || actionType.equals("IF_CHANCE") || actionType.equals("IF_MONEY")) ? String.format("%.1f", newValue) : String.valueOf((int) newValue);
+                        boolean isDecimal = actionType.startsWith("SOUND_") || actionType.equals("HEAL")
+                                || actionType.equals("FEED") || actionType.equals("IF_CHANCE")
+                                || actionType.equals("IF_MONEY");
+                        String displayValue = isDecimal
+                                ? String.format("%.1f", newValue)
+                                : String.valueOf((int) newValue);
                         com.fabian.utils.CompatibilityUtils.setDisplayName(meta, "&e" + actionType + ": &f" + displayValue);
                         centerItem.setItemMeta(meta);
                         event.getView().getTopInventory().setItem(13, centerItem);
                         player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            return;
+        }
+
+        // Subtract buttons (RED_WOOL)
+        if (clicked.getType() == Material.RED_WOOL) {
+            String displayName = com.fabian.utils.ColorUtils.stripColor(com.fabian.utils.CompatibilityUtils.getDisplayName(clicked.getItemMeta()));
+            if (displayName.startsWith("-")) {
+                try {
+                    int subValue = Integer.parseInt(displayName.substring(1));
+                    ItemStack centerItem = event.getView().getTopInventory().getItem(13);
+                    if (centerItem != null && centerItem.getItemMeta() != null) {
+                        ItemMeta meta = centerItem.getItemMeta();
+                        double currentValue = meta.getPersistentDataContainer()
+                                .get(new NamespacedKey(plugin, "numeric_value"), PersistentDataType.DOUBLE);
+                        String actionType = meta.getPersistentDataContainer()
+                                .get(new NamespacedKey(plugin, "action_type_tag"), PersistentDataType.STRING);
+                        double newValue = currentValue - subValue;
+                        // DELAY cannot go below 0
+                        if ("DELAY".equals(actionType)) {
+                            newValue = Math.max(0, newValue);
+                        }
+                        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "numeric_value"),
+                                PersistentDataType.DOUBLE, newValue);
+                        boolean isDecimal = actionType.startsWith("SOUND_") || actionType.equals("HEAL")
+                                || actionType.equals("FEED") || actionType.equals("IF_CHANCE")
+                                || actionType.equals("IF_MONEY");
+                        String displayValue = isDecimal
+                                ? String.format("%.1f", newValue)
+                                : String.valueOf((int) newValue);
+                        com.fabian.utils.CompatibilityUtils.setDisplayName(meta, "&e" + actionType + ": &f" + displayValue);
+                        centerItem.setItemMeta(meta);
+                        event.getView().getTopInventory().setItem(13, centerItem);
+                        player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 0.8f);
                     }
                 } catch (NumberFormatException ignored) {
                 }

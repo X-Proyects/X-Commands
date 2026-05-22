@@ -29,10 +29,14 @@ public class ActionEditMenu extends BaseMenu {
         String type = "MESSAGE";
         String value = "";
 
-        if (action.startsWith("[")) {
+        if (action.trim().equals("[") || action.trim().equals("]")) {
+            type = action.trim();
+            value = "";
+        } else if (action.startsWith("[") || action.startsWith("![")) {
+            int start = action.indexOf("[") + 1;
             int end = action.indexOf("]");
             if (end != -1) {
-                type = action.substring(1, end);
+                type = action.substring(start, end);
                 value = action.substring(end + 1).trim();
             }
         } else {
@@ -47,16 +51,29 @@ public class ActionEditMenu extends BaseMenu {
         // Fill background
         fillBackground(inv);
 
-        // Edit Type
-        inv.setItem(11, createItem(Material.COMPARATOR,
-                lang.getMessage("gui-action-edit-type"),
-                lang.getMessage("gui-action-edit-type-lore", type).split("\\|")));
+        // Determine if this action takes a value
+        boolean takesValue = !(type.equalsIgnoreCase("IF_OP") || type.equalsIgnoreCase("CLOSE") || type.equals("[") || type.equals("]"));
 
-        // Edit Value
-        inv.setItem(15, createItem(Material.PAPER,
-                lang.getMessage("gui-action-edit-value"),
-                lang.getMessage("gui-action-edit-value-lore", (value.isEmpty() ? lang.getMessage("gui-empty") : value))
-                        .split("\\|")));
+        // Preserve '!' prefix for display purposes
+        String displayType = action.startsWith("!") ? "!" + type : type;
+
+        if (takesValue) {
+            // Edit Type
+            inv.setItem(11, createItem(Material.COMPARATOR,
+                    lang.getMessage("gui-action-edit-type"),
+                    lang.getMessage("gui-action-edit-type-lore", displayType).split("\\|")));
+
+            // Edit Value
+            inv.setItem(15, createItem(Material.PAPER,
+                    lang.getMessage("gui-action-edit-value"),
+                    lang.getMessage("gui-action-edit-value-lore", (value.isEmpty() ? lang.getMessage("gui-none") : value))
+                            .split("\\|")));
+        } else {
+            // Edit Type (Centered)
+            inv.setItem(13, createItem(Material.COMPARATOR,
+                    lang.getMessage("gui-action-edit-type"),
+                    lang.getMessage("gui-action-edit-type-lore", displayType).split("\\|")));
+        }
 
         // Back Button
         addBackButton(inv, 18);

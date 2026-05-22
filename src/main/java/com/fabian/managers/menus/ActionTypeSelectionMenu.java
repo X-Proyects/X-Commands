@@ -28,7 +28,7 @@ public class ActionTypeSelectionMenu extends BaseMenu {
         String[] types = {
             "MESSAGE", "BROADCAST", "ACTIONBAR", "TITLE", "SOUND", "EFFECT", "GIVE", "TELEPORT", "DELAY", 
             "HEAL", "FEED", "DAMAGE", "CONSOLE", "PLAYER", "KICK", "CLOSE", "PARTICLE", "BUNGEE", 
-            "GIVE_MONEY", "TAKE_MONEY", "VELOCITY", "SENT_TO", "IF_PERMISSION", "IF_CHANCE", "IF_OP", "IF_WORLD", "IF_MONEY"
+            "GIVE_MONEY", "TAKE_MONEY", "VELOCITY", "SENT_TO", "IF_PERMISSION", "IF_CHANCE", "IF_OP", "IF_WORLD", "IF_MONEY", "BRACKET"
         };
 
         for (int i = 0; i < types.length; i++) {
@@ -42,7 +42,7 @@ public class ActionTypeSelectionMenu extends BaseMenu {
     }
 
     private ItemStack createTypeItem(String type) {
-        String actionTag = "[" + type + "]";
+        String actionTag = type.equals("BRACKET") ? "[" : "[" + type + "]";
         ItemStack item = new ItemStack(getActionMaterial(actionTag));
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -54,8 +54,16 @@ public class ActionTypeSelectionMenu extends BaseMenu {
             List<String> lore = new ArrayList<>();
             lore.add(lang.getMessage(descKey));
             lore.add("");
-            lore.add(lang.getMessage("gui-type-select"));
-            
+            if (type.equals("BRACKET")) {
+                lore.add(lang.getMessage("gui-type-bracket-right"));
+                lore.add(lang.getMessage("gui-type-bracket-left"));
+            } else {
+                lore.add(lang.getMessage("gui-type-select"));
+                if (type.startsWith("IF_")) {
+                    lore.add(lang.getMessage("gui-type-select-not"));
+                }
+            }
+
             CompatibilityUtils.setLore(meta, lore);
 
             // Store type in PersistentDataContainer

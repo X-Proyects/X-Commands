@@ -20,16 +20,12 @@ public class SchedulerUtils {
     public static boolean isFolia() {
         if (isFolia == null) {
             try {
-                // Try several known Folia classes
+                // Only RegionizedServer is a reliable indicator of a running Folia server.
+                // RegionScheduler might be present in standard Paper API stubs, causing false positives on Paper/Spigot.
                 Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
                 isFolia = true;
-            } catch (ClassNotFoundException e1) {
-                try {
-                    Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
-                    isFolia = true;
-                } catch (ClassNotFoundException e2) {
-                    isFolia = false;
-                }
+            } catch (ClassNotFoundException e) {
+                isFolia = false;
             }
         }
         return isFolia;
@@ -44,7 +40,7 @@ public class SchedulerUtils {
                 Object scheduler = Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
                 scheduler.getClass().getMethod("run", Plugin.class, Consumer.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LoggerUtils.debug("Folia GlobalRegionScheduler 'run' failed: " + e.getMessage());
                 // Fallback to async if global fails or other errors
                 runTaskAsynchronously(plugin, runnable);
@@ -63,7 +59,7 @@ public class SchedulerUtils {
                 Object scheduler = Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
                 scheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, long.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), Math.max(1L, delayTicks));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LoggerUtils.debug("Folia GlobalRegionScheduler 'runDelayed' failed: " + e.getMessage());
                 Bukkit.getScheduler().runTaskLater(plugin, runnable, delayTicks);
             }
@@ -81,7 +77,7 @@ public class SchedulerUtils {
                 Object scheduler = Bukkit.class.getMethod("getAsyncScheduler").invoke(null);
                 scheduler.getClass().getMethod("runNow", Plugin.class, Consumer.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LoggerUtils.debug("Folia AsyncScheduler 'runNow' failed: " + e.getMessage());
                 // Last resort fallback
                 try {
@@ -103,7 +99,7 @@ public class SchedulerUtils {
                 Object scheduler = Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
                 return scheduler.getClass().getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), Math.max(1L, delayTicks), Math.max(1L, periodTicks));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LoggerUtils.debug("Folia GlobalRegionScheduler 'runAtFixedRate' failed: " + e.getMessage());
                 return Bukkit.getScheduler().runTaskTimer(plugin, runnable, delayTicks, periodTicks);
             }
@@ -119,7 +115,7 @@ public class SchedulerUtils {
         if (task == null) return;
         try {
             task.getClass().getMethod("cancel").invoke(task);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LoggerUtils.debug("Task cancellation failed: " + e.getMessage());
         }
     }
@@ -139,7 +135,7 @@ public class SchedulerUtils {
                 Object scheduler = player.getClass().getMethod("getScheduler").invoke(player);
                 scheduler.getClass().getMethod("run", Plugin.class, Consumer.class, Runnable.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), null);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LoggerUtils.debug("Folia EntityScheduler 'run' failed for " + player.getName() + ": " + e.getMessage());
                 runTask(plugin, runnable);
             }
@@ -163,7 +159,7 @@ public class SchedulerUtils {
                 Object scheduler = player.getClass().getMethod("getScheduler").invoke(player);
                 scheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, Runnable.class, long.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), null, delayTicks);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LoggerUtils.debug("Folia EntityScheduler 'runDelayed' failed for " + player.getName() + ": " + e.getMessage());
                 runTaskLater(plugin, runnable, delayTicks);
             }
@@ -183,7 +179,7 @@ public class SchedulerUtils {
             // Check for Folia/Paper's teleportAsync
             java.lang.reflect.Method method = player.getClass().getMethod("teleportAsync", org.bukkit.Location.class);
             method.invoke(player, location);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // Fallback to standard synchronous teleport
             player.teleport(location);
         }

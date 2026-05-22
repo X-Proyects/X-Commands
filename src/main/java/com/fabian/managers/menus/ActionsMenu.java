@@ -47,7 +47,7 @@ public class ActionsMenu extends BaseMenu {
         // Reorder Button
         inv.setItem(53, createItem(Material.HOPPER,
                 lang.getMessage("gui-actions-reorder"),
-                lang.getMessage("gui-actions-reorder-lore")));
+                lang.getMessage("gui-actions-reorder-lore").split("\\|")));
 
         smartOpenInventory(player, inv);
     }

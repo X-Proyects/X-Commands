@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.help.HelpTopic;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
@@ -222,9 +223,42 @@ public class CommandManager {
             }
         };
 
-        command.setDescription("Custom command from X-Commands");
+        command.setDescription(executor.getDescription() != null && !executor.getDescription().isEmpty()
+                ? executor.getDescription()
+                : "Custom command from X-Commands");
         command.setAliases(executor.getAliases());
+        
+        if (permNode != null && !permNode.isEmpty()) {
+            command.setPermission(permNode);
+        }
+        
         commandMap.register("xcommands", command);
+
+        // Register robust HelpTopic so the command appears in /help and /?
+        try {
+            final String cmdName = name.toLowerCase();
+            final String desc = executor.getDescription() != null && !executor.getDescription().isEmpty()
+                    ? executor.getDescription()
+                    : "Custom command from X-Commands";
+            final String perm = executor.getPermission();
+            
+            HelpTopic topic = new HelpTopic() {
+                {
+                    this.name = "/" + cmdName;
+                    this.shortText = desc;
+                    this.fullText = desc;
+                    this.amendedPermission = perm;
+                }
+
+                @Override
+                public boolean canSee(org.bukkit.command.CommandSender sender) {
+                    return amendedPermission == null || amendedPermission.isEmpty() || sender.hasPermission(amendedPermission);
+                }
+            };
+            Bukkit.getHelpMap().addTopic(topic);
+        } catch (Exception ignored) {
+            // Some server implementations may not support this
+        }
     }
 
     /**
@@ -333,6 +367,28 @@ public class CommandManager {
             File commandFile = new File(commandsFolder, commandName + ".yml");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(commandFile, StandardCharsets.UTF_8))) {
                 writer.write(content);
+            }
+
+            // Apply default aliases and actions from config
+            if (plugin.getConfigManager().getConfig().contains("default-command")) {
+                YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(commandFile);
+                
+                String defaultMaterial = plugin.getConfigManager().getConfig().getString("default-command.material");
+                if (defaultMaterial != null && !defaultMaterial.isEmpty()) {
+                    newConfig.set("item.material", defaultMaterial.toUpperCase());
+                }
+                
+                newConfig.set("aliases", plugin.getConfigManager().getConfig().getStringList("default-command.aliases"));
+                
+                java.util.List<String> defaultActions = plugin.getConfigManager().getConfig().getStringList("default-command.actions");
+                // Replace %command% placeholder with the actual command name
+                java.util.List<String> parsedActions = new java.util.ArrayList<>();
+                for (String action : defaultActions) {
+                    parsedActions.add(action.replace("%command%", commandName));
+                }
+                newConfig.set("actions", parsedActions);
+                
+                newConfig.save(commandFile);
             }
 
             // Now load THIS specific file into memory (using the standard loader logic)

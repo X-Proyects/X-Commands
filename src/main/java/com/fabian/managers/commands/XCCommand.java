@@ -102,17 +102,38 @@ public class XCCommand implements CommandExecutor, TabCompleter {
 
     private void sendHelp(CommandSender sender) {
         LanguageManager lang = plugin.getLanguageManager();
+
+        // Map of permission -> language key
+        String[][] entries = {
+            { "xcommands.admin.gui",     "help-gui"     },
+            { "xcommands.admin.locate",  "help-locate"  },
+            { "xcommands.admin.reload",  "help-reload"  },
+            { "xcommands.admin.update",  "help-update"  },
+            { "xcommands.admin.list",    "help-list"    },
+            { "xcommands.admin.info",    "help-info"    },
+            { "xcommands.admin.create",  "help-create"  },
+            { "xcommands.admin.delete",  "help-delete"  },
+            { "xcommands.admin.edit",    "help-edit"    },
+            { "xcommands.admin.version", "help-version" },
+        };
+
+        // Collect accessible entries
+        java.util.List<String> visible = new java.util.ArrayList<>();
+        for (String[] entry : entries) {
+            if (sender.hasPermission(entry[0])) {
+                visible.add(lang.getMessage(entry[1]));
+            }
+        }
+
+        if (visible.isEmpty()) {
+            com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("no-permission"));
+            return;
+        }
+
         com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-header"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-gui"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-locate"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-reload"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-update"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-list"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-info"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-create"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-delete"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-edit"));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-version"));
+        for (String line : visible) {
+            com.fabian.utils.CompatibilityUtils.sendMessage(sender, line);
+        }
         com.fabian.utils.CompatibilityUtils.sendMessage(sender, lang.getMessage("help-footer"));
     }
 
@@ -121,11 +142,23 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            List<String> subCommands = Arrays.asList("-gui", "help", "reload", "update", "create", "delete", "list", "info", "edit", "version", "locate");
             String input = args[0].toLowerCase();
-            for (String sub : subCommands) {
-                if (sub.startsWith(input)) {
-                    completions.add(sub);
+            String[][] allSubs = {
+                { "-gui",    "xcommands.admin.gui"     },
+                { "help",    "xcommands.admin"         },
+                { "reload",  "xcommands.admin.reload"  },
+                { "update",  "xcommands.admin.update"  },
+                { "create",  "xcommands.admin.create"  },
+                { "delete",  "xcommands.admin.delete"  },
+                { "list",    "xcommands.admin.list"    },
+                { "info",    "xcommands.admin.info"    },
+                { "edit",    "xcommands.admin.edit"    },
+                { "version", "xcommands.admin.version" },
+                { "locate",  "xcommands.admin.locate"  },
+            };
+            for (String[] sub : allSubs) {
+                if (sender.hasPermission(sub[1]) && sub[0].startsWith(input)) {
+                    completions.add(sub[0]);
                 }
             }
         } else if (args.length == 2) {
@@ -189,14 +222,16 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         }
 
         String prefix = plugin.getLanguageManager().getPrefix();
-        String foliaStatus = com.fabian.utils.SchedulerUtils.isFolia() ? "§aFolia (Enabled)" : "§7Standard Bukkit";
-        
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, prefix + " §b§lPlugin Information:");
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Plugin Version: §e" + com.fabian.utils.CompatibilityUtils.getVersion(plugin));
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Server Version: §e" + plugin.getServer().getName() + " " + plugin.getServer().getVersion());
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Server Platform: " + foliaStatus);
-        com.fabian.utils.CompatibilityUtils.sendMessage(sender, " §8» §7Java Version: §e" + System.getProperty("java.version"));
-        
+        String foliaStatus = com.fabian.utils.SchedulerUtils.isFolia()
+                ? plugin.getLanguageManager().getMessage("version-folia-on")
+                : plugin.getLanguageManager().getMessage("version-folia-off");
+
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("version-header", prefix));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("version-plugin", com.fabian.utils.CompatibilityUtils.getVersion(plugin)));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("version-server", plugin.getServer().getName() + " " + plugin.getServer().getVersion()));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("version-platform", foliaStatus));
+        com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("version-java", System.getProperty("java.version")));
+
         return true;
     }
 }

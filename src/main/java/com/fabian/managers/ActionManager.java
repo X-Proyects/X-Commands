@@ -27,7 +27,6 @@ public class ActionManager {
         final String params;
         final boolean negated;
         final boolean isDelay;
-        long parsedDelay = 0;
 
         ActionEntry(Action action, String tag, String params, boolean negated) {
             this.action = action;
@@ -35,12 +34,6 @@ public class ActionManager {
             this.params = params;
             this.negated = negated;
             this.isDelay = tag.equals("DELAY");
-            if (isDelay) {
-                try {
-                    parsedDelay = Long.parseLong(params.trim());
-                } catch (NumberFormatException ignored) {
-                }
-            }
         }
     }
 
@@ -116,7 +109,13 @@ public class ActionManager {
         }
 
         for (int i = startIndex; i < actionStrings.size(); i++) {
-            String actionString = actionStrings.get(i);
+            String actionString = actionStrings.get(i).trim();
+
+            // Ignore bracket notation when executing normally
+            if (actionString.equals("[") || actionString.equals("]")) {
+                continue;
+            }
+
             ActionEntry entry = getByKeyOrParse(actionString);
 
             if (entry == null) {
@@ -125,17 +124,46 @@ public class ActionManager {
 
             if (entry.isDelay) {
                 final int nextIndex = i + 1;
-                // Schedule remainder of the list
+                // Resolve delay at runtime (after placeholder/arg replacement) so dynamic values work
+                String delayStr = com.fabian.utils.PlaceholderUtils.replaceArgs(entry.params, args);
+                long delayTicks = 1L;
+                try {
+                    // Try integer first; fall back to double to handle values like "60.0"
+                    delayTicks = Math.max(1L, Long.parseLong(delayStr.trim()));
+                } catch (NumberFormatException e1) {
+                    try {
+                        delayTicks = Math.max(1L, (long) Double.parseDouble(delayStr.trim()));
+                    } catch (NumberFormatException e2) {
+                        plugin.logWarning("[DELAY] invalid value '" + delayStr + "' — defaulting to 1 tick.");
+                    }
+                }
+                final long finalDelay = delayTicks;
+                // Schedule remainder of the list after the delay
                 SchedulerUtils.runTaskLaterForPlayer(plugin, player, () -> {
                     executeActionsLoop(player, actionStrings, nextIndex, args);
-                }, entry.parsedDelay);
-                return; // Break current loop, remainder handled by task
+                }, finalDelay);
+                return; // Break current loop, remainder handled by the scheduled task
             }
 
             // Execute synchronous action
             if (entry.tag.startsWith("IF_")) {
-                if (!evaluateCondition(player, entry)) {
-                    i++; // Skip the NEXT action
+                if (!evaluateCondition(player, entry, args)) {
+                    // Check if the next action is a bracket block
+                    if (i + 1 < actionStrings.size() && actionStrings.get(i + 1).trim().equals("[")) {
+                        int bracketCount = 1;
+                        i++; // Move to the '['
+                        while (i + 1 < actionStrings.size() && bracketCount > 0) {
+                            i++;
+                            String nextAction = actionStrings.get(i).trim();
+                            if (nextAction.equals("[")) {
+                                bracketCount++;
+                            } else if (nextAction.equals("]")) {
+                                bracketCount--;
+                            }
+                        }
+                    } else {
+                        i++; // Skip just the NEXT single action
+                    }
                 }
                 continue;
             }
@@ -221,10 +249,12 @@ public class ActionManager {
         }
     }
 
-    private boolean evaluateCondition(Player player, ActionEntry entry) {
+    private boolean evaluateCondition(Player player, ActionEntry entry, String[] args) {
         Map<String, Object> context = new HashMap<>();
+        // Pre-process params with arguments for conditions
+        String params = com.fabian.utils.PlaceholderUtils.replaceArgs(entry.params, args);
         // Wrap the tag in brackets so ConditionManager can parse it correctly
-        String formattedCondition = (entry.negated ? "!" : "") + "[" + entry.tag + "]" + (entry.params.isEmpty() ? "" : " " + entry.params);
+        String formattedCondition = (entry.negated ? "!" : "") + "[" + entry.tag + "]" + (params.isEmpty() ? "" : " " + params);
         return plugin.getConditionManager().check(player, formattedCondition, context);
     }
 

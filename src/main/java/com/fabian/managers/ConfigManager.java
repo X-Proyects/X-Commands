@@ -101,6 +101,16 @@ public class ConfigManager {
 
             // Use ConfigUpdater to add missing keys without wiping comments
             ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
+            
+            // Also update all language files
+            String[] langFiles = { "en.yml", "es.yml", "ja.yml", "pt.yml", "ru.yml", "custom.yml" };
+            File messagesFolder = new File(plugin.getDataFolder(), "messages");
+            for (String langFile : langFiles) {
+                File diskLangFile = new File(messagesFolder, langFile);
+                if (diskLangFile.exists()) {
+                    ConfigUpdater.update(plugin, "messages/" + langFile, diskLangFile);
+                }
+            }
 
             // Update code in config
             config.set("code", currentCode);

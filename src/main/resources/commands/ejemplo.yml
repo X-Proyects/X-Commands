@@ -12,7 +12,7 @@ name: ejemplo
 aliases:
   - example
   - test
-  - probando
+  - testing
   
 # [item]
 # Defines the icon for this command if it's displayed in a GUI menu.

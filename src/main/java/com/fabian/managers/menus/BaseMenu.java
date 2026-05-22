@@ -120,6 +120,9 @@ public abstract class BaseMenu {
         if (upper.contains("[IF_WORLD]")) return Material.GLOBE_BANNER_PATTERN;
         if (upper.contains("[IF_MONEY")) return Material.GOLD_BLOCK;
         
+        // Multi-line Conditional Block Brackets
+        if (action.trim().equals("[") || action.trim().equals("]")) return Material.STRUCTURE_VOID;
+        
         return Material.PAPER;
     }
 

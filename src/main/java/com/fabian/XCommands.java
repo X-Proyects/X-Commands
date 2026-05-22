@@ -106,6 +106,8 @@ public class XCommands extends JavaPlugin {
                 if (command != null) {
                     command.setExecutor(xcCommand);
                     command.setTabCompleter(xcCommand);
+                    // Register HelpTopic so /xc appears in /help and /?
+                    getServer().getHelpMap().addTopic(new org.bukkit.help.GenericCommandHelpTopic(command));
                 } else {
                     logWarning("Failed to register /xc command! It might not be defined in plugin.yml.");
                 }

@@ -1,6 +1,7 @@
 # ============================================
 # X-COMMANDS - ARCHIVO DE IDIOMA ESPAÑOL
 # ============================================
+# Archivo de idioma español universal.
 
 # ============================================
 # MENSAJES GENERALES
@@ -29,7 +30,9 @@ edit-unknown-attribute: "&cAtributo desconocido. Usa: name, permission, descript
 command-not-found: "&cComando no encontrado."
 action-invalid-index: "&cÍndice de acción inválido."
 list-empty: "&cNo existen comandos personalizados."
-list-header: "&aComandos ({0}): &e"
+list-header: "&b&lLista de Comandos: &f({0})"
+list-separator: "&8&m----------------------------------"
+list-item: " &8 » &e{0}"
 info-usage: "&cUso: /xc info <nombre>"
 info-header: "&8&m----------------------------------"
 info-title: " &8» &7Info: &e{0}"
@@ -73,9 +76,9 @@ update-current: "&a¡Estás usando la última versión!"
 # ============================================
 help-header: "&8&m----------&r &bAyuda X-Commands &8&m----------"
 help-gui: "&e/xc -gui &7- Abrir el editor visual"
-help-locate: "&e/xc locate [lang] &7- Cambiar o listar idiomas"
 help-reload: "&e/xc reload &7- Recargar el plugin"
 help-update: "&e/xc update &7- Buscar actualizaciones"
+help-locate: "&e/xc locate [lang] &7- Cambiar o listar idiomas"
 help-list: "&e/xc list &7- Listar todos los comandos"
 help-info: "&e/xc info <cmd> &7- Ver info de un comando"
 help-create: "&e/xc create <cmd> &7- Crear un nuevo comando"
@@ -88,7 +91,6 @@ help-footer: "&8&m--------------------------------"
 # GUI - MENÚ PRINCIPAL
 # ============================================
 gui-main-title: "&3&lX-Commands &8- &7Lista"
-gui-empty: "&7(Vacío)"
 gui-main-create: "&a&lCrear Comando"
 gui-main-create-lore: "&7Click para crear un nuevo comando.| |&eClick para empezar"
 gui-main-prev: "&eAnterior"
@@ -156,6 +158,10 @@ gui-type-if-world: "&9Si está en Mundo"
 gui-type-if-world-desc: "&7Condición: Solo en el mundo especificado."
 gui-type-if-money: "&aSi tiene Dinero"
 gui-type-if-money-desc: "&7Condición: Solo si tiene suficiente dinero."
+gui-type-bracket: "&bBloque de Acciones"
+gui-type-bracket-desc: "&7Agrupa acciones bajo una condición."
+gui-type-bracket-right: "&7Click Derecho: &eAgregar &8&l["
+gui-type-bracket-left: "&7Click Izquierdo: &eAgregar &8&l]"
 
 # ============================================
 # GUI - MENÚ DE EDICIÓN DE COMANDO
@@ -224,6 +230,7 @@ gui-action-edit-value-lore: "&7Actual: &f{0}| |&bClick para cambiar"
 # ============================================
 gui-selector-title: "&8Tipo: &3Acción #{0}"
 gui-type-select: "&bClick para seleccionar"
+gui-type-select-not: "&7Click Derecho: &cCondición NOT"
 
 # ============================================
 # GUI - MENÚ DE REORDENAR
@@ -232,6 +239,8 @@ gui-reorder-title: "&8Reordenar: &3/{0}"
 gui-reorder-lore: "&7Arrastra para reordenar|&7Suelta en la basura para eliminar"
 gui-reorder-trash: "&c&lBORRAR ACCIÓN"
 gui-reorder-trash-lore: "&7Arrastra una acción aquí|&7para eliminarla permanentemente."
+gui-reorder-edit: "&bEditar Acciones"
+gui-reorder-edit-lore: "&7Gestiona la lista de pasos|&7que ejecuta este comando.| |&eClic para entrar"
 
 # ============================================
 # GUI - MENÚ DE ACCIÓN NUMÉRICA
@@ -239,6 +248,7 @@ gui-reorder-trash-lore: "&7Arrastra una acción aquí|&7para eliminarla permanen
 gui-numeric-title: "&8Editando: &3{0}"
 gui-numeric-current: "&7Valor actual"
 gui-numeric-add: "&7Click para añadir"
+gui-numeric-subtract: "&7Click para restar"
 gui-numeric-reset: "&cResetear Valor"
 gui-numeric-reset-lore: "&7Establecer a 0"
 gui-numeric-confirm: "&aConfirmar & Guardar"
@@ -301,6 +311,17 @@ gui-particle-amount: "&eCantidad"
 gui-particle-amount-lore: "&7Actual: &f{0}| |&bClick para editar"
 
 # ============================================
+# GUI - MENÚ DE ACCIÓN SONIDO
+# ============================================
+gui-sound-title: "&8Acción Sonido: &3{0}"
+gui-sound-select: "&eSeleccionar Sonido"
+gui-sound-select-lore: "&7Actual: &f{0}| |&bClick para editar"
+gui-sound-volume: "&eCambiar Volumen"
+gui-sound-volume-lore: "&7Actual: &f{0}| |&bClick para editar"
+gui-sound-pitch: "&eCambiar Tono (Pitch)"
+gui-sound-pitch-lore: "&7Actual: &f{0}| |&bClick para editar"
+
+# ============================================
 # GUI - MENÚ DE CONFIRMACIÓN
 # ============================================
 gui-confirm-delete-title: "&4Confirmar Eliminación: &0/{0}"
@@ -336,10 +357,6 @@ chat-alias-edit: "&eEscribe el nuevo nombre para el alias en el chat (o 'cancela
 create-success-msg: "&aComando creado exitosamente."
 changes-discarded: "&c&lCambios descartados."
 unsaved-changes-warning: "&e⚠ &cAtención: Tienes cambios sin guardar. Salir nuevamente en los próximos 5 segundos perderá tus cambios."
-
-# ============================================
-# MENSAJES DE IDIOMA
-# ============================================
 language-changed: "&aIdioma cambiado a: &e{0}"
 language-list: "&7Idiomas disponibles: &f{0}"
 language-not-found: "&c¡Idioma no encontrado! Disponibles: &f{0}"
@@ -370,7 +387,6 @@ chat-input-displayname: "&eEscribe el nombre visible en el chat (o 'cancelar'):"
 chat-input-alias: "&eEscribe el alias en el chat (o 'cancelar'):"
 chat-input-action-content: "&eEscribe el contenido de la acción en el chat (o 'cancelar'):"
 chat-input-cancel: "cancelar"
-chat-input-cancelled: "&cOperación cancelada."
 chat-input-timeout: "&cTiempo de espera agotado."
 chat-input-invalid-material: "&c¡Nombre de material inválido!"
 chat-input-invalid-world: "&c¡Mundo no encontrado!"
@@ -438,3 +454,15 @@ action-desc-if-chance: "&7Ejecuta lo siguiente según una probabilidad (0-100)."
 action-desc-if-op: "&7Ejecuta lo siguiente solo si el jugador es OP."
 action-desc-if-world: "&7Ejecuta lo siguiente solo en el mundo especificado."
 action-desc-if-money: "&7Ejecuta lo siguiente solo si tiene suficiente dinero."
+action-no-value-needed: "&eEsta acción no requiere ningún valor adicional."
+
+# ============================================
+# VERSION INFO
+# ============================================
+version-folia-on: "&aFolia (Habilitado)"
+version-folia-off: "&7Standard Bukkit"
+version-header: "{0} &b&lInformación del Plugin:"
+version-plugin: " &8» &7Versión del Plugin: &e{0}"
+version-server: " &8» &7Versión del Servidor: &e{0}"
+version-platform: " &8» &7Plataforma del Servidor: {0}"
+version-java: " &8» &7Versión de Java: &e{0}"

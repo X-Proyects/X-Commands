@@ -27,12 +27,12 @@ public class ListCommand {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("§b§lX-Commands List: §f(").append(commands.size()).append(")\n");
-        sb.append("§8§m----------------------------------\n");
+        sb.append(plugin.getLanguageManager().getMessage("list-header", String.valueOf(commands.size()))).append("\n");
+        sb.append(plugin.getLanguageManager().getMessage("list-separator")).append("\n");
 
         int count = 0;
         for (String cmdName : commands.keySet()) {
-            sb.append(" §8» §e").append(cmdName);
+            sb.append(plugin.getLanguageManager().getMessage("list-item", cmdName));
             count++;
             if (count % 3 == 0) {
                 sb.append("\n");
@@ -42,7 +42,7 @@ public class ListCommand {
         }
         
         if (count % 3 != 0) sb.append("\n");
-        sb.append("§8§m----------------------------------");
+        sb.append(plugin.getLanguageManager().getMessage("list-separator"));
 
         CompatibilityUtils.sendMessage(sender, sb.toString());
         return true;

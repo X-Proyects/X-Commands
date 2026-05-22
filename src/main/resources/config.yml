@@ -48,8 +48,17 @@ hide-namespaced-commands:
 # Useful for troubleshooting complex action/condition chains.
 debug: false
 
+# [default-command]
+# Specifies the default aliases and actions added when creating a new command.
+default-command:
+  material: PAPER
+  aliases: []
+  actions:
+    - "[MESSAGE] &aComando &b%command% &aejecutado correctamente!"
+
+
 # ------------------------------------------------------------------------------
 # INTERNAL SETTINGS - DO NOT MODIFY THESE
 # ------------------------------------------------------------------------------
 # 'code' tracks the configuration version for automatic updates.
-code: 11
+code: 12
