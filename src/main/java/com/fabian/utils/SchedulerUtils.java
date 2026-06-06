@@ -12,9 +12,9 @@ import java.util.function.Consumer;
  */
 public class SchedulerUtils {
 
-    private static Boolean isFolia = null;
-    private static java.lang.reflect.Method teleportAsyncMethod = null;
-    private static Boolean teleportAsyncAvailable = null;
+    private static volatile Boolean isFolia = null;
+    private static volatile java.lang.reflect.Method teleportAsyncMethod = null;
+    private static volatile Boolean teleportAsyncAvailable = null;
 
     /**
      * Checks if the server is running Folia.

@@ -1,6 +1,5 @@
 package com.fabian.actions;
 
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -26,32 +25,57 @@ public class HealAction implements Action {
             }
         }
 
-        Attribute attribute = null;
-        
-        // 1. Try modern name (1.21.2+)
-        org.bukkit.NamespacedKey modernKey = org.bukkit.NamespacedKey.minecraft("max_health");
-        attribute = org.bukkit.Registry.ATTRIBUTE.get(modernKey);
-        
+        if (amount != null) {
+            if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+                com.fabian.utils.LoggerUtils.warn("Invalid heal value (NaN/Infinity). Action skipped.");
+                return;
+            }
+            amount = Math.max(0, amount);
+        }
+
+        Object attribute = null;
+
+        // 1. Try modern Registry (1.20.6+) — with safe fallback for pre-1.20.6
+        try {
+            org.bukkit.NamespacedKey modernKey = org.bukkit.NamespacedKey.minecraft("max_health");
+            attribute = org.bukkit.Registry.ATTRIBUTE.get(modernKey);
+        } catch (NoSuchFieldError | NoClassDefFoundError e) {
+            // Pre-1.20.6: Registry.ATTRIBUTE does not exist
+        }
+
         // 2. Try legacy name if modern name not found (1.18.2 - 1.21.1)
         if (attribute == null) {
-            org.bukkit.NamespacedKey legacyKey = org.bukkit.NamespacedKey.minecraft("generic_max_health");
-            attribute = org.bukkit.Registry.ATTRIBUTE.get(legacyKey);
+            try {
+                org.bukkit.NamespacedKey legacyKey = org.bukkit.NamespacedKey.minecraft("generic_max_health");
+                attribute = org.bukkit.Registry.ATTRIBUTE.get(legacyKey);
+            } catch (NoSuchFieldError | NoClassDefFoundError ignored) {
+                // Pre-1.20.6: fall through to deprecated Attribute.valueOf
+            }
+        }
+
+        // 3. Last resort: deprecated Attribute.valueOf (works on all versions)
+        if (attribute == null) {
+            try {
+                attribute = org.bukkit.attribute.Attribute.valueOf("GENERIC_MAX_HEALTH");
+            } catch (Exception ignored) {
+            }
         }
 
         double maxHealth = DEFAULT_MAX_HEALTH;
         if (attribute != null) {
-            org.bukkit.attribute.AttributeInstance instance = player.getAttribute(attribute);
-            if (instance != null) {
-                maxHealth = instance.getValue();
+            try {
+                org.bukkit.attribute.AttributeInstance instance = player.getAttribute((org.bukkit.attribute.Attribute) attribute);
+                if (instance != null) {
+                    maxHealth = instance.getValue();
+                }
+            } catch (ClassCastException ignored) {
             }
         }
 
         if (amount != null) {
-            // Heal specific amount
             double newHealth = Math.min(maxHealth, player.getHealth() + amount);
             player.setHealth(newHealth);
         } else {
-            // Heal to full
             player.setHealth(maxHealth);
         }
     }

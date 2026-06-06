@@ -27,7 +27,7 @@ public class LocateCommand {
         if (args.length == 1) {
             // Show current language and list available
             String current = langManager.getCurrentLanguage();
-            CompatibilityUtils.sendMessage(sender, langManager.getMessage("language-changed", current));
+            CompatibilityUtils.sendMessage(sender, langManager.getMessage("language-current", current));
             CompatibilityUtils.sendMessage(sender, langManager.getMessage("language-list", String.join(", ", available)));
             return true;
         }

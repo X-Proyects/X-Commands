@@ -23,9 +23,8 @@ public class UpdateCommand {
 
         UpdateChecker checker = plugin.getUpdateChecker();
         if (checker == null) {
-            // Re-initialize with a temporary instance if the main one is null
-            // TODO: Add setter for updateChecker in XCommands to persist this
             checker = new UpdateChecker(plugin, 132155);
+            plugin.setUpdateChecker(checker);
         }
 
         com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("update-checking"));

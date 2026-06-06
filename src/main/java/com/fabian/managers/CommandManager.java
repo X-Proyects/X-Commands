@@ -106,7 +106,7 @@ public class CommandManager {
         if (firstRun && commandsFolder.mkdirs()) {
 
             // Save default commands only on very first install
-            String[] defaults = { "ejemplo.yml", "admin.yml", "welcome.yml", "aviso.yml" };
+            String[] defaults = { "example.yml", "admin.yml", "welcome.yml", "announce.yml" };
             for (String def : defaults) {
                 plugin.saveResource("commands/" + def, false);
             }
@@ -334,13 +334,13 @@ public class CommandManager {
 
         try {
             // Read template as String to preserve comments
-            InputStream resourceStream = plugin.getResource("commands/ejemplo.yml");
+            InputStream resourceStream = plugin.getResource("commands/example.yml");
             if (resourceStream == null) {
                 // Try legacy check if folder was recently renamed
-                resourceStream = plugin.getResource("comands/ejemplo.yml"); 
+                resourceStream = plugin.getResource("comands/example.yml"); 
             }
             if (resourceStream == null) {
-                plugin.logSevere("Template 'commands/ejemplo.yml' not found in resources.");
+                plugin.logSevere("Template 'commands/example.yml' not found in resources.");
                 return false;
             }
 
@@ -354,9 +354,9 @@ public class CommandManager {
             // name: ejemplo -> name: NewName
             content = content.replaceAll("(?m)^name:.*", "name: " + java.util.regex.Matcher.quoteReplacement(commandName));
             // permission: xcommands.ejemplo -> permission: xcommands.newname
-            content = content.replaceAll("(?m)^permission:.*", "permission: xcommands." + commandName.toLowerCase());
+            content = content.replaceAll("(?m)^permission:.*", "permission: xcommands." + java.util.regex.Matcher.quoteReplacement(commandName.toLowerCase()));
             // display-name: "..." -> display-name: "&bNewName"
-            content = content.replaceAll("(?m)^(\\s*)display-name:.*", "$1display-name: \"&b" + commandName + "\"");
+            content = content.replaceAll("(?m)^(\\s*)display-name:.*", java.util.regex.Matcher.quoteReplacement("$1display-name: \"&b" + commandName + "\""));
 
             // Save the file with comments
             File commandsFolder = new File(plugin.getDataFolder(), "commands");
@@ -468,7 +468,7 @@ public class CommandManager {
             List<String> actions = executor.getActions();
             if (index >= 0 && index < actions.size()) {
                 actions.set(index, newContent);
-                // Updated in memory only
+                markDirty(commandName);
             }
         }
     }
@@ -482,6 +482,7 @@ public class CommandManager {
             // Update the live list in memory
             executor.getActions().clear();
             executor.getActions().addAll(actions);
+            markDirty(commandName);
         }
     }
 
@@ -509,6 +510,7 @@ public class CommandManager {
         } else if (path.equals("cooldown")) {
             try {
                 int cooldown = Integer.parseInt(value.toString());
+                if (cooldown < 0) cooldown = 0;
                 executor.setCooldown(cooldown);
                 markDirty(commandName);
             } catch (NumberFormatException e) {
@@ -517,6 +519,7 @@ public class CommandManager {
         } else if (path.equals("interval")) {
             try {
                 int interval = Integer.parseInt(value.toString());
+                if (interval < 0) interval = 0;
                 executor.setInterval(interval);
                 markDirty(commandName);
             } catch (NumberFormatException e) {
@@ -599,7 +602,15 @@ public class CommandManager {
                     File oldFile = new File(commandsFolder, originalName.toLowerCase() + ".yml");
                     File newFile = new File(commandsFolder, currentName.toLowerCase() + ".yml");
                     if (oldFile.exists()) {
-                        oldFile.renameTo(newFile);
+                        if (!oldFile.renameTo(newFile)) {
+                            try {
+                                java.nio.file.Files.copy(oldFile.toPath(), newFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                oldFile.delete();
+                            } catch (java.io.IOException ioe) {
+                                plugin.logSevere("Failed to rename command file: " + ioe.getMessage());
+                                return;
+                            }
+                        }
                     }
                 }
 
@@ -620,6 +631,7 @@ public class CommandManager {
 
                 // Finalize updates on the Main Thread to ensure thread safety with Bukkit API
                 SchedulerUtils.runTask(plugin, () -> {
+                    if (!plugin.isEnabled()) return;
                     executor.setOriginalName(currentName);
                     dirtyCommands.remove(currentName.toLowerCase());
                     syncRegistration(currentName);

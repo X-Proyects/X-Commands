@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 @SuppressWarnings({"unchecked", "deprecation"})
 public class CompatibilityUtils {
 
-    private static Boolean isPaper = null;
+    private static volatile Boolean isPaper = null;
 
     /**
      * Checks if the server is running Paper (for Adventure API support).

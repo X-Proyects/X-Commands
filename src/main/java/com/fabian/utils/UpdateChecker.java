@@ -14,8 +14,8 @@ public class UpdateChecker {
 
     private final XCommands plugin;
     private final int resourceId;
-    private String latestVersion;
-    private boolean updateAvailable;
+    private volatile String latestVersion;
+    private volatile boolean updateAvailable;
 
     public UpdateChecker(XCommands plugin, int resourceId) {
         this.plugin = plugin;
@@ -97,8 +97,20 @@ public class UpdateChecker {
 
         int length = Math.max(currentParts.length, remoteParts.length);
         for (int i = 0; i < length; i++) {
-            int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i].replaceAll("[^0-9]", "")) : 0;
-            int remotePart = i < remoteParts.length ? Integer.parseInt(remoteParts[i].replaceAll("[^0-9]", "")) : 0;
+            int currentPart = 0;
+            int remotePart = 0;
+            if (i < currentParts.length) {
+                String cleaned = currentParts[i].replaceAll("[^0-9]", "");
+                if (!cleaned.isEmpty()) {
+                    try { currentPart = Integer.parseInt(cleaned); } catch (NumberFormatException e) { currentPart = 0; }
+                }
+            }
+            if (i < remoteParts.length) {
+                String cleaned = remoteParts[i].replaceAll("[^0-9]", "");
+                if (!cleaned.isEmpty()) {
+                    try { remotePart = Integer.parseInt(cleaned); } catch (NumberFormatException e) { remotePart = 0; }
+                }
+            }
 
             if (remotePart > currentPart)
                 return true;

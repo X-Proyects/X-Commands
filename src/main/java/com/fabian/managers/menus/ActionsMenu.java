@@ -23,7 +23,7 @@ public class ActionsMenu extends BaseMenu {
     }
 
     public void open(Player player, String commandName) {
-        CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName);
+        CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName.toLowerCase());
         if (cmd == null) return;
 
         Inventory inv = createInventory(new com.fabian.utils.MenuHolder(com.fabian.utils.MenuHolder.MenuType.ACTIONS, commandName, -1, 0), 54, 

@@ -36,6 +36,10 @@ public class ConsoleAction implements Action {
         // Remove semicolons that could be used as command separators
         command = command.replace(";", " ");
 
+        // Remove null bytes and control characters
+        command = command.replace("\0", "");
+        command = command.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]", "");
+
         // Trim to prevent excessively long commands
         if (command.length() > 1024) {
             String original = command;

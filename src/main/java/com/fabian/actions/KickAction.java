@@ -19,8 +19,9 @@ public class KickAction implements Action {
         String params = (String) context.get("params");
         if (params == null) return;
 
-        String reason = ColorUtils.translate(PlaceholderUtils.process(params, player));
-        player.kick(LegacyComponentSerializer.legacySection().deserialize(reason));
+        String reason = PlaceholderUtils.process(params, player);
+        reason = ColorUtils.translate(reason);
+        player.kick(LegacyComponentSerializer.legacySection().deserialize(ColorUtils.stripColor(reason)));
     }
 
     @Override

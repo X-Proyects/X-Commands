@@ -262,11 +262,9 @@ public class InventoryListener implements Listener {
         // Navigation
         if (clicked.getType() == Material.ARROW) {
             String itemName = com.fabian.utils.ColorUtils.stripColor(com.fabian.utils.CompatibilityUtils.getDisplayName(meta));
-            if (itemName.equals(plugin.getLanguageManager().getMessage("gui-main-prev"))
-                    || itemName.equalsIgnoreCase("Anterior")) {
+            if (itemName.equals(plugin.getLanguageManager().getMessage("gui-main-prev"))) {
                 plugin.getInventoryManager().openMainMenu(player, page - 1);
-            } else if (itemName.equals(plugin.getLanguageManager().getMessage("gui-main-next"))
-                    || itemName.equalsIgnoreCase("Siguiente")) {
+            } else if (itemName.equals(plugin.getLanguageManager().getMessage("gui-main-next"))) {
                 plugin.getInventoryManager().openMainMenu(player, page + 1);
             }
             return;

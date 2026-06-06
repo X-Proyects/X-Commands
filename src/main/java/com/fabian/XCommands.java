@@ -345,4 +345,8 @@ public class XCommands extends JavaPlugin {
     public UpdateChecker getUpdateChecker() {
         return updateChecker;
     }
+
+    public void setUpdateChecker(UpdateChecker checker) {
+        this.updateChecker = checker;
+    }
 }

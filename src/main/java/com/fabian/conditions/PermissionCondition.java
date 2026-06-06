@@ -14,9 +14,6 @@ public class PermissionCondition implements Condition {
         
         permission = permission.trim();
 
-        // OP players have every permission unless explicitly denied
-        if (player.isOp()) return true;
-        
         // Handle wildcard permission check (ends with %)
         if (permission.endsWith("%")) {
             String prefix = permission.substring(0, permission.length() - 1).toLowerCase();

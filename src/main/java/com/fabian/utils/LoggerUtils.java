@@ -10,7 +10,14 @@ import org.bukkit.command.ConsoleCommandSender;
 public class LoggerUtils {
 
     private static final String PREFIX = XCommands.INTERNAL_PREFIX + " ";
-    private static final ConsoleCommandSender console = Bukkit.getConsoleSender();
+    private static ConsoleCommandSender console;
+    
+    private static ConsoleCommandSender getConsole() {
+        if (console == null) {
+            try { console = Bukkit.getConsoleSender(); } catch (Exception e) { console = null; }
+        }
+        return console;
+    }
 
     /**
      * Logs an information message
@@ -54,10 +61,11 @@ public class LoggerUtils {
     }
 
     private static void sendMessage(String message) {
-        if (console != null) {
-            console.sendMessage(ColorUtils.translate(PREFIX + message));
+        ConsoleCommandSender c = getConsole();
+        if (c != null) {
+            c.sendMessage(ColorUtils.translate(PREFIX + message));
         } else {
-            Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(PREFIX + message));
+            try { Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(PREFIX + message)); } catch (Exception ignored) {}
         }
     }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Sends a player to another server (Proxy)
- * Format: [SENT_TO] server
+ * Format: [SEND_TO] server
  */
 public class SendToAction implements Action {
 
@@ -21,7 +21,7 @@ public class SendToAction implements Action {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Connect");
             out.writeUTF(params.trim());
-            com.fabian.utils.LoggerUtils.debug("Attempting to send player " + player.getName() + " to server (SENT_TO): " + params.trim());
+            com.fabian.utils.LoggerUtils.debug("Attempting to send player " + player.getName() + " to server (SEND_TO): " + params.trim());
             player.sendPluginMessage(XCommands.getInstance(), "BungeeCord", out.toByteArray());
         } catch (Exception e) {
             com.fabian.utils.LoggerUtils.severe("Failed to send player to proxy server: " + params, e);
@@ -30,6 +30,6 @@ public class SendToAction implements Action {
 
     @Override
     public String getTag() {
-        return "SENT_TO";
+        return "SEND_TO";
     }
 }

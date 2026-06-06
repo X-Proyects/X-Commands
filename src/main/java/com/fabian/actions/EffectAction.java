@@ -22,7 +22,7 @@ public class EffectAction implements Action {
             String[] parts = params.split(";");
 
             String effectName = parts[0].toUpperCase().trim();
-            int duration = parts.length > 1 ? Integer.parseInt(parts[1]) : 100;
+            int duration = parts.length > 1 ? Math.max(1, Integer.parseInt(parts[1])) : 100;
             int level = parts.length > 2 ? Math.max(0, Math.min(255, Integer.parseInt(parts[2]) - 1)) : 0;
 
             PotionEffectType effectType = null;

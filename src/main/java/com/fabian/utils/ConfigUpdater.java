@@ -67,7 +67,9 @@ public class ConfigUpdater {
 
     private static void updateFlatFile(XCommands plugin, String resourcePath, File diskFile, YamlConfiguration diskConfig) throws IOException {
         List<String> resLines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(plugin.getResource(resourcePath), StandardCharsets.UTF_8))) {
+        InputStream resStream = plugin.getResource(resourcePath);
+        if (resStream == null) return;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resStream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 resLines.add(line);
