@@ -49,7 +49,7 @@ public class ConfigManager {
 
         validateConfig();
 
-        // Check for updates
+        // Also check if config needs auto-migration from an older version
         checkUpdate();
 
         plugin.logInfo("Configuration loaded (" + cachedLanguage + ")!");
@@ -90,31 +90,38 @@ public class ConfigManager {
         if (resourceStream == null)
             return;
 
-        YamlConfiguration resConfig = YamlConfiguration.loadConfiguration(
-                new InputStreamReader(resourceStream, StandardCharsets.UTF_8));
+        try {
+            YamlConfiguration resConfig = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(resourceStream, StandardCharsets.UTF_8));
 
-        int currentCode = resConfig.getInt("code", 1);
-        int diskCode = config.getInt("code", 0);
+            int currentCode = resConfig.getInt("code", 1);
+            int diskCode = config.getInt("code", 0);
 
-        if (diskCode < currentCode) {
-            plugin.logInfo("Updating configuration files...");
+            if (diskCode < currentCode) {
+                plugin.logInfo("Updating configuration files...");
 
-            // Use ConfigUpdater to add missing keys without wiping comments
-            ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
-            
-            // Also update all language files
-            String[] langFiles = { "en.yml", "es.yml", "ja.yml", "pt.yml", "ru.yml", "custom.yml" };
-            File messagesFolder = new File(plugin.getDataFolder(), "messages");
-            for (String langFile : langFiles) {
-                File diskLangFile = new File(messagesFolder, langFile);
-                if (diskLangFile.exists()) {
-                    ConfigUpdater.update(plugin, "messages/" + langFile, diskLangFile);
+                // Use ConfigUpdater to add missing keys without wiping comments
+                ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
+                
+                // Also update all language files
+                String[] langFiles = { "en.yml", "es.yml", "ja.yml", "pt.yml", "ru.yml", "custom.yml" };
+                File messagesFolder = new File(plugin.getDataFolder(), "messages");
+                for (String langFile : langFiles) {
+                    File diskLangFile = new File(messagesFolder, langFile);
+                    if (diskLangFile.exists()) {
+                        ConfigUpdater.update(plugin, "messages/" + langFile, diskLangFile);
+                    }
                 }
-            }
 
-            // Update code in config
-            config.set("code", currentCode);
-            plugin.saveConfig();
+                // Update code in config
+                config.set("code", currentCode);
+                plugin.saveConfig();
+            }
+        } finally {
+            try {
+                resourceStream.close();
+            } catch (Exception ignored) {
+            }
         }
     }
 

@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public class HealAction implements Action {
 
+    private static final double DEFAULT_MAX_HEALTH = 20.0;
+
     @Override
     public void execute(Player player, Map<String, Object> context) {
         if (player == null) return;
@@ -36,7 +38,7 @@ public class HealAction implements Action {
             attribute = org.bukkit.Registry.ATTRIBUTE.get(legacyKey);
         }
 
-        double maxHealth = 20.0;
+        double maxHealth = DEFAULT_MAX_HEALTH;
         if (attribute != null) {
             org.bukkit.attribute.AttributeInstance instance = player.getAttribute(attribute);
             if (instance != null) {

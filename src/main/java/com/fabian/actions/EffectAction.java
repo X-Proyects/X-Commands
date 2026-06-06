@@ -23,7 +23,7 @@ public class EffectAction implements Action {
 
             String effectName = parts[0].toUpperCase().trim();
             int duration = parts.length > 1 ? Integer.parseInt(parts[1]) : 100;
-            int level = parts.length > 2 ? Integer.parseInt(parts[2]) - 1 : 0;
+            int level = parts.length > 2 ? Math.max(0, Math.min(255, Integer.parseInt(parts[2]) - 1)) : 0;
 
             PotionEffectType effectType = null;
             org.bukkit.NamespacedKey key = org.bukkit.NamespacedKey.minecraft(effectName.toLowerCase());
@@ -33,20 +33,19 @@ public class EffectAction implements Action {
                 @SuppressWarnings("unchecked")
                 org.bukkit.Registry<PotionEffectType> registry = (org.bukkit.Registry<PotionEffectType>) org.bukkit.Registry.class.getField("EFFECT").get(null);
                 effectType = registry.get(key);
-            } catch (Exception ignored) {}
+            } catch (Exception e) { com.fabian.utils.LoggerUtils.debug("Effect registry lookup failed: " + e.getMessage()); }
 
             // 2. Try legacy Registry (1.18.2 - 1.21.1)
             if (effectType == null) {
                 try {
                     effectType = org.bukkit.Registry.POTION_EFFECT_TYPE.get(key);
-                } catch (Exception ignored) {}
+                } catch (Exception e) { com.fabian.utils.LoggerUtils.debug("Effect registry lookup failed: " + e.getMessage()); }
             }
 
             // 3. Last resort fallback
             if (effectType == null) {
                 @SuppressWarnings("deprecation")
-                PotionEffectType legacy = PotionEffectType.getByName(effectName);
-                effectType = legacy;
+                effectType = PotionEffectType.getByName(effectName);
             }
 
             if (effectType == null) {

@@ -15,7 +15,6 @@ upcoming-feature: "&cEm breve..."
 # ============================================
 # COMMAND MANAGEMENT
 # ============================================
-command-usage: "&cUso: /xc [create|delete|edit|list|info]"
 create-usage: "&cUso: /xc create <nome>"
 create-success: "&aComando '&e{0}&a' criado com sucesso!"
 create-exists: "&cO comando '&e{0}&c' já existe."
@@ -212,7 +211,7 @@ gui-actions-order-lore: "&7Gerenciamento da sequência"
 gui-actions-add: "&aAdicionar Ação"
 gui-actions-add-lore: "&7Clique para adicionar uma nova"
 gui-actions-item-name: "&eAção #{0}"
-gui-actions-item-lore: "&7Conteúdo:|&f{0}| |&7Clique Direito: &bEditar|&7Clique Esquerdo: &eMover|&7Shift + Direito: &cExcluir"
+gui-actions-item-lore: "&7Conteúdo:|&f{0}| |&7Clique: &bEditar|&7Shift + Direito: &cExcluir"
 gui-actions-reorder: "&6Reordenar Ações"
 gui-actions-reorder-lore: "&7Arraste e solte para mudar a ordem| |&eClique para abrir"
 
@@ -236,7 +235,7 @@ gui-type-select-not: "&7Clique Direito: &cCondição NÃO"
 # GUI - ACTION REORDER MENU
 # ============================================
 gui-reorder-title: "&8Ordem: &3/{0}"
-gui-reorder-lore: "&7Arraste para reordenar|&7Solte no lixo para excluir"
+gui-reorder-lore: "&7Arraste para reordenar|&7Shift + Direito para mover|&7Solte na lixeira para excluir"
 gui-reorder-trash: "&c&lEXCLUIR AÇÃO"
 gui-reorder-trash-lore: "&7Arraste uma ação aqui|&7para excluí-la permanentemente."
 gui-reorder-edit: "&bEditar Ações"

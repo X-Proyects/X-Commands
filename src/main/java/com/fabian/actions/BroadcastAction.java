@@ -12,12 +12,10 @@ public class BroadcastAction implements Action {
 
     @Override
     public void execute(Player player, Map<String, Object> context) {
-        if (player == null) return;
-
         String params = (String) context.get("params");
         if (params == null) return;
 
-        String processed = PlaceholderUtils.process(params, player);
+        String processed = (player != null) ? PlaceholderUtils.process(params, player) : params;
         com.fabian.utils.CompatibilityUtils.broadcast(processed);
     }
 

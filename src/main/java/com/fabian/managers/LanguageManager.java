@@ -132,8 +132,7 @@ public class LanguageManager {
      */
     private void saveResource(String resourcePath, File destination) {
         try {
-            InputStream inputStream = plugin.getResource(resourcePath);
-            if (inputStream != null) {
+            if (plugin.getResource(resourcePath) != null) {
                 plugin.saveResource(resourcePath, false);
             }
         } catch (Exception e) {
@@ -203,9 +202,6 @@ public class LanguageManager {
         String message = languageConfig.getString(key);
 
         if (message == null) {
-            // Use internal fallback strictly if not found in any config
-            // Log warning only once per key per reload to avoid spam? No, spam is good for
-            // visibility.
             plugin.logWarning("Missing language key: " + key);
             String missing = ColorUtils.translate("&cMissing message: " + key);
             messageCache.put(key, missing);
@@ -305,9 +301,58 @@ public class LanguageManager {
     }
     
     public void setLanguage(String lang) {
-        plugin.getConfig().set("language", lang);
-        plugin.saveConfig();
-        plugin.getConfigManager().reload();
+        plugin.getConfigManager().setLanguage(lang);
+    }
+
+    /**
+     * Force-updates a specific language file from JAR defaults, then reloads
+     * into memory if it is the currently active language.
+     *
+     * @param langCode language code (e.g. "en", "es")
+     * @return true if the active language was reloaded
+     */
+    public boolean forceReloadMessages(String langCode) {
+        String fileName = langCode.endsWith(".yml") ? langCode : langCode + ".yml";
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File diskFile = new File(messagesFolder, fileName);
+
+        if (!diskFile.exists()) {
+            saveResource("messages/" + fileName, diskFile);
+        }
+
+        ConfigUpdater.update(plugin, "messages/" + fileName, diskFile);
+
+        String currentLang = plugin.getConfigManager().getLanguage();
+        String currentBase = currentLang.endsWith(".yml") ? currentLang.substring(0, currentLang.length() - 4) : currentLang;
+        if (currentBase.equalsIgnoreCase(langCode)) {
+            reload();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Force-updates ALL language files found on disk, then reloads the
+     * active language into memory.
+     *
+     * @return the number of language files that were processed
+     */
+    public int forceReloadAllMessages() {
+        java.util.List<String> available = getAvailableLanguages();
+        for (String lang : available) {
+            String fileName = lang.endsWith(".yml") ? lang : lang + ".yml";
+            File messagesFolder = new File(plugin.getDataFolder(), "messages");
+            File diskFile = new File(messagesFolder, fileName);
+
+            if (diskFile.exists()) {
+                ConfigUpdater.update(plugin, "messages/" + fileName, diskFile);
+            } else {
+                saveResource("messages/" + fileName, diskFile);
+            }
+        }
+
         reload();
+        return available.size();
     }
 }

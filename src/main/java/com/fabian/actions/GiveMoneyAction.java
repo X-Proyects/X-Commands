@@ -19,6 +19,13 @@ public class GiveMoneyAction implements Action {
 
         try {
             double amount = Double.parseDouble(params.trim());
+
+            // Prevent negative amounts that could withdraw money instead of depositing
+            if (amount <= 0) {
+                com.fabian.utils.LoggerUtils.warn("Invalid amount for action [GIVE_MONEY]: " + amount + " (must be positive). Action skipped.");
+                return;
+            }
+
             EconomyUtils.deposit(player, amount);
         } catch (Exception e) {
             com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [GIVE_MONEY]: " + params);

@@ -14,9 +14,6 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
  */
 public class CommandHideListener implements Listener {
 
-    public CommandHideListener() {
-    }
-
     /**
      * Triggered when the server sends the list of available commands to a player.
      * We modify this list to hide specific commands based on the plugin

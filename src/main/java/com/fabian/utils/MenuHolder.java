@@ -3,6 +3,9 @@ package com.fabian.utils;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+/**
+ * Holds menu metadata for inventory GUI screens.
+ */
 public class MenuHolder implements InventoryHolder {
 
     private MenuType type;

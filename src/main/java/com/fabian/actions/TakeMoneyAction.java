@@ -19,6 +19,13 @@ public class TakeMoneyAction implements Action {
 
         try {
             double amount = Double.parseDouble(params.trim());
+
+            // Prevent negative amounts that would duplicate money instead of taking it
+            if (amount <= 0) {
+                com.fabian.utils.LoggerUtils.warn("Invalid amount for action [TAKE_MONEY]: " + amount + " (must be positive). Action skipped.");
+                return;
+            }
+
             if (EconomyUtils.has(player, amount)) {
                 EconomyUtils.withdraw(player, amount);
             }

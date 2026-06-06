@@ -25,6 +25,7 @@ public class MainMenu extends BaseMenu {
     }
 
     public void open(Player player, int page) {
+        page = Math.max(0, page);
         Inventory inv = createInventory(new MenuHolder(MenuHolder.MenuType.MAIN, null, -1, page), 54, lang.getMessage("gui-main-title"));
 
         Map<String, CustomCommandExecutor> commands = plugin.getCommandManager().getCustomCommands();

@@ -35,6 +35,6 @@ public class ConfirmDeleteMenu extends BaseMenu {
                 lang.getMessage("gui-confirm-no"),
                 lang.getMessage("gui-confirm-no-lore").split("\\|")));
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 }

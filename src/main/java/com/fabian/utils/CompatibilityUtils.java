@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * Utility class to handle cross-version compatibility between Spigot and Paper.
  * Handles differences in Inventory creation, Title sending, and ActionBar.
  */
-@SuppressWarnings("all")
+@SuppressWarnings({"unchecked", "deprecation"})
 public class CompatibilityUtils {
 
     private static Boolean isPaper = null;

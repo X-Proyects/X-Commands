@@ -23,6 +23,7 @@ public class GiveAction implements Action {
 
             String materialName = parts[0].toUpperCase().trim();
             int amount = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 1;
+            if (amount <= 0) amount = 1;
 
             Material material = Material.matchMaterial(materialName);
             if (material == null) {
@@ -41,7 +42,7 @@ public class GiveAction implements Action {
             }
 
             // Add to inventory and drop if full
-            java.util.HashMap<Integer, ItemStack> remaining = player.getInventory().addItem(item);
+            java.util.Map<Integer, ItemStack> remaining = player.getInventory().addItem(item);
             if (!remaining.isEmpty()) {
                 remaining.values().forEach(remainingItem -> 
                     player.getWorld().dropItemNaturally(player.getLocation(), remainingItem)

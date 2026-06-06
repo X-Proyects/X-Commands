@@ -2,7 +2,6 @@ package com.fabian.managers;
 
 import com.fabian.conditions.*;
 import com.fabian.XCommands;
-import com.fabian.conditions.Condition;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

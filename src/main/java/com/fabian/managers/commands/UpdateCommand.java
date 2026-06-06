@@ -23,12 +23,9 @@ public class UpdateCommand {
 
         UpdateChecker checker = plugin.getUpdateChecker();
         if (checker == null) {
-            // Re-initialize if for some reason it's null, making sure we persist it if
-            // possible or just use a temp one
-            // The main plugin class usually holds one instance.
+            // Re-initialize with a temporary instance if the main one is null
+            // TODO: Add setter for updateChecker in XCommands to persist this
             checker = new UpdateChecker(plugin, 132155);
-            // We should probably set it back to plugin if possible, but there's no setter.
-            // But usually it's initialized in onEnable.
         }
 
         com.fabian.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("update-checking"));

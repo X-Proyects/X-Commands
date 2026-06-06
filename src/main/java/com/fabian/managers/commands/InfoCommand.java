@@ -27,7 +27,7 @@ public class InfoCommand {
             return true;
         }
 
-        String cmdName = args[1];
+        String cmdName = args[1].toLowerCase();
         CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(cmdName);
 
         if (cmd == null) {

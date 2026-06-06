@@ -15,7 +15,6 @@ upcoming-feature: "&c近日公開予定..."
 # ============================================
 # COMMAND MANAGEMENT
 # ============================================
-command-usage: "&c使用法: /xc [create|delete|edit|list|info]"
 create-usage: "&c使用法: /xc create <名前>"
 create-success: "&aコマンド '&e{0}&a' が正常に作成されました！"
 create-exists: "&cコマンド '&e{0}&c' は既に存在します。"
@@ -212,7 +211,7 @@ gui-actions-order-lore: "&7シーケンス管理"
 gui-actions-add: "&aアクションを追加"
 gui-actions-add-lore: "&7クリックして追加"
 gui-actions-item-name: "&eアクション #{0}"
-gui-actions-item-lore: "&7内容:|&f{0}| |&7右クリック: &b編集|&7左クリック: &e移動|&7Shift + 右: &c削除"
+gui-actions-item-lore: "&7内容:|&f{0}| |&7クリック: &b編集|&7Shift + 右: &c削除"
 gui-actions-reorder: "&6順番を並べ替え"
 gui-actions-reorder-lore: "&7ドラッグ＆ドロップで並べ替え| |&eクリックして開く"
 
@@ -236,7 +235,7 @@ gui-type-select-not: "&7右クリック: &c否定 (NOT) 条件"
 # GUI - ACTION REORDER MENU
 # ============================================
 gui-reorder-title: "&8並べ替え: &3/{0}"
-gui-reorder-lore: "&7ドラッグして並べ替え|&7ゴミ箱にドロップして削除"
+gui-reorder-lore: "&7ドラッグして並び替え|&7Shift + 右クリックでシフト|&7ゴミ箱にドロップして削除"
 gui-reorder-trash: "&c&lアクションを削除"
 gui-reorder-trash-lore: "&7ここにアクションをドラッグして|&7永久に削除します。"
 gui-reorder-edit: "&bアクションの編集"

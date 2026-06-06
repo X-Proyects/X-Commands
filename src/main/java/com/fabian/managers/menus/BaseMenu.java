@@ -111,7 +111,6 @@ public abstract class BaseMenu {
         if (upper.contains("[TAKE_MONEY]")) return Material.GOLD_NUGGET;
         if (upper.contains("[VELOCITY]")) return Material.BLUE_DYE;
         if (upper.contains("[SENT_TO]")) return Material.CYAN_DYE;
-        if (upper.contains("[SOUND]")) return Material.JUKEBOX;
         
         // Conditionals
         if (upper.contains("[IF_PERMISSION")) return Material.COMMAND_BLOCK_MINECART;

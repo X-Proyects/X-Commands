@@ -39,7 +39,6 @@ public class LoggerUtils {
     public static void severe(String message, Throwable throwable) {
         error(message);
         if (throwable != null) {
-            System.err.println("[X-Commands ERROR] " + message);
             throwable.printStackTrace();
         }
     }

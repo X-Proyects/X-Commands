@@ -9,6 +9,8 @@ import java.util.Map;
  */
 public class FeedAction implements Action {
 
+    private static final int MAX_FOOD_LEVEL = 20;
+
     @Override
     public void execute(Player player, Map<String, Object> context) {
         if (player == null) return;
@@ -24,9 +26,9 @@ public class FeedAction implements Action {
         }
 
         if (amount != null) {
-            player.setFoodLevel(Math.min(20, player.getFoodLevel() + amount));
+            player.setFoodLevel(Math.min(MAX_FOOD_LEVEL, player.getFoodLevel() + amount));
         } else {
-            player.setFoodLevel(20);
+            player.setFoodLevel(MAX_FOOD_LEVEL);
             player.setSaturation(20.0f);
         }
     }

@@ -5,9 +5,11 @@ import com.fabian.actions.*;
 import com.fabian.utils.SchedulerUtils;
 import org.bukkit.entity.Player;
 
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +20,13 @@ public class ActionManager {
 
     private final XCommands plugin;
     private final Map<String, Action> actions;
-    private final Map<String, ActionEntry> actionCache = new HashMap<>();
+    private static final int MAX_CACHE_SIZE = 500;
+    private final Map<String, ActionEntry> actionCache = new LinkedHashMap<String, ActionEntry>(MAX_CACHE_SIZE, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, ActionEntry> eldest) {
+            return size() > MAX_CACHE_SIZE;
+        }
+    };
     private final Pattern actionPattern = Pattern.compile("(!?)\\[([a-zA-Z_]+)\\]\\s*(.*)");
 
     private static class ActionEntry {
@@ -259,9 +267,9 @@ public class ActionManager {
     }
 
     /**
-     * Gets all registered action tags
+     * Gets all registered actions
      * 
-     * @return Set of action tags
+     * @return Map of registered actions by tag
      */
     public Map<String, Action> getActions() {
         return new HashMap<>(actions);

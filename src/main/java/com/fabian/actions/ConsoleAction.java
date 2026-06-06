@@ -1,6 +1,7 @@
 package com.fabian.actions;
 
 import com.fabian.utils.PlaceholderUtils;
+import com.fabian.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -17,8 +18,32 @@ public class ConsoleAction implements Action {
 
         String command = PlaceholderUtils.process(params, player);
         if (command == null || command.trim().isEmpty()) return;
-        
+
+        command = sanitizeCommand(command);
+
         org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), command);
+    }
+
+    /**
+     * Sanitizes the command string to prevent injection attacks.
+     * Strips newlines, semicolons, and other command separators that could
+     * allow execution of unintended commands via placeholder expansion.
+     */
+    private String sanitizeCommand(String command) {
+        // Remove newlines and carriage returns that could chain commands
+        command = command.replace("\n", " ").replace("\r", " ");
+
+        // Remove semicolons that could be used as command separators
+        command = command.replace(";", " ");
+
+        // Trim to prevent excessively long commands
+        if (command.length() > 1024) {
+            String original = command;
+            command = command.substring(0, 1024);
+            LoggerUtils.warn("Console command truncated to 1024 chars. Original length: " + original.length());
+        }
+
+        return command.trim();
     }
 
     @Override

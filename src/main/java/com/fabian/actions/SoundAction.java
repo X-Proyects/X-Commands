@@ -21,6 +21,8 @@ public class SoundAction implements Action {
             String soundName = parts[0].trim();
             float volume = parts.length > 1 ? Float.parseFloat(parts[1]) : 1.0f;
             float pitch = parts.length > 2 ? Float.parseFloat(parts[2]) : 1.0f;
+            volume = Math.max(0f, Math.min(1f, volume));
+            pitch = Math.max(0.1f, Math.min(2f, pitch));
 
             com.fabian.utils.SoundUtils.playSound(player, soundName, volume, pitch);
         } catch (Exception e) {

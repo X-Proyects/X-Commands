@@ -30,7 +30,9 @@ public class XCommands extends JavaPlugin {
     private CooldownManager cooldownManager;
     private CommandManager commandManager;
     private InventoryManager inventoryManager;
+    private CommandInterceptorListener commandInterceptorListener;
     private UpdateChecker updateChecker;
+    private com.fabian.metrics.Metrics metrics;
 
     /**
      * Sends an info message to console with custom prefix
@@ -123,10 +125,12 @@ public class XCommands extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new UpdateListener(this), this);
             getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
             getServer().getPluginManager().registerEvents(new CommandHideListener(), this);
-            getServer().getPluginManager().registerEvents(new CommandInterceptorListener(this), this);
+            commandInterceptorListener = new CommandInterceptorListener(this);
+            getServer().getPluginManager().registerEvents(commandInterceptorListener, this);
 
             // Load custom commands
             commandManager.loadCommands();
+            commandInterceptorListener.rebuildAliasLookup();
 
             // Export all available guides
             File guidesFolder = new File(getDataFolder(), "guides");
@@ -149,25 +153,25 @@ public class XCommands extends JavaPlugin {
 
             // Initialize bStats Metrics if enabled
             if (getConfig().getBoolean("metrics", true)) {
-                new com.fabian.metrics.Metrics(this, BSTATS_ID);
+                metrics = new com.fabian.metrics.Metrics(this, BSTATS_ID);
             }
 
             logInfo("v" + getDescription().getVersion() + " successfully started!");
         } catch (Exception e) {
-            com.fabian.utils.LoggerUtils
-                    .severe("Failed to enable X-Commands! Please check your configuration and server version.", e);
+            logSevere("Failed to enable X-Commands! Please check your configuration and server version.", e);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
 
     @Override
     public void onDisable() {
+        if (metrics != null) {
+            metrics.shutdown();
+        }
+        com.fabian.utils.EconomyUtils.teardown();
         logInfo("successfully disabled!");
     }
 
-    /**
-     * Gets the plugin instance
-     */
     /**
      * Performs migration of the data folder from the old name to the new one.
      */
@@ -266,6 +270,9 @@ public class XCommands extends JavaPlugin {
         libraryManager.loadLibrary(examinationString);
     }
 
+    /**
+     * Gets the plugin instance
+     */
     public static XCommands getInstance() {
         return instance;
     }
@@ -285,12 +292,15 @@ public class XCommands extends JavaPlugin {
     }
 
     /**
-     * Gets the action manager
+     * Gets the condition manager
      */
     public ConditionManager getConditionManager() {
         return conditionManager;
     }
 
+    /**
+     * Gets the action manager
+     */
     public ActionManager getActionManager() {
         return actionManager;
     }
@@ -304,6 +314,13 @@ public class XCommands extends JavaPlugin {
      */
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    /**
+     * Gets the command interceptor listener
+     */
+    public CommandInterceptorListener getCommandInterceptorListener() {
+        return commandInterceptorListener;
     }
 
     /**

@@ -9,6 +9,8 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Intercepts commands that are not registered in Bukkit but exist in X-Commands.
@@ -17,9 +19,23 @@ import java.util.Arrays;
 public class CommandInterceptorListener implements Listener {
 
     private final XCommands plugin;
+    private final Map<String, String> aliasLookup = new HashMap<>();
 
     public CommandInterceptorListener(XCommands plugin) {
         this.plugin = plugin;
+    }
+
+    /**
+     * Rebuilds the alias lookup map. Should be called after commands are loaded/reloaded.
+     */
+    public void rebuildAliasLookup() {
+        aliasLookup.clear();
+        for (CustomCommandExecutor executor : plugin.getCommandManager().getCustomCommands().values()) {
+            String commandName = executor.getCommandName().toLowerCase();
+            for (String alias : executor.getAliases()) {
+                aliasLookup.put(alias.toLowerCase(), commandName);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -48,16 +64,11 @@ public class CommandInterceptorListener implements Listener {
         // Find if this is one of our commands
         CustomCommandExecutor executor = plugin.getCommandManager().getCustomCommands().get(cmdLabel);
         
-        // Check aliases if not found by primary name
+        // Check aliases using O(1) lookup map
         if (executor == null) {
-            for (CustomCommandExecutor ex : plugin.getCommandManager().getCustomCommands().values()) {
-                for (String alias : ex.getAliases()) {
-                    if (alias.equalsIgnoreCase(cmdLabel)) {
-                        executor = ex;
-                        break;
-                    }
-                }
-                if (executor != null) break;
+            String resolvedName = aliasLookup.get(cmdLabel);
+            if (resolvedName != null) {
+                executor = plugin.getCommandManager().getCustomCommands().get(resolvedName);
             }
         }
 

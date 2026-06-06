@@ -2,13 +2,12 @@ package com.fabian.conditions;
 
 import org.bukkit.entity.Player;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Checks a probability chance (0-100)
  */
 public class ChanceCondition implements Condition {
-    private final Random random = new Random();
 
     @Override
     public boolean check(Player player, Map<String, Object> context) {
@@ -17,7 +16,12 @@ public class ChanceCondition implements Condition {
         
         try {
             double chance = Double.parseDouble(params.trim());
-            return random.nextDouble() * 100 <= chance;
+            double original = chance;
+            chance = Math.max(0, Math.min(100, chance));
+            if (original < 0 || original > 100) {
+                com.fabian.utils.LoggerUtils.warn("Chance value " + original + " out of 0-100 range, clamped to " + chance);
+            }
+            return ThreadLocalRandom.current().nextDouble() * 100 <= chance;
         } catch (NumberFormatException e) {
             return false;
         }

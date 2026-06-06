@@ -59,10 +59,7 @@ public class ActionsMenu extends BaseMenu {
             CompatibilityUtils.setDisplayName(meta, lang.getMessage("gui-actions-item-name", (index + 1)));
 
             String[] loreArr = lang.getMessage("gui-actions-item-lore", action).split("\\|");
-            List<String> loreList = new ArrayList<>();
-            for (String line : loreArr) {
-                loreList.add(line);
-            }
+            List<String> loreList = new ArrayList<>(java.util.Arrays.asList(loreArr));
             CompatibilityUtils.setLore(meta, loreList);
 
             // Store index in PersistentDataContainer

@@ -74,6 +74,6 @@ public class ActionReorderMenu extends BaseMenu {
         // Back/Save Button
         inv.setItem(45, createItem(Material.ARROW, lang.getMessage("gui-back"), lang.getMessage("gui-back-lore")));
 
-        player.openInventory(inv);
+        smartOpenInventory(player, inv);
     }
 }

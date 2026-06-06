@@ -14,6 +14,7 @@ import com.fabian.managers.menus.SoundMenu;
 import com.fabian.utils.MenuHolder;
 import com.fabian.utils.MenuHolder.MenuType;
 import com.fabian.utils.SchedulerUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,7 +28,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,8 +37,10 @@ public class InventoryListener implements Listener {
 
     private final XCommands plugin;
     private final Map<UUID, ChatInputRequest> chatInputs = new ConcurrentHashMap<>();
-    private final Map<UUID, Long> closeWarningTimestamps = new HashMap<>();
-    private final Map<UUID, Long> scheduledTransitions = new HashMap<>();
+    private final Map<UUID, Long> closeWarningTimestamps = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> scheduledTransitions = new ConcurrentHashMap<>();
+    private final Map<UUID, Object> inputTimeoutTasks = new ConcurrentHashMap<>();
+    private static final long INPUT_TIMEOUT_TICKS = 600L; // 30 seconds
 
     // Cached Keys
     private final NamespacedKey keyCommandName;
@@ -60,6 +62,7 @@ public class InventoryListener implements Listener {
         chatInputs.remove(uuid);
         closeWarningTimestamps.remove(uuid);
         scheduledTransitions.remove(uuid);
+        cancelInputTimeout(uuid);
         plugin.getCommandManager().clearPlayerCooldowns(uuid);
     }
 
@@ -297,7 +300,7 @@ public class InventoryListener implements Listener {
         int slot = event.getSlot();
 
         // Check permission once for most edit actions
-        if (slot != 36 && slot != 40 && !hasPermission(player, "xcommands.admin.edit")) {
+        if (slot != 36 && !hasPermission(player, "xcommands.admin.edit")) {
             if (slot != 44 || !hasPermission(player, "xcommands.admin.delete")) {
                 return;
             }
@@ -705,9 +708,12 @@ public class InventoryListener implements Listener {
 
         event.setCancelled(true);
         String input = event.getMessage();
-        chatInputs.remove(player.getUniqueId());
+        UUID uuid = player.getUniqueId();
+        cancelInputTimeout(uuid);
+        chatInputs.remove(uuid);
 
-        if (input.equalsIgnoreCase("cancelar") || input.equalsIgnoreCase("cancel")) {
+        String cancelWord = plugin.getLanguageManager().getMessage("chat-input-cancel");
+        if (input.equalsIgnoreCase(cancelWord) || input.equalsIgnoreCase("cancel")) {
             player.sendMessage(plugin.getLanguageManager().getMessage("input-cancelled"));
             SchedulerUtils.runForPlayer(plugin, player, () -> {
                 plugin.getInventoryManager().openCommandEditMenu(player, request.commandName);
@@ -967,6 +973,26 @@ public class InventoryListener implements Listener {
                     }, 1L);
                     return;
 
+                case GIVE_DISPLAYNAME:
+                    CustomCommandExecutor giveDnExec = plugin.getCommandManager().getCustomCommands()
+                            .get(request.commandName.toLowerCase());
+                    if (giveDnExec != null && request.actionIndex >= 0
+                            && request.actionIndex < giveDnExec.getActions().size()) {
+                        String action = giveDnExec.getActions().get(request.actionIndex);
+                        String content = action.contains("]") ? action.substring(action.indexOf("]") + 1).trim() : "";
+                        String[] parts = content.split(";", 3);
+                        String material = parts.length > 0 ? parts[0] : "DIAMOND";
+                        String amount = parts.length > 1 ? parts[1] : "1";
+                        String newAction = "[GIVE] " + material + ";" + amount + ";" + input;
+                        plugin.getCommandManager().editAction(request.commandName, request.actionIndex, newAction);
+                        plugin.getCommandManager().markDirty(request.commandName);
+                        player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
+                    }
+                    SchedulerUtils.runTaskLater(plugin, () -> {
+                        new GiveMenu(plugin).open(player, request.commandName, request.actionIndex);
+                    }, 1L);
+                    return;
+
                 case PARTICLE_TYPE:
                 case PARTICLE_COUNT:
                     CustomCommandExecutor partExec = plugin.getCommandManager().getCustomCommands()
@@ -1031,13 +1057,26 @@ public class InventoryListener implements Listener {
     }
 
     private void requestChatInput(Player player, String commandName, InputType type, int actionIndex) {
-        scheduledTransitions.put(player.getUniqueId(), System.currentTimeMillis());
-        chatInputs.put(player.getUniqueId(), new ChatInputRequest(commandName, type, actionIndex));
+        UUID uuid = player.getUniqueId();
+        scheduledTransitions.put(uuid, System.currentTimeMillis());
+        cancelInputTimeout(uuid);
+        chatInputs.put(uuid, new ChatInputRequest(commandName, type, actionIndex));
         player.closeInventory();
         player.sendMessage("");
-        player.sendMessage(plugin.getLanguageManager().getMessage("input-wait"));
-        player.sendMessage(plugin.getLanguageManager().getMessage("input-instructions"));
+
+        // Type-specific prompt
+        switch (type) {
+            case GIVE_DISPLAYNAME:
+                player.sendMessage(plugin.getLanguageManager().getMessage("chat-input-displayname"));
+                break;
+            default:
+                player.sendMessage(plugin.getLanguageManager().getMessage("input-wait"));
+                player.sendMessage(plugin.getLanguageManager().getMessage("input-instructions"));
+                break;
+        }
+
         player.sendMessage("");
+        scheduleInputTimeout(uuid);
     }
 
     private void scheduleTransition(Player player, Runnable action) {
@@ -1059,6 +1098,29 @@ public class InventoryListener implements Listener {
             return;
         }
 
+        int slot = event.getSlot();
+
+        // Auto-shift items to the right on Shift+Right-Click
+        if (event.getClick() == org.bukkit.event.inventory.ClickType.SHIFT_RIGHT && slot >= 0 && slot < 36) {
+            event.setCancelled(true);
+            org.bukkit.inventory.Inventory topInv = event.getView().getTopInventory();
+            
+            // Check if last slot is empty
+            ItemStack lastItem = topInv.getItem(35);
+            if (lastItem != null && lastItem.getType() != Material.AIR) {
+                // Cannot shift, it would delete the last item
+                player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 1, 1);
+                return;
+            }
+
+            for (int i = 34; i >= slot; i--) {
+                topInv.setItem(i + 1, topInv.getItem(i));
+            }
+            topInv.setItem(slot, null);
+            player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
+            return;
+        }
+
         // Prevent taking items out using Hotbar keys, Drop, shift-click, etc.
         org.bukkit.event.inventory.InventoryAction action = event.getAction();
         if (action == org.bukkit.event.inventory.InventoryAction.MOVE_TO_OTHER_INVENTORY || 
@@ -1071,8 +1133,6 @@ public class InventoryListener implements Listener {
             event.setCancelled(true);
             return;
         }
-
-        int slot = event.getSlot();
 
         // 1. Handle Trash Can (Slot 49)
         if (slot == 49) {
@@ -1120,7 +1180,7 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        // 4. Update 'action_index' in lore/PDC if necessary?
+        // 5. Update 'action_index' in lore/PDC if necessary?
         // Actually we don't need to update index on every move.
         // We only care about the final order when saving.
         // So allow default behavior for slots 0-35
@@ -1312,6 +1372,8 @@ public class InventoryListener implements Listener {
 
         // Add alias button
         if (slot == 31) {
+            if (!hasPermission(player, "xcommands.admin.edit"))
+                return;
             requestChatInput(player, cmdName, InputType.ALIAS_NEW, -1);
             return;
         }
@@ -1319,6 +1381,8 @@ public class InventoryListener implements Listener {
         // Alias item interaction
         for (int i = 0; i < AliasMenu.ALIAS_SLOTS.length; i++) {
             if (slot == AliasMenu.ALIAS_SLOTS[i] && i < executor.getAliases().size()) {
+                if (!hasPermission(player, "xcommands.admin.edit"))
+                    return;
                 if (event.isLeftClick() && event.isShiftClick()) {
                     // Delete with transition to avoid close warning
                     executor.getAliases().remove(i);
@@ -1440,7 +1504,7 @@ public class InventoryListener implements Listener {
         TELEPORT_WORLD, TELEPORT_COORDS,
         EFFECT_TYPE, EFFECT_DURATION, EFFECT_AMPLIFIER,
         PARTICLE_TYPE, PARTICLE_COORDS, PARTICLE_COUNT,
-        SOUND_TYPE
+        SOUND_TYPE, GIVE_DISPLAYNAME
     }
 
     private void handleTeleportMenu(InventoryClickEvent event, Player player, ItemStack clicked, String cmdName, int actionIndex) {
@@ -1520,8 +1584,14 @@ public class InventoryListener implements Listener {
         String action = exec.getActions().get(actionIndex);
         String[] parts = action.substring(action.indexOf("]") + 1).trim().split(";");
         
-        double volume = parts.length > 1 ? Double.parseDouble(parts[1]) : 1.0;
-        double pitch = parts.length > 2 ? Double.parseDouble(parts[2]) : 1.0;
+        double volume = 1.0;
+        double pitch = 1.0;
+        try {
+            volume = parts.length > 1 ? Double.parseDouble(parts[1]) : 1.0;
+        } catch (NumberFormatException e) { /* use default 1.0 */ }
+        try {
+            pitch = parts.length > 2 ? Double.parseDouble(parts[2]) : 1.0;
+        } catch (NumberFormatException e) { /* use default 1.0 */ }
 
         if (slot == 11) { // Sound Select
             requestChatInput(player, cmdName, InputType.SOUND_TYPE, actionIndex);
@@ -1584,17 +1654,42 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        // Material (Slot 11) or Name (Slot 15)
-        if (slot == 11 || slot == 15) {
+        // Material (Slot 11)
+        if (slot == 11) {
             requestChatInput(player, cmdName, InputType.ACTION_CONTENT, actionIndex);
             return;
         }
 
+        // Display Name (Slot 15)
+        if (slot == 15) {
+            requestChatInput(player, cmdName, InputType.GIVE_DISPLAYNAME, actionIndex);
+            return;
+        }
+
         // Confirm
-        if (slot == 25) {
+        if (slot == 26) {
             scheduleTransition(player, () -> {
                 plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
             });
+        }
+    }
+
+    private void scheduleInputTimeout(UUID uuid) {
+        Object task = SchedulerUtils.runTaskLater(plugin, () -> {
+            if (chatInputs.remove(uuid) != null) {
+                Player p = Bukkit.getPlayer(uuid);
+                if (p != null && p.isOnline()) {
+                    p.sendMessage(plugin.getLanguageManager().getMessage("chat-input-timeout"));
+                }
+            }
+        }, INPUT_TIMEOUT_TICKS);
+        inputTimeoutTasks.put(uuid, task);
+    }
+
+    private void cancelInputTimeout(UUID uuid) {
+        Object task = inputTimeoutTasks.remove(uuid);
+        if (task != null) {
+            SchedulerUtils.cancelTask(task);
         }
     }
 

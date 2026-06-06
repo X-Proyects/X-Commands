@@ -30,20 +30,21 @@ public class UpdateChecker {
     @SuppressWarnings("deprecation")
     public void checkForUpdates(CommandSender sender) {
         SchedulerUtils.runTaskAsynchronously(plugin, () -> {
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
             try {
                 String currentVersion = plugin.getDescription().getVersion();
 
                 // Spigot API for resource versions
                 URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("User-Agent", "Fabian/X-Commands/" + currentVersion);
                 connection.setConnectTimeout(5000);
                 connection.setReadTimeout(5000);
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String version = reader.readLine();
-                reader.close();
 
                 this.latestVersion = version;
                 LanguageManager lang = plugin.getLanguageManager();
@@ -71,6 +72,13 @@ public class UpdateChecker {
                     CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("update-error"));
                 } else {
                     CompatibilityUtils.sendMessage(Bukkit.getConsoleSender(), plugin.getLanguageManager().getMessageWithPrefix("update-error"));
+                }
+            } finally {
+                if (reader != null) {
+                    try { reader.close(); } catch (Exception ignored) {}
+                }
+                if (connection != null) {
+                    connection.disconnect();
                 }
             }
         });

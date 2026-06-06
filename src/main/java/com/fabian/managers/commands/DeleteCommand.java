@@ -1,6 +1,7 @@
 package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -16,12 +17,12 @@ public class DeleteCommand {
 
     public boolean execute(CommandSender sender, String[] args) {
         if (!sender.hasPermission("xcommands.admin.delete")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
             return true;
         }
 
         if (args.length < 2) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("delete-usage"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("delete-usage"));
             return true;
         }
 
@@ -33,16 +34,16 @@ public class DeleteCommand {
                 if (successMsg.contains("{0}")) {
                     successMsg = successMsg.replace("{0}", commandName);
                 }
-                sender.sendMessage(successMsg);
+                CompatibilityUtils.sendMessage(sender, successMsg);
             } else {
-                sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("command-error"));
+                CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("command-error"));
             }
         } else {
             String notFoundMsg = plugin.getLanguageManager().getMessageWithPrefix("delete-not-found");
             if (notFoundMsg.contains("{0}")) {
                 notFoundMsg = notFoundMsg.replace("{0}", commandName);
             }
-            sender.sendMessage(notFoundMsg);
+            CompatibilityUtils.sendMessage(sender, notFoundMsg);
         }
 
         return true;

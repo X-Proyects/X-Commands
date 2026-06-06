@@ -26,6 +26,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
     private final InfoCommand infoCommand;
     private final EditCommand editCommand;
     private final LocateCommand locateCommand;
+    private final ForceMessagesCommand forceMessagesCommand;
 
     public XCCommand(XCommands plugin) {
         this.plugin = plugin;
@@ -37,6 +38,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         this.infoCommand = new InfoCommand(plugin);
         this.editCommand = new EditCommand(plugin);
         this.locateCommand = new LocateCommand(plugin);
+        this.forceMessagesCommand = new ForceMessagesCommand(plugin);
     }
 
     @Override
@@ -90,6 +92,9 @@ public class XCCommand implements CommandExecutor, TabCompleter {
             case "locate":
                 return locateCommand.execute(sender, args);
 
+            case "forcemessages":
+                return forceMessagesCommand.execute(sender, args);
+
             case "version":
                 return sendVersionInfo(sender);
 
@@ -107,6 +112,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         String[][] entries = {
             { "xcommands.admin.gui",     "help-gui"     },
             { "xcommands.admin.locate",  "help-locate"  },
+            { "xcommands.admin.forcemessages", "help-forcemessages" },
             { "xcommands.admin.reload",  "help-reload"  },
             { "xcommands.admin.update",  "help-update"  },
             { "xcommands.admin.list",    "help-list"    },
@@ -155,6 +161,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 { "edit",    "xcommands.admin.edit"    },
                 { "version", "xcommands.admin.version" },
                 { "locate",  "xcommands.admin.locate"  },
+                { "forcemessages", "xcommands.admin.forcemessages" },
             };
             for (String[] sub : allSubs) {
                 if (sender.hasPermission(sub[1]) && sub[0].startsWith(input)) {
@@ -172,6 +179,16 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 }
             } else if (sub.equals("locate")) {
                 String input = args[1].toLowerCase();
+                for (String lang : plugin.getLanguageManager().getAvailableLanguages()) {
+                    if (lang.startsWith(input)) {
+                        completions.add(lang);
+                    }
+                }
+            } else if (sub.equals("forcemessages")) {
+                String input = args[1].toLowerCase();
+                if ("all".startsWith(input)) {
+                    completions.add("all");
+                }
                 for (String lang : plugin.getLanguageManager().getAvailableLanguages()) {
                     if (lang.startsWith(input)) {
                         completions.add(lang);

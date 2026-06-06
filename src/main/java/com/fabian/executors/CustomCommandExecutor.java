@@ -1,6 +1,7 @@
 package com.fabian.executors;
 
 import com.fabian.XCommands;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -67,7 +68,7 @@ public class CustomCommandExecutor implements CommandExecutor {
         // Check permission
         if (!permission.isEmpty() && !sender.hasPermission(permission)) {
             String message = plugin.getLanguageManager().getMessage("command-no-permission");
-            sender.sendMessage(message);
+            CompatibilityUtils.sendMessage(sender, message);
             return true;
         }
 
@@ -75,7 +76,7 @@ public class CustomCommandExecutor implements CommandExecutor {
         if (player != null && !world.isEmpty()) {
             if (!player.getWorld().getName().equalsIgnoreCase(world)) {
                 String message = plugin.getLanguageManager().getMessage("command-wrong-world");
-                player.sendMessage(message);
+                CompatibilityUtils.sendMessage(player, message);
                 return true;
             }
         }
@@ -88,7 +89,7 @@ public class CustomCommandExecutor implements CommandExecutor {
 
             if (remaining > 0) {
                 String message = plugin.getLanguageManager().getMessage("command-cooldown", (remaining / 1000) + 1);
-                player.sendMessage(message);
+                CompatibilityUtils.sendMessage(player, message);
                 return true;
             }
             cooldowns.put(player.getUniqueId(), currentTime);
@@ -99,7 +100,7 @@ public class CustomCommandExecutor implements CommandExecutor {
             plugin.getActionManager().executeActions(player, actions, args);
         } catch (Exception e) {
             String message = plugin.getLanguageManager().getMessage("command-error");
-            sender.sendMessage(message);
+            CompatibilityUtils.sendMessage(sender, message);
             plugin.logSevere("Error executing command " + commandName + ": " + e.getMessage());
         }
 

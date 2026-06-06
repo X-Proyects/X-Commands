@@ -13,6 +13,8 @@ import java.util.function.Consumer;
 public class SchedulerUtils {
 
     private static Boolean isFolia = null;
+    private static java.lang.reflect.Method teleportAsyncMethod = null;
+    private static Boolean teleportAsyncAvailable = null;
 
     /**
      * Checks if the server is running Folia.
@@ -61,7 +63,8 @@ public class SchedulerUtils {
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), Math.max(1L, delayTicks));
             } catch (Throwable e) {
                 LoggerUtils.debug("Folia GlobalRegionScheduler 'runDelayed' failed: " + e.getMessage());
-                Bukkit.getScheduler().runTaskLater(plugin, runnable, delayTicks);
+                // Cannot use Bukkit.getScheduler() on Folia, use async as fallback
+                runTaskAsynchronously(plugin, runnable);
             }
         } else {
             Bukkit.getScheduler().runTaskLater(plugin, runnable, delayTicks);
@@ -101,7 +104,8 @@ public class SchedulerUtils {
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), Math.max(1L, delayTicks), Math.max(1L, periodTicks));
             } catch (Throwable e) {
                 LoggerUtils.debug("Folia GlobalRegionScheduler 'runAtFixedRate' failed: " + e.getMessage());
-                return Bukkit.getScheduler().runTaskTimer(plugin, runnable, delayTicks, periodTicks);
+                // Cannot use Bukkit.getScheduler() on Folia, log and return null
+                return null;
             }
         } else {
             return Bukkit.getScheduler().runTaskTimer(plugin, runnable, delayTicks, periodTicks);
@@ -176,9 +180,21 @@ public class SchedulerUtils {
         if (player == null || location == null) return;
         
         try {
-            // Check for Folia/Paper's teleportAsync
-            java.lang.reflect.Method method = player.getClass().getMethod("teleportAsync", org.bukkit.Location.class);
-            method.invoke(player, location);
+            // Check cached method first
+            if (teleportAsyncAvailable == null) {
+                try {
+                    teleportAsyncMethod = player.getClass().getMethod("teleportAsync", org.bukkit.Location.class);
+                    teleportAsyncAvailable = true;
+                } catch (NoSuchMethodException e) {
+                    teleportAsyncAvailable = false;
+                }
+            }
+            
+            if (teleportAsyncAvailable && teleportAsyncMethod != null) {
+                teleportAsyncMethod.invoke(player, location);
+            } else {
+                player.teleport(location);
+            }
         } catch (Throwable e) {
             // Fallback to standard synchronous teleport
             player.teleport(location);

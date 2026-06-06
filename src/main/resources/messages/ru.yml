@@ -15,7 +15,6 @@ upcoming-feature: "&cСкоро..."
 # ============================================
 # COMMAND MANAGEMENT
 # ============================================
-command-usage: "&cИспользование: /xc [create|delete|edit|list|info]"
 create-usage: "&cИспользование: /xc create <имя>"
 create-success: "&aКоманда '&e{0}&a' успешно создана!"
 create-exists: "&cКоманда '&e{0}&c' уже существует."
@@ -212,7 +211,7 @@ gui-actions-order-lore: "&7Управление последовательнос
 gui-actions-add: "&aДобавить действие"
 gui-actions-add-lore: "&7Нажмите, чтобы добавить новое"
 gui-actions-item-name: "&eДействие #{0}"
-gui-actions-item-lore: "&7Содержимое:|&f{0}| |&7ПКМ: &bИзменить|&7ЛКМ: &eПереместить|&7Shift + ПКМ: &cУдалить"
+gui-actions-item-lore: "&7Содержимое:|&f{0}| |&7Клик: &bИзменить|&7Shift + ПКМ: &cУдалить"
 gui-actions-reorder: "&6Изменить порядок"
 gui-actions-reorder-lore: "&7Перетащите, чтобы изменить порядок| |&eНажмите, чтобы открыть"
 
@@ -236,7 +235,7 @@ gui-type-select-not: "&7ПКМ: &cУсловие НЕ"
 # GUI - ACTION REORDER MENU
 # ============================================
 gui-reorder-title: "&8Порядок: &3/{0}"
-gui-reorder-lore: "&7Перетащите, чтобы изменить порядок|&7Бросьте в корзину для удаления"
+gui-reorder-lore: "&7Перетащите для изменения порядка|&7Shift + ПКМ для сдвига действий|&7Бросьте в корзину для удаления"
 gui-reorder-trash: "&c&lУДАЛИТЬ ДЕЙСТВИЕ"
 gui-reorder-trash-lore: "&7Перетащите действие сюда,|&7чтобы удалить его навсегда."
 gui-reorder-edit: "&bРедактировать действия"

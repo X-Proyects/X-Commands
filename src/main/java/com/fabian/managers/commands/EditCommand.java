@@ -2,6 +2,7 @@ package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
 import com.fabian.executors.CustomCommandExecutor;
+import com.fabian.utils.CompatibilityUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -21,12 +22,12 @@ public class EditCommand {
 
     public boolean execute(CommandSender sender, String[] args) {
         if (!sender.hasPermission("xcommands.admin.edit")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
             return true;
         }
 
         if (args.length < 3) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("edit-usage"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("edit-usage"));
             return true;
         }
 
@@ -34,7 +35,7 @@ public class EditCommand {
         CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName);
 
         if (cmd == null) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("command-not-found"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("command-not-found"));
             return true;
         }
 
@@ -47,29 +48,19 @@ public class EditCommand {
                 if (args.length < 4) return sendUsage(sender, "name <newName>");
                 String newName = args[3].toLowerCase();
                 if (!newName.matches("[a-zA-Z0-9_]+")) {
-                    sender.sendMessage(plugin.getLanguageManager().getMessage("input-invalid-name"));
+                    CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("input-invalid-name"));
                     return true;
                 }
                 if (plugin.getCommandManager().getCustomCommands().containsKey(newName)) {
-                    sender.sendMessage(plugin.getLanguageManager().getMessage("input-command-exists"));
+                    CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("input-command-exists"));
                     return true;
                 }
                 
-                // We need to rename the file. The safest way is to clone the executor, delete the old, and save the new.
-                // But CustomCommandExecutor has setCommandName. Let's just remove from map, change name, put in map, mark dirty old, mark dirty new.
-                plugin.getCommandManager().getCustomCommands().remove(commandName);
-                cmd.setCommandName(newName);
-                plugin.getCommandManager().getCustomCommands().put(newName, cmd);
-                
-                // Delete old file
-                java.io.File oldFile = new java.io.File(new java.io.File(plugin.getDataFolder(), "commands"), commandName + ".yml");
-                if (oldFile.exists()) oldFile.delete();
-                
-                plugin.getCommandManager().markDirty(newName);
-                plugin.getCommandManager().saveCommand(newName);
+                // Use the proper renameCommand method which handles unregistration/re-registration
+                plugin.getCommandManager().updateConfigValue(commandName, "name", newName);
                 String renameMsg = plugin.getLanguageManager().getMessageWithPrefix("edit-renamed");
                 if (renameMsg.contains("{0}")) renameMsg = renameMsg.replace("{0}", newName);
-                sender.sendMessage(renameMsg);
+                CompatibilityUtils.sendMessage(sender, renameMsg);
                 break;
 
             case "permission":
@@ -93,7 +84,7 @@ public class EditCommand {
                     cmd.setCooldown(Math.max(0, cd));
                     save(cmd, sender, "Cooldown");
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("edit-invalid-number"));
+                    CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("edit-invalid-number"));
                 }
                 break;
 
@@ -104,7 +95,7 @@ public class EditCommand {
                     cmd.setInterval(Math.max(0, interval));
                     save(cmd, sender, "Interval");
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("edit-invalid-number"));
+                    CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("edit-invalid-number"));
                 }
                 break;
 
@@ -167,10 +158,10 @@ public class EditCommand {
                         cmd.getActions().addAll(actions);
                         save(cmd, sender, "Action");
                     } else {
-                        sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("action-invalid-index"));
+                        CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("action-invalid-index"));
                     }
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("edit-invalid-number"));
+                    CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("edit-invalid-number"));
                 }
             } else if (actType.equals("add")) {
                 if (args.length < 6) return sendUsage(sender, "action add <type> <value...>");
@@ -186,7 +177,7 @@ public class EditCommand {
             break;
 
         default:
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("edit-unknown-attribute"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("edit-unknown-attribute"));
             break;
         }
 
@@ -198,12 +189,12 @@ public class EditCommand {
         plugin.getCommandManager().saveCommand(cmd.getCommandName());
         String msg = plugin.getLanguageManager().getMessageWithPrefix("edit-success");
         if (msg.contains("{0}")) msg = msg.replace("{0}", attribute);
-        sender.sendMessage(msg);
+        CompatibilityUtils.sendMessage(sender, msg);
     }
 
     private boolean sendUsage(CommandSender sender, String usage) {
         String prefix = com.fabian.utils.ColorUtils.translate(plugin.getConfigManager().getPrefix());
-        sender.sendMessage(prefix + " §cUsage: /xc edit <command> " + usage);
+        CompatibilityUtils.sendMessage(sender, prefix + " §cUsage: /xc edit <command> " + usage);
         return true;
     }
 }

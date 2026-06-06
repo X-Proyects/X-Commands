@@ -82,24 +82,24 @@ public final class ColorUtils {
 
         String processed = input;
 
-        // 1. Normalizar formato hexadecimal heredado &#RRGGBB a <#RRGGBB>
+        // 1. Normalize legacy hex format &#RRGGBB to <#RRGGBB>
         if (processed.contains("&#")) {
             Matcher matcher = HEX_PATTERN.matcher(processed);
             processed = matcher.replaceAll("<#$1>");
         }
 
-        // 2. Convertir codigos legacy a tags MiniMessage si hay tags MiniMessage
-        // Esto permite mezclar gradientes con códigos como &l
+        // 2. Convert legacy codes to MiniMessage tags if MiniMessage tags are present
+        // This allows mixing gradients with codes like &l
         if (processed.contains("<")) {
             String miniMessageString = convertLegacyToMiniMessageTags(processed);
             try {
                 return MINI_MESSAGE.deserialize(miniMessageString);
             } catch (Exception e) {
-                // Fallback a legacy en caso de error de parseo
+                // Fallback to legacy on parse error
             }
         }
 
-        // 3. Normalizar ampersand a section para el parser legacy
+        // 3. Normalize ampersand to section for the legacy parser
         if (processed.contains("&")) {
             processed = translateLegacy(processed);
         }
@@ -108,7 +108,7 @@ public final class ColorUtils {
     }
 
     /**
-     * Convierte codigos legacy (&a, &l, etc) a tags de MiniMessage (<green>, <bold>, etc).
+     * Converts legacy codes (&a, &l, etc) to MiniMessage tags (<green>, <bold>, etc).
      */
     private static String convertLegacyToMiniMessageTags(String input) {
         char[] b = input.toCharArray();
@@ -119,7 +119,7 @@ public final class ColorUtils {
                 String tag = getMiniMessageTag(next);
                 if (tag != null) {
                     sb.append(tag);
-                    i++; // Saltamos el codigo de color
+                    i++; // Skip the color code
                     continue;
                 }
             }

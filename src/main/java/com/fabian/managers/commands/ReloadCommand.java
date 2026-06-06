@@ -26,14 +26,14 @@ public class ReloadCommand {
             plugin.getActionManager().reload();
             plugin.getCooldownManager().reload();
             plugin.getCommandManager().reload();
+            plugin.getCommandInterceptorListener().rebuildAliasLookup();
             
             // Re-load inventory manager if needed
             plugin.getInventoryManager().reload();
 
             CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("reload-success"));
         } catch (Exception e) {
-            plugin.getLogger().severe("Error reloading plugin: " + e.getMessage());
-            e.printStackTrace();
+            plugin.logSevere("Error reloading plugin: " + e.getMessage(), e);
             CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("reload-error"));
         }
 

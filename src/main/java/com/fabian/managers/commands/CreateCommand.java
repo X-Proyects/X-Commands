@@ -1,6 +1,7 @@
 package com.fabian.managers.commands;
 
 import com.fabian.XCommands;
+import com.fabian.utils.CompatibilityUtils;
 import com.fabian.utils.SchedulerUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,19 +19,19 @@ public class CreateCommand {
 
     public boolean execute(CommandSender sender, String[] args) {
         if (!sender.hasPermission("xcommands.admin.create")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("no-permission"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
             return true;
         }
 
         if (args.length < 2) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("create-usage"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("create-usage"));
             return true;
         }
 
         String commandName = args[1].toLowerCase();
 
         if (!commandName.matches("[a-zA-Z0-9_]+")) {
-            sender.sendMessage(plugin.getLanguageManager().getMessageWithPrefix("input-invalid-name"));
+            CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("input-invalid-name"));
             return true;
         }
 
@@ -40,7 +41,7 @@ public class CreateCommand {
             if (successMsg.contains("{0}")) {
                 successMsg = successMsg.replace("{0}", commandName);
             }
-            sender.sendMessage(successMsg);
+            CompatibilityUtils.sendMessage(sender, successMsg);
 
             if (sender instanceof Player) {
                 Player player = (Player) sender;
@@ -53,7 +54,7 @@ public class CreateCommand {
             if (existsMsg.contains("{0}")) {
                 existsMsg = existsMsg.replace("{0}", commandName);
             }
-            sender.sendMessage(existsMsg);
+            CompatibilityUtils.sendMessage(sender, existsMsg);
         }
 
         return true;

@@ -18,6 +18,10 @@ public class DamageAction implements Action {
 
         try {
             double damage = Double.parseDouble(params.trim());
+            if (Double.isNaN(damage) || Double.isInfinite(damage) || damage < 0) {
+                com.fabian.utils.LoggerUtils.warn("Invalid damage value for [DAMAGE]: " + damage + " (must be a positive finite number). Action skipped.");
+                return;
+            }
             player.damage(damage);
         } catch (Exception e) {
             com.fabian.utils.LoggerUtils.warn("Invalid parameters for action [DAMAGE]: " + params);

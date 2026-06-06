@@ -15,7 +15,6 @@ upcoming-feature: "&cComing soon..."
 # ============================================
 # COMMAND MANAGEMENT
 # ============================================
-command-usage: "&cUsage: /xc [create|delete|edit|list|info]"
 create-usage: "&cUsage: /xc create <name>"
 create-success: "&aCommand '&e{0}&a' created successfully!"
 create-exists: "&cCommand '&e{0}&c' already exists."
@@ -212,7 +211,7 @@ gui-actions-order-lore: "&7Sequence management"
 gui-actions-add: "&aAdd Action"
 gui-actions-add-lore: "&7Click to add a new one"
 gui-actions-item-name: "&eAction #{0}"
-gui-actions-item-lore: "&7Content:|&f{0}| |&7Right Click: &bEdit|&7Left Click: &eMove|&7Shift + Right: &cDelete"
+gui-actions-item-lore: "&7Content:|&f{0}| |&7Click: &bEdit|&7Shift + Right: &cDelete"
 gui-actions-reorder: "&6Reorder Actions"
 gui-actions-reorder-lore: "&7Drag and drop to change order| |&eClick to open"
 
@@ -236,7 +235,7 @@ gui-type-select-not: "&7Right Click: &cNOT condition"
 # GUI - ACTION REORDER MENU
 # ============================================
 gui-reorder-title: "&8Order: &3/{0}"
-gui-reorder-lore: "&7Drag to reorder|&7Drop in trash to delete"
+gui-reorder-lore: "&7Drag to reorder|&7Shift + Right to shift|&7Drop in trash to delete"
 gui-reorder-trash: "&c&lDELETE ACTION"
 gui-reorder-trash-lore: "&7Drag an action here|&7to delete it permanently."
 gui-reorder-edit: "&bEdit Actions"

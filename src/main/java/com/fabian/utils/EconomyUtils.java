@@ -85,4 +85,11 @@ public class EconomyUtils {
             econ.depositPlayer(player, amount);
         }
     }
+
+    /**
+     * Tears down the economy reference. Called on plugin disable.
+     */
+    public static void teardown() {
+        econ = null;
+    }
 }

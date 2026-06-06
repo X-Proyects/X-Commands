@@ -28,6 +28,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages custom command registration and loading
@@ -39,11 +40,11 @@ public class CommandManager {
     private CommandMap commandMap;
     // Cached reflection field
     private Field knownCommandsField;
-    private final Map<String, Object> commandTimers = new HashMap<>(); // Object to store BukkitTask or ScheduledTask
+    private final Map<String, Object> commandTimers = new ConcurrentHashMap<>(); // Object to store BukkitTask or ScheduledTask
 
     public CommandManager(XCommands plugin) {
         this.plugin = plugin;
-        this.customCommands = new HashMap<>();
+        this.customCommands = new ConcurrentHashMap<>();
         initCommandMap();
     }
 
@@ -177,8 +178,7 @@ public class CommandManager {
             }
 
         } catch (Exception e) {
-            plugin.logSevere("Error loading command from " + file.getName() + ": " + e.getMessage());
-            e.printStackTrace();
+            plugin.logSevere("Error loading command from " + file.getName() + ": " + e.getMessage(), e);
         }
     }
 
@@ -352,7 +352,7 @@ public class CommandManager {
 
             // Perform replacements to keep comments intact
             // name: ejemplo -> name: NewName
-            content = content.replaceAll("(?m)^name:.*", "name: " + commandName);
+            content = content.replaceAll("(?m)^name:.*", "name: " + java.util.regex.Matcher.quoteReplacement(commandName));
             // permission: xcommands.ejemplo -> permission: xcommands.newname
             content = content.replaceAll("(?m)^permission:.*", "permission: xcommands." + commandName.toLowerCase());
             // display-name: "..." -> display-name: "&bNewName"
@@ -396,8 +396,7 @@ public class CommandManager {
 
             return true;
         } catch (Exception e) {
-            plugin.logSevere("Error creating command from template: " + e.getMessage());
-            e.printStackTrace();
+            plugin.logSevere("Error creating command from template: " + e.getMessage(), e);
             return false;
         }
     }
@@ -417,6 +416,9 @@ public class CommandManager {
         customCommands.remove(commandName.toLowerCase());
         stopTimer(commandName);
 
+        // Clear cooldowns for this command to prevent memory leak
+        plugin.getCooldownManager().clearCooldowns(commandName);
+
         // Async file deletion
         String originalName = executor.getOriginalName();
         SchedulerUtils.runTaskAsynchronously(plugin, () -> {
@@ -433,15 +435,14 @@ public class CommandManager {
                 if (command != null) {
                     command.unregister(commandMap);
 
-                    // Remove from known commands map in CommandMap using reflection if necessary
-                    // Many CommandMap implementations require this to fully remove the command
+                    // Remove from known commands map using cached reflection field
                     try {
-                        Field knownCommandsField = commandMap.getClass().getDeclaredField("knownCommands");
-                        knownCommandsField.setAccessible(true);
-                        @SuppressWarnings("unchecked")
-                        Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
-                        knownCommands.remove(commandName.toLowerCase());
-                        knownCommands.remove("xcommands:" + commandName.toLowerCase());
+                        if (knownCommandsField != null) {
+                            @SuppressWarnings("unchecked")
+                            Map<String, Command> knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
+                            knownCommands.remove(commandName.toLowerCase());
+                            knownCommands.remove("xcommands:" + commandName.toLowerCase());
+                        }
                     } catch (Exception e1) {
                         // Ignore if failed, as it might be version dependent
                     }
@@ -493,24 +494,10 @@ public class CommandManager {
         if (executor == null)
             return commandName;
 
-        // Update memory based on path
+        // Handle rename via dedicated method
         if (path.equals("name")) {
-            // Renaming is complex because key changes.
-            // For now, simpler implementation: just update display name or internal name
-            // field if existing
-            // But CustomCommandExecutor has 'commandName' field.
-            // If we rename the command key, we need to re-key it in the map and
-            // re-register.
-            // For simplicity, let's say "name" here refers to config 'name' which is the
-            // command alias/key?
-            // Actually, usually 'name' in config is the command name.
-            // If the user changes the command NAME, we need to re-key it in the map and
-            // re-register.
-            // This is complex. Let's assume for now we only support changing
-            // description/permission/item name in memory easily.
-            // If it's the actual command KEY/NAME, we might need a specific rename method.
-            // Looking at InventoryListener, it calls updateConfigValue(..., "name", input).
-            // Creating a rename method is safer.
+            renameCommand(commandName, value.toString());
+            return value.toString();
         }
 
         if (path.equals("description")) {
@@ -556,18 +543,6 @@ public class CommandManager {
         } else if (path.equals("material")) {
             executor.setMaterial(value.toString().toUpperCase());
             markDirty(commandName);
-        }
-        // Config path 'item.display-name' etc is not handled generically well here
-        // without accessors.
-        // We really should add setters to CustomCommandExecutor.
-        // For now assuming the listener handles logic.
-        // BUT WAIT: The listener uses "name" for "Cambiar Nombre".
-        // If we rename, we usually need to re-create the file.
-
-        // Handling special case for renaming in memory:
-        if (path.equals("name")) {
-            renameCommand(commandName, value.toString());
-            return value.toString();
         }
 
         return commandName;
@@ -724,7 +699,7 @@ public class CommandManager {
     }
 
     public Map<String, CustomCommandExecutor> getCustomCommands() {
-        return customCommands;
+        return java.util.Collections.unmodifiableMap(customCommands);
     }
 
     /**

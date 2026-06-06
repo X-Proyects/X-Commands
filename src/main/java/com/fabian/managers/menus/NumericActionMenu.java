@@ -79,6 +79,6 @@ public class NumericActionMenu extends BaseMenu {
                 // Back — slot 45
                 addBackButton(inv, 45);
 
-                player.openInventory(inv);
+                smartOpenInventory(player, inv);
         }
 }
