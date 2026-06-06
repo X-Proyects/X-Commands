@@ -42,10 +42,11 @@ public class EffectAction implements Action {
                 } catch (Exception e) { com.fabian.utils.LoggerUtils.debug("Effect registry lookup failed: " + e.getMessage()); }
             }
 
-            // 3. Last resort fallback
+            // 3. Last resort fallback (legacy method, may be removed in future versions)
             if (effectType == null) {
-                @SuppressWarnings("deprecation")
-                effectType = PotionEffectType.getByName(effectName);
+                try {
+                    effectType = PotionEffectType.getByName(effectName);
+                } catch (Exception e) { /* legacy lookup not available */ }
             }
 
             if (effectType == null) {

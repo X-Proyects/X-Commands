@@ -12,6 +12,7 @@ reload-success: "&aPlugin recarregado com sucesso!"
 reload-error: "&cErro ao recarregar o plugin. Verifique o console para detalhes."
 upcoming-feature: "&cEm breve..."
 
+
 # ============================================
 # COMMAND MANAGEMENT
 # ============================================
@@ -41,34 +42,6 @@ info-actions: " &8» &7Ações: &f{0}"
 info-desc: " &8» &7Descrição: &f{0}"
 info-footer: "&8&m----------------------------------"
 
-# ============================================
-# CUSTOM COMMAND ERRORS
-# ============================================
-command-no-permission: "&cVocê não tem permissão para usar este comando."
-command-wrong-world: "&cEste comando não pode ser usado neste mundo."
-command-cooldown: "&cVocê deve esperar %time% segundos antes de usar este comando novamente."
-command-error: "&cErro ao executar o comando. Verifique o console para detalhes."
-
-# ============================================
-# ACTION ERRORS
-# ============================================
-action-invalid: "&cAção inválida: {0}"
-action-parse-error: "&cErro ao processar ação: {0}"
-
-# ============================================
-# UPDATE MESSAGES
-# ============================================
-update-checking: "&7Verificando atualizações..."
-update-no-new: "&aVocê está usando la versión mas reciente!"
-update-new: "&aUma nova atualização está disponível: &e{0}&a! Baixe em: &b{1}"
-update-error: "&cErro ao verificar atualizações."
-update-check-no-new: "&7Não há novas atualizações disponíveis."
-update-check-new: "&aUma nova atualização está disponível! Local: &ev{0} &7| Remota: &ev{1}"
-update-check-download: "&aBaixe em: &b{0}"
-update-check-error-console: "&cNão foi possível verificar atualizações: {0}"
-update-available: "&aUma nova atualização está disponível! Local: &ev{0} &7| Nova: &ev{1}"
-update-download: "&aBaixe em: &b{0}"
-update-current: "&aVocê está rodando a versão mais recente!"
 
 # ============================================
 # HELP MENU
@@ -84,257 +57,41 @@ help-create: "&e/xc create <cmd> &7- Cria um novo comando"
 help-delete: "&e/xc delete <cmd> &7- Exclui um comando"
 help-edit: "&e/xc edit <cmd> ... &7- Edita um comando"
 help-version: "&e/xc version &7- Mostra informações do plugin e do servidor"
+help-forcemessages: "&e/xc forcemessages <new|keep> <all|idioma> &7- Reiniciar ou atualizar mensagens"
 help-footer: "&8&m--------------------------------"
 
-# ============================================
-# GUI - MAIN MENU
-# ============================================
-gui-main-title: "&3&lX-Commands &8- &7Lista"
-gui-main-create: "&a&lCriar Comando"
-gui-main-create-lore: "&7Clique para criar um novo comando| |&eClique para iniciar"
-gui-main-prev: "&eAnterior"
-gui-main-next: "&ePróximo"
-gui-main-page: "&7Ir para página {0}"
-gui-main-click-left: "&7Clique Esquerdo: &bEditar"
-gui-main-click-right: "&7Clique Direito: &eMostrar Ações"
-gui-main-help: "&eAjuda e Comandos"
-gui-main-help-lore: "&7Clique para ver a lista de|&7comandos disponíveis.| |&eClique para ver"
 
 # ============================================
-# GUI - ACTION TYPES (SELECTOR)
+# CUSTOM COMMAND ERRORS
 # ============================================
-gui-type-message: "&aMensagem"
-gui-type-message-desc: "&7Envia uma mensagem privada ao jogador."
-gui-type-broadcast: "&6Anúncio"
-gui-type-broadcast-desc: "&7Envia uma mensagem global para o servidor."
-gui-type-actionbar: "&eActionBar"
-gui-type-actionbar-desc: "&7Mostra texto acima da barra de vida."
-gui-type-title: "&bTítulo"
-gui-type-title-desc: "&7Mostra um grande título na tela."
-gui-type-sound: "&dSom"
-gui-type-sound-desc: "&7Reproduz um efeito sonoro."
-gui-type-effect: "&5Efeito"
-gui-type-effect-desc: "&7Aplica um efeito de poção ao jogador."
-gui-type-give: "&9Dar Item"
-gui-type-give-desc: "&7Entrega itens ao inventário."
-gui-type-teleport: "&3Teleporte"
-gui-type-teleport-desc: "&7Move o jogador para outro local."
-gui-type-delay: "&7Esperar (Ticks)"
-gui-type-delay-desc: "&7Pausa a execução por alguns instantes."
-gui-type-heal: "&cCura"
-gui-type-heal-desc: "&7Restaura a vida ao máximo."
-gui-type-feed: "&6Alimentar"
-gui-type-feed-desc: "&7Restaura a fome ao máximo."
-gui-type-damage: "&4Dano"
-gui-type-damage-desc: "&7Tira vida do jogador."
-gui-type-console: "&cConsole"
-gui-type-console-desc: "&7Executes a command from the console."
-gui-type-player: "&aJogador"
-gui-type-player-desc: "&7Força o jogador a executar um comando."
-gui-type-kick: "&4Expulsar"
-gui-type-kick-desc: "&7Expulsa o jogador do servidor."
-gui-type-close: "&7Fechar"
-gui-type-close-desc: "&7Fecha o inventário atual do jogador."
-gui-type-particle: "&ePartícula"
-gui-type-particle-desc: "&7Gera efeitos visuales de partículas."
-gui-type-bungee: "&5Bungee"
-gui-type-bungee-desc: "&7Envia o jogador para outro servidor (BungeeCord)."
-gui-type-give-money: "&6Dar Dinheiro"
-gui-type-give-money-desc: "&7Adiciona dinheiro ao saldo (Requer Vault)."
-gui-type-take-money: "&cRetirar Dinheiro"
-gui-type-take-money-desc: "&7Retira dinheiro do saldo (Requer Vault)."
-gui-type-velocity: "&bVelocity"
-gui-type-velocity-desc: "&7Envia o jogador para um servidor (Velocity)."
-gui-type-sent-to: "&3Enviado Para"
-gui-type-sent-to-desc: "&7Envia o jogador para outro servidor via proxy."
-gui-type-if-permission: "&aSe tiver Permissão"
-gui-type-if-permission-desc: "&7Condición: Apenas se o jogador tiver a permissão."
-gui-type-if-chance: "&eSe tiver Sorte"
-gui-type-if-chance-desc: "&7Condición: Probabilidade de sucesso (0-100)."
-gui-type-if-op: "&4Se for OP"
-gui-type-if-op-desc: "&7Condición: Apenas se o jogador for operador."
-gui-type-if-world: "&9Se no Mundo"
-gui-type-if-world-desc: "&7Condición: Apenas no mundo especificado."
-gui-type-if-money: "&aSe tiver Dinheiro"
-gui-type-if-money-desc: "&7Condición: Apenas se o jogador tiver dinheiro suficiente."
-gui-type-bracket: "&bBloco de Ações"
-gui-type-bracket-desc: "&7Agrupa ações sob uma condição."
-gui-type-bracket-right: "&7Clique Direito: &eAdicionar &8&l["
-gui-type-bracket-left: "&7Clique Esquerdo: &eAdicionar &8&l]"
+command-no-permission: "&cVocê não tem permissão para usar este comando."
+command-wrong-world: "&cEste comando não pode ser usado neste mundo."
+command-cooldown: "&cVocê deve esperar %time% segundos antes de usar este comando novamente."
+command-error: "&cErro ao executar o comando. Verifique o console para detalhes."
+
 
 # ============================================
-# GUI - COMMAND EDIT MENU
+# ACTION ERRORS
 # ============================================
-gui-edit-title: "&8Editando: &3/{0}"
-gui-edit-name: "&eMudar Nome"
-gui-edit-name-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-edit-desc: "&eMudar Descrição"
-gui-edit-desc-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-edit-reg: "&eAlternar Registro"
-gui-edit-reg-lore: "&7Estado: {0}| |&bClique para alternar"
-gui-edit-material: "&eAlterar Ícone"
-gui-edit-material-lore: "&7Ícone atual: &b{0}| |&bClique para alterar"
-gui-edit-reg-on: "&aHabilitado"
-gui-edit-reg-off: "&cDesabilitado"
-gui-edit-perm: "&eMudar Permissão"
-gui-edit-perm-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-edit-cooldown: "&eMudar Cooldown"
-gui-edit-cooldown-lore: "&7Atual: &f{0}s| |&bClique para mudar"
-gui-edit-interval: "&eMudar Intervalo"
-gui-edit-interval-lore: "&7Atual: &f{0}s| |&bClique para mudar"
-gui-edit-alias: "&eMudar Aliases"
-gui-edit-alias-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-edit-actions: "&bEditar Ações"
-gui-edit-actions-lore: "&7Gerencie a lista de passos|&7que este comando executa.| |&eClique para entrar"
-gui-edit-reorder: "&6Reordenar Ações"
-gui-edit-reorder-lore: "&7Permite alterar a ordem|&7normal de execução.| |&eClique para entrar"
-gui-edit-save: "&a&lSalvar Alterações"
-gui-edit-save-lore: "&7Salva as alterações permanentemente.| |&eClique para salvar no disco"
-gui-edit-delete: "&c&lEXCLUIR COMANDO"
-gui-edit-delete-lore: "&7Exclui este arquivo permanentemente.| |&4Clique para excluir"
-gui-edit-back: "&7Voltar"
+action-invalid: "&cAção inválida: {0}"
+action-parse-error: "&cErro ao processar ação: {0}"
+
 
 # ============================================
-# GUI - ALIAS MENU
+# UPDATE MESSAGES
 # ============================================
-gui-alias-title: "&8Aliases: &3/{0}"
-gui-alias-add: "&aAdicionar Alias"
-gui-alias-add-lore: "&7Clique para adicionar um novo alias"
-gui-alias-edit-lore: "&7Atual: &f{0}| |&bClique Direito para editar|&cClique Esquerdo + Shift para remover"
+update-checking: "&7Verificando atualizações..."
+update-no-new: "&aVocê está usando a versão mais recente!"
+update-new: "&aUma nova atualização está disponível: &e{0}&a! Baixe em: &b{1}"
+update-error: "&cErro ao verificar atualizações."
+update-check-no-new: "&7Não há novas atualizações disponíveis."
+update-check-new: "&aUma nova atualização está disponível! Local: &ev{0} &7| Remota: &ev{1}"
+update-check-download: "&aBaixe em: &b{0}"
+update-check-error-console: "&cNão foi possível verificar atualizações: {0}"
+update-available: "&aUma nova atualização está disponível! Local: &ev{0} &7| Nova: &ev{1}"
+update-download: "&aBaixe em: &b{0}"
+update-current: "&aVocê está rodando a versão mais recente!"
 
-# ============================================
-# GUI - ACTIONS MENU
-# ============================================
-gui-actions-title: "&8Ações: &3/{0}"
-gui-actions-order: "&eOrdem de Execução"
-gui-actions-order-lore: "&7Gerenciamento da sequência"
-gui-actions-add: "&aAdicionar Ação"
-gui-actions-add-lore: "&7Clique para adicionar uma nova"
-gui-actions-item-name: "&eAção #{0}"
-gui-actions-item-lore: "&7Conteúdo:|&f{0}| |&7Clique: &bEditar|&7Shift + Direito: &cExcluir"
-gui-actions-reorder: "&6Reordenar Ações"
-gui-actions-reorder-lore: "&7Arraste e solte para mudar a ordem| |&eClique para abrir"
-
-# ============================================
-# GUI - ACTION EDIT MENU
-# ============================================
-gui-action-edit-title: "&8Editar Ação: &3{0}"
-gui-action-edit-type: "&eMudar Tipo"
-gui-action-edit-type-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-action-edit-value: "&eMudar Conteúdo"
-gui-action-edit-value-lore: "&7Atual: &f{0}| |&bClique para mudar"
-
-# ============================================
-# GUI - ACTION TYPE SELECTION MENU
-# ============================================
-gui-selector-title: "&8Tipo: &3Ação #{0}"
-gui-type-select: "&bClique para selecionar"
-gui-type-select-not: "&7Clique Direito: &cCondição NÃO"
-
-# ============================================
-# GUI - ACTION REORDER MENU
-# ============================================
-gui-reorder-title: "&8Ordem: &3/{0}"
-gui-reorder-lore: "&7Arraste para reordenar|&7Shift + Direito para mover|&7Solte na lixeira para excluir"
-gui-reorder-trash: "&c&lEXCLUIR AÇÃO"
-gui-reorder-trash-lore: "&7Arraste uma ação aqui|&7para excluí-la permanentemente."
-gui-reorder-edit: "&bEditar Ações"
-gui-reorder-edit-lore: "&7Gerencia a lista de passos|&7que este comando executa.| |&eClique para entrar"
-
-# ============================================
-# GUI - NUMERIC ACTION MENU
-# ============================================
-gui-numeric-title: "&8Edição Numérica: &3{0}"
-gui-numeric-current: "&7Valor atual"
-gui-numeric-add: "&7Clique para adicionar"
-gui-numeric-subtract: "&7Clique para subtrair"
-gui-numeric-reset: "&cRedefinir Valor"
-gui-numeric-reset-lore: "&7Definir para 0"
-gui-numeric-confirm: "&aConfirmar e Salvar"
-
-# ============================================
-# GUI - TITLE ACTION MENU
-# ============================================
-gui-title-menu-title: "&8Ação de Título: &3{0}"
-gui-title-main: "&eTítulo Principal"
-gui-title-main-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-title-sub: "&eSubtítulo"
-gui-title-sub-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-title-fadein: "&eAparecer (Ticks)"
-gui-title-fadein-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-title-stay: "&ePermanecer (Ticks)"
-gui-title-stay-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-title-fadeout: "&eDesaparecer (Ticks)"
-gui-title-fadeout-lore: "&7Atual: &f{0}| |&bClique para mudar"
-
-# ============================================
-# GUI - TELEPORT ACTION MENU
-# ============================================
-gui-teleport-menu-title: "&8Ação de Teleporte: &3{0}"
-gui-teleport-current: "&eLocalização Atual"
-gui-teleport-current-lore: "&7Clique para usar sua posição"
-gui-teleport-coords: "&eCoordenadas Manuais"
-gui-teleport-coords-lore: "&7X: &f{0}|&7Y: &f{1}|&7Z: &f{2}| |&bClique para mudar"
-gui-teleport-world: "&eMundo"
-gui-teleport-world-lore: "&7Atual: &f{0}| |&bClique para mudar"
-
-# ============================================
-# GUI - EFFECT ACTION MENU
-# ============================================
-gui-effect-menu-title: "&8Ação de Efeito: &3{0}"
-gui-effect-type: "&eTipo de Efeito"
-gui-effect-type-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-effect-duration: "&eDuração (Seg)"
-gui-effect-duration-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-effect-amplifier: "&eAmplificação (Nível)"
-gui-effect-amplifier-lore: "&7Atual: &f{0}| |&bClique para mudar"
-
-# ============================================
-# GUI - GIVE ITEM ACTION MENU
-# ============================================
-gui-give-menu-title: "&8Ação de Dar: &3{0}"
-gui-give-material: "&eMaterial"
-gui-give-material-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-give-amount: "&eQuantidade"
-gui-give-amount-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-give-name: "&eNome Personalizado"
-gui-give-name-lore: "&7Atual: &f{0}| |&bClique para mudar"
-
-# ============================================
-# GUI - PARTICLE ACTION MENU
-# ============================================
-gui-particle-menu-title: "&8Ação de Partícula: &3{0}"
-gui-particle-type: "&eTipo de Partícula"
-gui-particle-type-lore: "&7Atual: &f{0}| |&bClique para mudar"
-gui-particle-amount: "&eQuantidade"
-gui-particle-amount-lore: "&7Atual: &f{0}| |&bClique para mudar"
-
-# ============================================
-# GUI - SOUND ACTION MENU
-# ============================================
-gui-sound-title: "&8Ação de Som: &3{0}"
-gui-sound-select: "&eSelecionar Som"
-gui-sound-select-lore: "&7Atual: &f{0}| |&bClique para alterar"
-gui-sound-volume: "&eAlterar Volume"
-gui-sound-volume-lore: "&7Atual: &f{0}| |&bClique para alterar"
-gui-sound-pitch: "&eAlterar Tom (Pitch)"
-gui-sound-pitch-lore: "&7Atual: &f{0}| |&bClique para alterar"
-
-# ============================================
-# GUI - CONFIRMATION MENU
-# ============================================
-gui-confirm-delete-title: "&4Confirmar Exclusão: &0/{0}"
-gui-confirm-yes: "&a&lCONFIRMAR"
-gui-confirm-yes-lore: "&7Excluir permanentemente."
-gui-confirm-no: "&c&lCANCELAR"
-gui-confirm-no-lore: "&7Voltar ao menu anterior."
-
-# ============================================
-# COMMON GUI ELEMENTS
-# ============================================
-gui-back: "&7Voltar"
-gui-back-lore: "&7Voltar para o menu anterior"
-gui-none: "Nenhum"
 
 # ============================================
 # SYSTEM MESSAGES
@@ -360,14 +117,6 @@ language-changed: "&aIdioma alterado para: &e{0}"
 language-list: "&7Idiomas disponíveis: &f{0}"
 language-not-found: "&cIdioma não encontrado! Disponíveis: &f{0}"
 
-# ============================================
-# ACTION MESSAGES
-# ============================================
-action-updated: "&aAção atualizada."
-action-type-changed: "&aTipo alterado para: &e{0}"
-action-added: "&aAção adicionada."
-action-deleted: "&cAção excluída."
-actions-reordered: "&aAções reordenadas com sucesso."
 
 # ============================================
 # INPUT MESSAGES
@@ -389,6 +138,17 @@ chat-input-cancel: "cancel"
 chat-input-timeout: "&cTempo limite esgotado."
 chat-input-invalid-material: "&cNome do material inválido!"
 chat-input-invalid-world: "&cMundo não encontrado!"
+
+
+# ============================================
+# ACTION MESSAGES
+# ============================================
+action-updated: "&aAção atualizada."
+action-type-changed: "&aTipo alterado para: &e{0}"
+action-added: "&aAção adicionada."
+action-deleted: "&cAção excluída."
+actions-reordered: "&aAções reordenadas com sucesso."
+
 
 # ============================================
 # ACTION TYPES - NAMES
@@ -422,6 +182,7 @@ action-name-if-op: "&4Apenas OP"
 action-name-if-world: "&9Mundo"
 action-name-if-money: "&aDinheiro"
 
+
 # ============================================
 # ACTION TYPES - DESCRIPTIONS
 # ============================================
@@ -449,11 +210,288 @@ action-desc-velocity: "&7Envia o jogador para um servidor (Velocity)."
 action-desc-send-to: "&7Envia o jogador para um servidor via Proxy."
 action-desc-if-perm: "&7Executa o seguinte apenas se o jogador tiver a permissão."
 action-desc-if-perm-not: "&7Executa o seguinte apenas se o jogador NÃO tiver a permissão."
-action-desc-if-chance: "&7Executes the following based on a chance (0-100)."
-action-desc-if-op: "&7Executes the following only if player is OP."
+action-desc-if-chance: "&7Executa o seguinte com base em uma chance (0-100)."
+action-desc-if-op: "&7Executa o seguinte apenas se o jogador for OP."
 action-desc-if-world: "&7Executa o seguinte apenas no mundo especificado."
 action-desc-if-money: "&7Executa o seguinte apenas se o jogador tiver dinheiro suficiente."
 action-no-value-needed: "&eEsta ação não requer nenhum valor adicional."
+
+
+# ============================================
+# GUI - MAIN MENU
+# ============================================
+gui-main-title: "&3&lX-Commands &8- &7Lista"
+gui-main-create: "&a&lCriar Comando"
+gui-main-create-lore: "&7Clique para criar um novo comando| |&eClique para iniciar"
+gui-main-prev: "&eAnterior"
+gui-main-next: "&ePróximo"
+gui-main-page: "&7Ir para página {0}"
+gui-main-click-left: "&7Clique Esquerdo: &bEditar"
+gui-main-click-right: "&7Clique Direito: &eMostrar Ações"
+gui-main-help: "&eAjuda e Comandos"
+gui-main-help-lore: "&7Clique para ver a lista de|&7comandos disponíveis.| |&eClique para ver"
+
+
+# ============================================
+# GUI - COMMAND EDIT MENU
+# ============================================
+gui-edit-title: "&8Editando: &3/{0}"
+gui-edit-name: "&eMudar Nome"
+gui-edit-name-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-edit-desc: "&eMudar Descrição"
+gui-edit-desc-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-edit-reg: "&eAlternar Registro"
+gui-edit-reg-lore: "&7Estado: {0}| |&bClique para alternar"
+gui-edit-material: "&eAlterar Ícone"
+gui-edit-material-lore: "&7Ícone atual: &b{0}| |&bClique para alterar"
+gui-edit-reg-on: "&aHabilitado"
+gui-edit-reg-off: "&cDesabilitado"
+gui-edit-perm: "&eMudar Permissão"
+gui-edit-perm-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-edit-cooldown: "&eMudar Cooldown"
+gui-edit-cooldown-lore: "&7Atual: &f{0}s| |&bClique para mudar"
+gui-edit-interval: "&eMudar Intervalo"
+gui-edit-interval-lore: "&7Atual: &f{0}s| |&bClique para mudar"
+gui-edit-alias: "&eMudar Aliases"
+gui-edit-alias-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-edit-actions: "&bEditar Ações"
+gui-edit-actions-lore: "&7Gerencie a lista de passos|&7que este comando executa.| |&eClique para entrar"
+gui-edit-reorder: "&6Reordenar Ações"
+gui-edit-reorder-lore: "&7Permite alterar a ordem|&7normal de execução.| |&eClique para entrar"
+gui-edit-save: "&a&lSalvar Alterações"
+gui-edit-save-lore: "&7Salva as alterações permanentemente.| |&eClique para salvar no disco"
+gui-edit-delete: "&c&lEXCLUIR COMANDO"
+gui-edit-delete-lore: "&7Exclui este arquivo permanentemente.| |&4Clique para excluir"
+gui-edit-back: "&7Voltar"
+
+
+# ============================================
+# GUI - ALIAS MENU
+# ============================================
+gui-alias-title: "&8Aliases: &3/{0}"
+gui-alias-add: "&aAdicionar Alias"
+gui-alias-add-lore: "&7Clique para adicionar um novo alias"
+gui-alias-edit-lore: "&7Atual: &f{0}| |&bClique Direito para editar|&cClique Esquerdo + Shift para remover"
+
+
+# ============================================
+# GUI - ACTIONS MENU
+# ============================================
+gui-actions-title: "&8Ações: &3/{0}"
+gui-actions-add: "&aAdicionar Ação"
+gui-actions-add-lore: "&7Clique para adicionar uma nova"
+gui-actions-item-name: "&eAção #{0}"
+gui-actions-item-lore: "&7Conteúdo:|&f{0}| |&7Clique: &bEditar|&7Shift + Clique: &cExcluir"
+gui-actions-reorder: "&6Reordenar Ações"
+gui-actions-reorder-lore: "&7Arraste e solte para mudar a ordem| |&eClique para abrir"
+
+
+# ============================================
+# GUI - ACTION EDIT MENU
+# ============================================
+gui-action-edit-title: "&8Editar Ação: &3{0}"
+gui-action-edit-type: "&eMudar Tipo"
+gui-action-edit-type-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-action-edit-value: "&eMudar Conteúdo"
+gui-action-edit-value-lore: "&7Atual: &f{0}| |&bClique para mudar"
+
+
+# ============================================
+# GUI - ACTION TYPE SELECTION MENU
+# ============================================
+gui-selector-title: "&8Tipo: &3Ação #{0}"
+gui-type-select: "&bClique para selecionar"
+gui-type-select-not: "&7Clique Direito: &cCondição NÃO"
+
+
+gui-type-message: "&aMensagem"
+gui-type-message-desc: "&7Envia uma mensagem privada ao jogador."
+gui-type-broadcast: "&6Anúncio"
+gui-type-broadcast-desc: "&7Envia uma mensagem global para o servidor."
+gui-type-actionbar: "&eActionBar"
+gui-type-actionbar-desc: "&7Mostra texto acima da barra de vida."
+gui-type-title: "&bTítulo"
+gui-type-title-desc: "&7Mostra um grande título na tela."
+gui-type-sound: "&dSom"
+gui-type-sound-desc: "&7Reproduz um efeito sonoro."
+gui-type-effect: "&5Efeito"
+gui-type-effect-desc: "&7Aplica um efeito de poção ao jogador."
+gui-type-give: "&9Dar Item"
+gui-type-give-desc: "&7Entrega itens ao inventário."
+gui-type-teleport: "&3Teleporte"
+gui-type-teleport-desc: "&7Move o jogador para outro local."
+gui-type-delay: "&7Esperar (Ticks)"
+gui-type-delay-desc: "&7Pausa a execução por alguns instantes."
+gui-type-heal: "&cCura"
+gui-type-heal-desc: "&7Restaura a vida ao máximo."
+gui-type-feed: "&6Alimentar"
+gui-type-feed-desc: "&7Restaura a fome ao máximo."
+gui-type-damage: "&4Dano"
+gui-type-damage-desc: "&7Tira vida do jogador."
+gui-type-console: "&cConsole"
+gui-type-console-desc: "&7Executa um comando do console."
+gui-type-player: "&aJogador"
+gui-type-player-desc: "&7Força o jogador a executar um comando."
+gui-type-kick: "&4Expulsar"
+gui-type-kick-desc: "&7Expulsa o jogador do servidor."
+gui-type-close: "&7Fechar"
+gui-type-close-desc: "&7Fecha o inventário atual do jogador."
+gui-type-particle: "&ePartícula"
+gui-type-particle-desc: "&7Gera efeitos visuais de partículas."
+gui-type-bungee: "&5Bungee"
+gui-type-bungee-desc: "&7Envia o jogador para outro servidor (BungeeCord)."
+gui-type-give-money: "&6Dar Dinheiro"
+gui-type-give-money-desc: "&7Adiciona dinheiro ao saldo (Requer Vault)."
+gui-type-take-money: "&cRetirar Dinheiro"
+gui-type-take-money-desc: "&7Retira dinheiro do saldo (Requer Vault)."
+gui-type-velocity: "&bVelocity"
+gui-type-velocity-desc: "&7Envia o jogador para um servidor (Velocity)."
+gui-type-sent-to: "&3Enviado Para"
+gui-type-sent-to-desc: "&7Envia o jogador para outro servidor via proxy."
+gui-type-if-permission: "&aSe tiver Permissão"
+gui-type-if-permission-desc: "&7Condição: Apenas se o jogador tiver a permissão."
+gui-type-if-chance: "&eSe tiver Sorte"
+gui-type-if-chance-desc: "&7Condição: Probabilidade de sucesso (0-100)."
+gui-type-if-op: "&4Se for OP"
+gui-type-if-op-desc: "&7Condição: Apenas se o jogador for operador."
+gui-type-if-world: "&9Se no Mundo"
+gui-type-if-world-desc: "&7Condição: Apenas no mundo especificado."
+gui-type-if-money: "&aSe tiver Dinheiro"
+gui-type-if-money-desc: "&7Condição: Apenas se o jogador tiver dinheiro suficiente."
+gui-type-bracket: "&bBloco de Ações"
+gui-type-bracket-desc: "&7Agrupa ações sob uma condição."
+gui-type-bracket-right: "&7Clique Direito: &eAdicionar &8&l["
+gui-type-bracket-left: "&7Clique Esquerdo: &eAdicionar &8&l]"
+
+
+# ============================================
+# GUI - ACTION REORDER MENU
+# ============================================
+gui-reorder-title: "&8Ordem: &3/{0}"
+gui-reorder-lore: "&7Arraste para reordenar|&7Solte na lixeira para excluir"
+gui-reorder-trash: "&c&lEXCLUIR AÇÃO"
+gui-reorder-trash-lore: "&7Arraste uma ação aqui|&7para excluí-la permanentemente."
+gui-reorder-edit: "&bEditar Ações"
+gui-reorder-edit-lore: "&7Gerencia a lista de passos|&7que este comando executa.| |&eClique para entrar"
+
+
+# ============================================
+# GUI - NUMERIC ACTION MENU
+# ============================================
+gui-numeric-title: "&8Edição Numérica: &3{0}"
+gui-numeric-current: "&7Valor atual"
+gui-numeric-add: "&7Clique para adicionar"
+gui-numeric-subtract: "&7Clique para subtrair"
+gui-numeric-reset: "&cRedefinir Valor"
+gui-numeric-reset-lore: "&7Definir para 0"
+gui-numeric-confirm: "&aConfirmar e Salvar"
+
+
+# ============================================
+# GUI - TITLE ACTION MENU
+# ============================================
+gui-title-menu-title: "&8Ação de Título: &3{0}"
+gui-title-main: "&eTítulo Principal"
+gui-title-main-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-title-sub: "&eSubtítulo"
+gui-title-sub-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-title-fadein: "&eAparecer (Ticks)"
+gui-title-fadein-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-title-stay: "&ePermanecer (Ticks)"
+gui-title-stay-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-title-fadeout: "&eDesaparecer (Ticks)"
+gui-title-fadeout-lore: "&7Atual: &f{0}| |&bClique para mudar"
+
+
+# ============================================
+# GUI - TELEPORT ACTION MENU
+# ============================================
+gui-teleport-menu-title: "&8Ação de Teleporte: &3{0}"
+gui-teleport-current: "&eLocalização Atual"
+gui-teleport-current-lore: "&7Clique para usar sua posição"
+gui-teleport-coords: "&eCoordenadas Manuais"
+gui-teleport-coords-lore: "&7X: &f{0}|&7Y: &f{1}|&7Z: &f{2}| |&bClique para mudar"
+gui-teleport-world: "&eMundo"
+gui-teleport-world-lore: "&7Atual: &f{0}| |&bClique para mudar"
+
+
+# ============================================
+# GUI - EFFECT ACTION MENU
+# ============================================
+gui-effect-menu-title: "&8Ação de Efeito: &3{0}"
+gui-effect-type: "&eTipo de Efeito"
+gui-effect-type-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-effect-duration: "&eDuração (Seg)"
+gui-effect-duration-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-effect-amplifier: "&eAmplificação (Nível)"
+gui-effect-amplifier-lore: "&7Atual: &f{0}| |&bClique para mudar"
+
+
+# ============================================
+# GUI - GIVE ITEM ACTION MENU
+# ============================================
+gui-give-menu-title: "&8Ação de Dar: &3{0}"
+gui-give-material: "&eMaterial"
+gui-give-material-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-give-amount: "&eQuantidade"
+gui-give-amount-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-give-name: "&eNome Personalizado"
+gui-give-name-lore: "&7Atual: &f{0}| |&bClique para mudar"
+
+
+# ============================================
+# GUI - PARTICLE ACTION MENU
+# ============================================
+gui-particle-menu-title: "&8Ação de Partícula: &3{0}"
+gui-particle-type: "&eTipo de Partícula"
+gui-particle-type-lore: "&7Atual: &f{0}| |&bClique para mudar"
+gui-particle-amount: "&eQuantidade"
+gui-particle-amount-lore: "&7Atual: &f{0}| |&bClique para mudar"
+
+
+# ============================================
+# GUI - SOUND ACTION MENU
+# ============================================
+gui-sound-title: "&8Ação de Som: &3{0}"
+gui-sound-select: "&eSelecionar Som"
+gui-sound-select-lore: "&7Atual: &f{0}| |&bClique para alterar"
+gui-sound-volume: "&eAlterar Volume"
+gui-sound-volume-lore: "&7Atual: &f{0}| |&bClique para alterar"
+gui-sound-pitch: "&eAlterar Tom (Pitch)"
+gui-sound-pitch-lore: "&7Atual: &f{0}| |&bClique para alterar"
+
+
+# ============================================
+# GUI - CONFIRMATION MENU
+# ============================================
+gui-confirm-delete-title: "&4Confirmar Exclusão: &0/{0}"
+gui-confirm-yes: "&a&lCONFIRMAR"
+gui-confirm-yes-lore: "&7Excluir permanentemente."
+gui-confirm-no: "&c&lCANCELAR"
+gui-confirm-no-lore: "&7Voltar ao menu anterior."
+
+
+# ============================================
+# COMMON GUI ELEMENTS
+# ============================================
+gui-back: "&7Voltar"
+gui-back-lore: "&7Voltar para o menu anterior"
+gui-none: "Nenhum"
+
+
+# ============================================
+# FORCE MESSAGES COMMAND
+# ============================================
+force-messages-usage: "&7Uso: &e/xc forcemessages <new|keep> <all|idioma>"
+force-messages-current: "&7Idioma atual: &e{0}"
+force-messages-success: "&aArquivo '&e{0}&a' atualizado (keys faltantes adicionados) e recarregado."
+force-messages-no-changes: "&7Arquivo '&e{0}&7' atualizado no disco, mas não é o idioma ativo."
+force-messages-all: "&aAtualizados &e{0}&a arquivo(s) com keys faltantes."
+force-messages-reset-success: "&aArquivo '&e{0}&a' regenerado dos valores padrão e recarregado."
+force-messages-reset-no-active: "&7Arquivo '&e{0}&7' regenerado dos valores padrão, mas não é o idioma ativo."
+force-messages-reset-all: "&aRegenerados &e{0}&a arquivo(s) de idioma dos valores padrão."
+force-messages-invalid-mode: "&cModo inválido. Use &enew&c ou &ekeep&c."
+
 
 # ============================================
 # VERSION INFO

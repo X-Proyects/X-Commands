@@ -1,102 +1,103 @@
-# 🚀 X-Commands - Guía de Acciones
-# -----------------------------------------------------------
-# Este archivo contiene descripciones y ejemplos de uso para
-# todas las acciones disponibles en el plugin.
-# -----------------------------------------------------------
+# ============================================
+# X-COMMANDS - GUIA DE ACCIONES (ESPAÑOL)
+# ============================================
+# Descripciones y ejemplos de uso para todas
+# las acciones disponibles en el plugin.
+# ============================================
 
 actions:
   MESSAGE:
     description: "Envía un mensaje privado al chat del jugador."
     format: "[MESSAGE] texto"
     example: "[MESSAGE] &a¡Hola %player%! Bienvenido al servidor."
-  
+
   BROADCAST:
     description: "Envía un mensaje a todos los jugadores conectados."
     format: "[BROADCAST] texto"
     example: "[BROADCAST] &e&l[AVISO] &fEl servidor se reiniciará pronto."
-  
+
   ACTIONBAR:
     description: "Muestra un mensaje dinámico sobre la barra de acceso rápido."
     format: "[ACTIONBAR] texto"
     example: "[ACTIONBAR] &6&l¡Energía al máximo!"
-  
+
   TITLE:
     description: "Muestra un título y subtítulo en pantalla con tiempos personalizados."
     format: "[TITLE] título;subtítulo;aparecer;permanecer;desaparecer"
     example: "[TITLE] &6&l¡VICTORIA!;&fHas ganado la partida;10;70;20"
-  
+
   SOUND:
     description: "Reproduce un sonido de Minecraft para el jugador."
     format: "[SOUND] nombre_sonido;volumen;tono"
     example: "[SOUND] ENTITY_PLAYER_LEVELUP;1.0;1.2"
-  
+
   EFFECT:
     description: "Aplica un efecto de poción al jugador."
     format: "[EFFECT] nombre_efecto;duración_ticks;amplificador"
     example: "[EFFECT] SPEED;600;2"
-  
+
   CONSOLE:
     description: "Ejecuta un comando desde la consola del servidor."
     format: "[CONSOLE] comando"
     example: "[CONSOLE] money give %player% 100"
-  
+
   PLAYER:
     description: "Obliga al jugador a ejecutar un comando."
     format: "[PLAYER] comando"
     example: "[PLAYER] spawn"
-  
+
   TELEPORT:
     description: "Teletransporta al jugador a coordenadas específicas."
     format: "[TELEPORT] mundo;x;y;z;yaw;pitch"
     example: "[TELEPORT] world;100;64;100;90;0"
-  
+
   HEAL:
     description: "Cura completamente al jugador."
     example: "[HEAL]"
-  
+
   FEED:
     description: "Llena la barra de hambre y saturación."
     example: "[FEED]"
-  
+
   DAMAGE:
     description: "Inflige daño al jugador (en medios corazones)."
     format: "[DAMAGE] cantidad"
     example: "[DAMAGE] 4.0"
-  
+
   GIVE:
     description: "Entrega un objeto al inventario del jugador con un nombre opcional."
     format: "[GIVE] material;cantidad;nombre"
     example: "[GIVE] DIAMOND;5;&bDiamante de Regalo"
-  
+
   DELAY:
-    description: "Pausa la ejecución antes de la siguiente acción."
+    description: "Pausa la ejecución antes de la siguiente acción (en ticks)."
     format: "[DELAY] ticks"
     example: "[DELAY] 40"
-  
-  CLOSE_INVENTORY:
+
+  CLOSE:
     description: "Cierra cualquier menú o inventario abierto."
-    example: "[CLOSE_INVENTORY]"
-  
+    example: "[CLOSE]"
+
   KICK:
     description: "Expulsa al jugador del servidor con un motivo."
     format: "[KICK] motivo"
     example: "[KICK] &cHas sido expulsado por la administración."
-  
+
   PARTICLE:
     description: "Genera partículas alrededor del jugador."
     format: "[PARTICLE] nombre_particula x_offset y_offset z_offset cantidad"
     example: "[PARTICLE] FLAME 0.5 0.5 0.5 10"
-  
+
   BUNGEE:
     description: "Envía al jugador a otro servidor en una red BungeeCord."
     format: "[BUNGEE] servidor"
     example: "[BUNGEE] lobby"
-  
+
   GIVE_MONEY:
     description: "Entrega dinero al balance económico del jugador (Requiere Vault)."
     format: "[GIVE_MONEY] cantidad"
     example: "[GIVE_MONEY] 100"
-  
+
   TAKE_MONEY:
     description: "Quita dinero del balance económico del jugador (Requiere Vault)."
     format: "[TAKE_MONEY] cantidad"
@@ -113,76 +114,99 @@ actions:
     example: "[SENT_TO] skyblock"
 
   IF_PERMISSION:
-    description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador TIENE el permiso. Soporta comodines usando % al final."
-    format: "[IF_PERMISSION] permiso.%"
-    example: "[IF_PERMISSION] meta.subname.%"
-  
+    description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador TIENE el permiso."
+    format: "[IF_PERMISSION] permiso"
+    example: "[IF_PERMISSION] rank.vip"
+
   IF_PERMISSION_NOT:
     description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador NO TIENE el permiso."
     format: "[IF_PERMISSION_NOT] permiso"
-    example: "[IF_PERMISSION_NOT] rango.vip"
-  
+    example: "[IF_PERMISSION_NOT] rank.vip"
+
   IF_MONEY:
-    description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador TIENE el dinero (Econ)."
+    description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador TIENE suficiente dinero."
     format: "[IF_MONEY] cantidad"
     example: "[IF_MONEY] 500.0"
-  
-  IF_MONEY_NOT:
-    description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador NO TIENE el dinero."
-    format: "[IF_MONEY_NOT] cantidad"
+
   IF_OP:
     description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador ES operador (OP)."
     example: "[IF_OP]"
-  
+
   IF_WORLD:
     description: "Condicional: Solo ejecuta la SIGUIENTE acción si el jugador está en el MUNDO especificado."
     format: "[IF_WORLD] nombre_mundo"
     example: "[IF_WORLD] survival"
-  
+
   IF_CHANCE:
     description: "Condicional: Solo ejecuta la SIGUIENTE acción si el azar (0-100) tiene éxito."
     format: "[IF_CHANCE] porcentaje"
     example: "[IF_CHANCE] 50"
 
-# 🎨 Formatos de Color y Estilo
-# -----------------------------------------------------------
+# ============================================
+# FORMATOS DE COLOR Y ESTILO
+# ============================================
 # El plugin soporta múltiples formatos de color modernos:
-# -----------------------------------------------------------
+# ============================================
+
 colors:
   MINIMESSAGE:
     description: "Usa el formato de Paper para colores y estilos avanzados."
     example: "<red>Texto Rojo</red> <bold>Negrita</bold> <underlined>Subrayado</underlined>"
-  
+
   GRADIENTS:
     description: "Crea degradados espectaculares entre varios colores."
     format: "<gradient:color1:color2>Texto</gradient>"
     example: "<gradient:#FF1919:#EE1F1F:#C01414>TEXTO DEGRADADO</gradient>"
-  
+
   HEX_RGB:
     description: "Usa códigos hexadecimales exactos."
     format: "&#RRGGBB o &x&R&R&G&G&B&B"
     example: "&#E7C500Texto Dorado"
-  
+
   HTML_TAGS:
     description: "Etiquetas simples tipo HTML para mayor comodidad."
     example: "<b>Negrita</b> <i>Cursiva</i> <u>Subrayado</u>"
 
-# -----------------------------------------------------------
-# 📊 Variables y Argumentos
-# -----------------------------------------------------------
+# ============================================
+# VARIABLES Y ARGUMENTOS
+# ============================================
+# Placeholders disponibles para contenido dinámico.
+# ============================================
+
 placeholders:
   PLAYER:
-    description: "Información básica del jugador que ejecuta la acción."
+    description: "Información básica del jugador que ejecuta el comando."
     placeholders:
       - "%player%: Nombre del jugador."
       - "%player_display%: Nombre visible (Nick)."
       - "%player_uuid%: UUID único."
       - "%player_money%: Saldo de economía."
-  
+      - "%player_world%: Nombre del mundo actual."
+
   COMMAND_ARGS:
     description: "Captura lo que el usuario escribe después del comando."
     placeholders:
       - "{args}: Todo el texto después del comando."
       - "{0}: La primera palabra (argumento)."
-      - "{1}: La segunda palabra, etc."
+      - "{1}: La segunda palabra, y así sucesivamente."
     example: "[BROADCAST] &b[Aviso] &f{args}"
+
+# ============================================
+# COMANDOS
+# ============================================
+# Comandos /xc disponibles para administradores.
+# ============================================
+
+commands:
+  - "/xc create <nombre> - Crear un nuevo comando"
+  - "/xc delete <nombre> - Eliminar un comando"
+  - "/xc edit <cmd> <atributo> [valor] - Editar un atributo de comando"
+  - "/xc edit <cmd> ... - Editar atributos via GUI (nombre, descripción, permiso, cooldown, intervalo, mundo, material, nombre visual, registro, alias, acción)"
+  - "/xc info <nombre> - Mostrar información del comando"
+  - "/xc list - Listar todos los comandos personalizados"
+  - "/xc reload - Recargar el plugin"
+  - "/xc update - Buscar actualizaciones"
+  - "/xc locate [idioma] - Cambiar o listar idiomas"
+  - "/xc version - Mostrar información del plugin y servidor"
+  - "/xc forcemessages <new|keep> <all|idioma> - Reiniciar o actualizar mensajes (por defecto 'all' si no se especifica segundo argumento)"
+  - "/xc -gui - Abrir el editor visual de comandos (GUI)"

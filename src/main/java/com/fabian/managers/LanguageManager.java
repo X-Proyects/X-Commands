@@ -141,6 +141,27 @@ public class LanguageManager {
     }
 
     /**
+     * Extracts a resource from the JAR and overwrites the destination file.
+     * Used by force-reset to guarantee a fresh copy regardless of disk state.
+     */
+    private void extractResource(String resourcePath, File destination) {
+        try (InputStream in = plugin.getResource(resourcePath);
+             java.io.OutputStream out = new java.io.FileOutputStream(destination)) {
+            if (in == null) {
+                plugin.logWarning("Resource not found in JAR: " + resourcePath);
+                return;
+            }
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e) {
+            plugin.logWarning("Could not extract resource: " + resourcePath + " - " + e.getMessage());
+        }
+    }
+
+    /**
      * Loads fallback messages from a specified file (usually EN.yml)
      */
     private void loadFallbacks(String fallbackFileName) {
@@ -354,5 +375,52 @@ public class LanguageManager {
 
         reload();
         return available.size();
+    }
+
+    /**
+     * Force-reset (overwrite) a specific language file from JAR defaults,
+     * then reloads into memory if it is the currently active language.
+     *
+     * @param langCode language code (e.g. "en", "es")
+     * @return true if the active language was reloaded
+     */
+    public boolean forceResetMessages(String langCode) {
+        String fileName = langCode.endsWith(".yml") ? langCode : langCode + ".yml";
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+        File diskFile = new File(messagesFolder, fileName);
+
+        // Delete the existing file and extract fresh from JAR
+        if (diskFile.exists()) {
+            diskFile.delete();
+        }
+        extractResource("messages/" + fileName, diskFile);
+
+        String currentLang = plugin.getConfigManager().getLanguage();
+        String currentBase = currentLang.endsWith(".yml") ? currentLang.substring(0, currentLang.length() - 4) : currentLang;
+        if (currentBase.equalsIgnoreCase(langCode)) {
+            reload();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Force-reset (overwrite) ALL default language files from JAR,
+     * then reloads the active language into memory.
+     *
+     * @return the number of language files that were reset
+     */
+    public int forceResetAllMessages() {
+        String[] defaults = { "en.yml", "es.yml", "ja.yml", "pt.yml", "ru.yml", "custom.yml" };
+        File messagesFolder = new File(plugin.getDataFolder(), "messages");
+
+        for (String def : defaults) {
+            File diskFile = new File(messagesFolder, def);
+            extractResource("messages/" + def, diskFile);
+        }
+
+        reload();
+        return defaults.length;
     }
 }

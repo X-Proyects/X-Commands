@@ -2,12 +2,14 @@ package com.fabian;
 
 import com.fabian.managers.commands.XCCommand;
 import com.fabian.managers.*;
+import com.fabian.utils.ColorUtils;
 import com.fabian.utils.EconomyUtils;
 import com.fabian.utils.UpdateChecker;
 import com.fabian.listeners.UpdateListener;
 import com.fabian.listeners.InventoryListener;
 import com.fabian.listeners.CommandHideListener;
 import com.fabian.listeners.CommandInterceptorListener;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
@@ -169,7 +171,14 @@ public class XCommands extends JavaPlugin {
             metrics.shutdown();
         }
         com.fabian.utils.EconomyUtils.teardown();
-        logInfo("successfully disabled!");
+
+        String version = getDescription().getVersion();
+        Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(
+                "&8[&bX-Commands&8] &8--------------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(
+                "&8[&bX-Commands&8] &c  Disabled v" + version + "! Goodbye."));
+        Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(
+                "&8[&bX-Commands&8] &8--------------------------------------------------"));
     }
 
     /**

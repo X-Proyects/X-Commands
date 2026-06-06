@@ -55,19 +55,19 @@ public class SchedulerUtils {
     /**
      * Runs a task after a delay.
      */
-    public static void runTaskLater(Plugin plugin, Runnable runnable, long delayTicks) {
+    public static Object runTaskLater(Plugin plugin, Runnable runnable, long delayTicks) {
         if (isFolia()) {
             try {
                 Object scheduler = Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
-                scheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, long.class)
+                return scheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, long.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), Math.max(1L, delayTicks));
             } catch (Throwable e) {
                 LoggerUtils.debug("Folia GlobalRegionScheduler 'runDelayed' failed: " + e.getMessage());
-                // Cannot use Bukkit.getScheduler() on Folia, use async as fallback
                 runTaskAsynchronously(plugin, runnable);
+                return null;
             }
         } else {
-            Bukkit.getScheduler().runTaskLater(plugin, runnable, delayTicks);
+            return Bukkit.getScheduler().runTaskLater(plugin, runnable, delayTicks);
         }
     }
 

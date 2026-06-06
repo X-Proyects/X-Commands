@@ -435,7 +435,7 @@ public class InventoryListener implements Listener {
         if (meta.getPersistentDataContainer().has(keyActionIndex, PersistentDataType.INTEGER)) {
             int index = meta.getPersistentDataContainer().get(keyActionIndex, PersistentDataType.INTEGER);
             
-            if (event.getClick() == ClickType.SHIFT_RIGHT) {
+            if (event.getClick() == ClickType.SHIFT_RIGHT || event.getClick() == ClickType.SHIFT_LEFT) {
                 if (!hasPermission(player, "xcommands.admin.edit"))
                     return;
 
@@ -1584,14 +1584,12 @@ public class InventoryListener implements Listener {
         String action = exec.getActions().get(actionIndex);
         String[] parts = action.substring(action.indexOf("]") + 1).trim().split(";");
         
-        double volume = 1.0;
-        double pitch = 1.0;
-        try {
-            volume = parts.length > 1 ? Double.parseDouble(parts[1]) : 1.0;
-        } catch (NumberFormatException e) { /* use default 1.0 */ }
-        try {
-            pitch = parts.length > 2 ? Double.parseDouble(parts[2]) : 1.0;
-        } catch (NumberFormatException e) { /* use default 1.0 */ }
+        double tmpVol = 1.0;
+        double tmpPitch = 1.0;
+        try { tmpVol = parts.length > 1 ? Double.parseDouble(parts[1]) : 1.0; } catch (NumberFormatException e) { /* default */ }
+        try { tmpPitch = parts.length > 2 ? Double.parseDouble(parts[2]) : 1.0; } catch (NumberFormatException e) { /* default */ }
+        final double volume = tmpVol;
+        final double pitch = tmpPitch;
 
         if (slot == 11) { // Sound Select
             requestChatInput(player, cmdName, InputType.SOUND_TYPE, actionIndex);

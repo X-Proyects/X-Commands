@@ -7,7 +7,7 @@
 # 
 # ==============================================================================
 # X-Commands | Developed by Fabian (X Proyects)
-# Discord: https://discord.gg/Yb6GsfGWmd
+# Discord: http://discord.xproyects.qzz.io/
 # Supported versions: 1.18.2 - 26.1+
 # ==============================================================================
 
@@ -54,7 +54,7 @@ default-command:
   material: PAPER
   aliases: []
   actions:
-    - "[MESSAGE] &aComando &b%command% &aejecutado correctamente!"
+    - "[MESSAGE] &aCommand &b%command% &aexecuted successfully!"
 
 
 # ------------------------------------------------------------------------------

@@ -22,16 +22,19 @@ public class ConfigUpdater {
             return;
 
         try {
+            YamlConfiguration resConfig = null;
             try (InputStream resourceStream = plugin.getResource(resourcePath)) {
                 if (resourceStream == null)
                     return;
 
-                YamlConfiguration resConfig = YamlConfiguration.loadConfiguration(
+                resConfig = YamlConfiguration.loadConfiguration(
                         new InputStreamReader(resourceStream, StandardCharsets.UTF_8));
             } catch (Exception e) {
                 plugin.logWarning("Failed to update " + diskFile.getName() + ": " + e.getMessage());
                 return;
             }
+
+            if (resConfig == null) return;
 
             YamlConfiguration diskConfig = new YamlConfiguration();
             try (InputStreamReader reader = new InputStreamReader(new FileInputStream(diskFile),

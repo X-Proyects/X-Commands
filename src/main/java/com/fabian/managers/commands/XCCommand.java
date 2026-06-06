@@ -186,13 +186,11 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 }
             } else if (sub.equals("forcemessages")) {
                 String input = args[1].toLowerCase();
-                if ("all".startsWith(input)) {
-                    completions.add("all");
+                if ("new".startsWith(input)) {
+                    completions.add("new");
                 }
-                for (String lang : plugin.getLanguageManager().getAvailableLanguages()) {
-                    if (lang.startsWith(input)) {
-                        completions.add(lang);
-                    }
+                if ("keep".startsWith(input)) {
+                    completions.add("keep");
                 }
             }
         } else if (args.length == 3) {
@@ -203,6 +201,16 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 for (String attr : attributes) {
                     if (attr.startsWith(input)) {
                         completions.add(attr);
+                    }
+                }
+            } else if (sub.equals("forcemessages")) {
+                String input = args[2].toLowerCase();
+                if ("all".startsWith(input)) {
+                    completions.add("all");
+                }
+                for (String lang : plugin.getLanguageManager().getAvailableLanguages()) {
+                    if (lang.startsWith(input)) {
+                        completions.add(lang);
                     }
                 }
             }

@@ -1,30 +1,28 @@
 # ==============================================================================
 #                      X-Commands: Custom Command Configuration
 # ==============================================================================
-# This command demonstrates presentation actions (Title, Sound, Message, Give).
+# This file defines a dynamic announcement command that uses {args}.
 # You can create as many .yml files as you want in this folder.
-# This is an example command — feel free to modify or delete it.
 
 # [name]
 # The primary name of the command. Players will use this as /<name>
-name: welcome
+name: announce
 
 # [aliases]
 # A list of alternative names for this command.
 aliases:
-  - bienvenida
-  - hi
-  - hello
+  - announcement
+  - aviso
 
 # [item]
 # Defines the icon for this command if it's displayed in a GUI menu.
 item:
-  material: TOTEM_OF_UNDYING
-  display-name: "&aWelcome Message"
+  material: NOTE_BLOCK
+  display-name: "&6Announcements"
 
 # [description]
 # A brief explanation of what the command does.
-description: "&7Sends an epic welcome message to the player."
+description: "&7Example of dynamic arguments using {args}"
 
 # [register]
 # If true, the command is automatically registered in the server's command map.
@@ -32,8 +30,7 @@ register: true
 
 # [permission]
 # The permission node required to execute this command.
-# Leave empty ("") if you want everyone to be able to use it.
-permission: ""
+permission: xcommands.staff.announce
 
 # [world]
 # Restricts the command to specific worlds.
@@ -93,9 +90,6 @@ interval: 0
 #   {1}     - Second argument word, etc.
 #
 actions:
-  - "[TITLE] &a&lWELCOME; &7to our server; 20; 60; 20"
-  - "[SOUND] UI_TOAST_CHALLENGE_COMPLETE;1.0;1.0"
-  - "[MESSAGE] &7Enjoy your stay at &b&lPro Server&7."
-  - "[ACTIONBAR] &fUse &e/help &fto see available commands."
-  - "[GIVE] COOKED_BEEF;16;&6Welcome Food"
-  - "[EFFECT] REGENERATION;100;1"
+  - "[BROADCAST] &8&l[&6&lANNOUNCE&8&l] &f{args}"
+  - "[SOUND] BLOCK_NOTE_BLOCK_PLING;1.0;1.5"
+  - "[MESSAGE] &aAnnouncement sent successfully!"

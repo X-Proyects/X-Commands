@@ -1,102 +1,103 @@
-# 🚀 X-Commands - Action Guide
-# -----------------------------------------------------------
-# This file contains descriptions and usage examples for all
+# ============================================
+# X-COMMANDS - ACTION GUIDE (ENGLISH)
+# ============================================
+# Descriptions and usage examples for all
 # available actions in the plugin.
-# -----------------------------------------------------------
+# ============================================
 
 actions:
   MESSAGE:
     description: "Sends a private message to the player's chat."
     format: "[MESSAGE] text"
     example: "[MESSAGE] &aHello %player%! Welcome to the server."
-  
+
   BROADCAST:
     description: "Sends a message to all connected players."
     format: "[BROADCAST] text"
     example: "[BROADCAST] &e&l[NOTICE] &fThe server will restart soon."
-  
+
   ACTIONBAR:
     description: "Shows a dynamic message above the hotbar."
     format: "[ACTIONBAR] text"
     example: "[ACTIONBAR] &6&lEnergy at maximum!"
-  
+
   TITLE:
     description: "Shows a title and subtitle on screen with custom timings."
     format: "[TITLE] title;subtitle;fadein;stay;fadeout"
     example: "[TITLE] &6&lVICTORY!;&fYou won the match;10;70;20"
-  
+
   SOUND:
     description: "Plays a Minecraft sound for the player."
     format: "[SOUND] sound_name;volume;pitch"
     example: "[SOUND] ENTITY_PLAYER_LEVELUP;1.0;1.2"
-  
+
   EFFECT:
     description: "Applies a potion effect to the player."
     format: "[EFFECT] effect_name;duration_ticks;amplifier"
     example: "[EFFECT] SPEED;600;2"
-  
+
   CONSOLE:
     description: "Executes a command from the server console."
     format: "[CONSOLE] command"
     example: "[CONSOLE] money give %player% 100"
-  
+
   PLAYER:
     description: "Forces the player to execute a command."
     format: "[PLAYER] command"
     example: "[PLAYER] spawn"
-  
+
   TELEPORT:
     description: "Teleports the player to specific coordinates."
     format: "[TELEPORT] world;x;y;z;yaw;pitch"
     example: "[TELEPORT] world;100;64;100;90;0"
-  
+
   HEAL:
     description: "Heals the player completely."
     example: "[HEAL]"
-  
+
   FEED:
     description: "Fills the hunger and saturation bar."
     example: "[FEED]"
-  
+
   DAMAGE:
     description: "Inflicts damage on the player (in half-hearts)."
     format: "[DAMAGE] amount"
     example: "[DAMAGE] 4.0"
-  
+
   GIVE:
     description: "Delivers an item to the player's inventory with an optional name."
     format: "[GIVE] material;amount;name"
     example: "[GIVE] DIAMOND;5;&bGift Diamond"
-  
+
   DELAY:
-    description: "Pauses execution before the next action."
+    description: "Pauses execution before the next action (in ticks)."
     format: "[DELAY] ticks"
     example: "[DELAY] 40"
-  
-  CLOSE_INVENTORY:
+
+  CLOSE:
     description: "Closes any open menu or inventory."
-    example: "[CLOSE_INVENTORY]"
-  
+    example: "[CLOSE]"
+
   KICK:
     description: "Kicks the player from the server with a reason."
     format: "[KICK] reason"
     example: "[KICK] &cYou have been kicked by the administration."
-  
+
   PARTICLE:
     description: "Spawns particles around the player."
     format: "[PARTICLE] particle_name x_offset y_offset z_offset count"
     example: "[PARTICLE] FLAME 0.5 0.5 0.5 10"
-  
+
   BUNGEE:
     description: "Sends the player to another server in a BungeeCord network."
     format: "[BUNGEE] server"
     example: "[BUNGEE] lobby"
-  
+
   GIVE_MONEY:
     description: "Gives money to the player's economy balance (Requires Vault)."
     format: "[GIVE_MONEY] amount"
     example: "[GIVE_MONEY] 100"
-  
+
   TAKE_MONEY:
     description: "Takes money from the player's economy balance (Requires Vault)."
     format: "[TAKE_MONEY] amount"
@@ -116,53 +117,96 @@ actions:
     description: "Conditional: Only executes the NEXT action if the player HAS the permission."
     format: "[IF_PERMISSION] permission"
     example: "[IF_PERMISSION] rank.vip"
-  
+
   IF_PERMISSION_NOT:
     description: "Conditional: Only executes the NEXT action if the player DOES NOT HAVE the permission."
     format: "[IF_PERMISSION_NOT] permission"
     example: "[IF_PERMISSION_NOT] rank.vip"
-  
+
   IF_MONEY:
-    description: "Conditional: Only executes the NEXT action if the player HAS the money (Econ)."
+    description: "Conditional: Only executes the NEXT action if the player HAS the money."
     format: "[IF_MONEY] amount"
     example: "[IF_MONEY] 500.0"
-  
-  IF_MONEY_NOT:
-    description: "Conditional: Only executes the NEXT action if the player DOES NOT HAVE the money."
-    format: "[IF_MONEY_NOT] amount"
+
   IF_OP:
     description: "Conditional: Only executes the NEXT action if the player IS an operator."
     example: "[IF_OP]"
-  
+
   IF_WORLD:
-    description: "Conditional: Only executes the NEXT action if the player is in the specified WORLD."
+    description: "Conditional: Only executes the NEXT action if the player is in the specified world."
     format: "[IF_WORLD] world_name"
     example: "[IF_WORLD] survival"
-  
+
   IF_CHANCE:
-    description: "Conditional: Only executes the NEXT action if the random CHANCE (0-100) succeeds."
+    description: "Conditional: Only executes the NEXT action if the random chance (0-100) succeeds."
     format: "[IF_CHANCE] percentage"
     example: "[IF_CHANCE] 50"
 
-# 🎨 Color and Style Formats
-# -----------------------------------------------------------
+# ============================================
+# COLOR AND STYLE FORMATS
+# ============================================
 # The plugin supports multiple modern color formats:
-# -----------------------------------------------------------
+# ============================================
+
 colors:
   MINIMESSAGE:
     description: "Uses Paper's format for advanced colors and styles."
     example: "<red>Red Text</red> <bold>Bold</bold> <underlined>Underlined</underlined>"
-  
+
   GRADIENTS:
     description: "Create spectacular gradients between multiple colors."
     format: "<gradient:color1:color2>Text</gradient>"
     example: "<gradient:#FF1919:#EE1F1F:#C01414>GRADIENT TEXT</gradient>"
-  
+
   HEX_RGB:
     description: "Use exact hexadecimal codes."
     format: "&#RRGGBB or &x&R&R&G&G&B&B"
     example: "&#E7C500Golden Text"
-  
+
   HTML_TAGS:
     description: "Simple HTML-like tags for convenience."
     example: "<b>Bold</b> <i>Italic</i> <u>Underlined</u>"
+
+# ============================================
+# VARIABLES AND ARGUMENTS
+# ============================================
+# Available placeholders for dynamic content.
+# ============================================
+
+placeholders:
+  PLAYER:
+    description: "Basic information of the player executing the command."
+    placeholders:
+      - "%player%: Player name."
+      - "%player_display%: Display name (Nickname)."
+      - "%player_uuid%: Unique UUID."
+      - "%player_money%: Economy balance."
+      - "%player_world%: Current world name."
+
+  COMMAND_ARGS:
+    description: "Captures what the user types after the command."
+    placeholders:
+      - "{args}: All text after the command."
+      - "{0}: First word (argument)."
+      - "{1}: Second word, and so on."
+    example: "[BROADCAST] &b[Notice] &f{args}"
+
+# ============================================
+# COMMANDS
+# ============================================
+# Available /xc commands for administrators.
+# ============================================
+
+commands:
+  - "/xc create <name> - Create a new command"
+  - "/xc delete <name> - Delete a command"
+  - "/xc edit <cmd> <attr> [value] - Edit a command attribute"
+  - "/xc edit <cmd> ... - Edit via GUI attributes (name, description, permission, cooldown, interval, world, material, displayname, register, alias, action)"
+  - "/xc info <name> - Show command information"
+  - "/xc list - List all custom commands"
+  - "/xc reload - Reload the plugin"
+  - "/xc update - Check for updates"
+  - "/xc locate [lang] - Change or list languages"
+  - "/xc version - Show plugin and server info"
+  - "/xc forcemessages <new|keep> <all|lang> - Reset or update message files (defaults to 'all' if no second argument)"
+  - "/xc -gui - Open the visual command editor (GUI)"
