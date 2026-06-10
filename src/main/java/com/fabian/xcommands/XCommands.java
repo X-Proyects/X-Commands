@@ -5,7 +5,9 @@ import com.fabian.xcommands.managers.commands.XCCommand;
 import com.fabian.xcommands.managers.*;
 import com.fabian.xcommands.utils.ColorUtils;
 import com.fabian.xcommands.utils.EconomyUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import com.fabian.xcommands.utils.UpdateChecker;
+import com.fabian.xcommands.utils.XCommandsExpansion;
 import com.fabian.xcommands.listeners.UpdateListener;
 import com.fabian.xcommands.listeners.InventoryListener;
 import com.fabian.xcommands.listeners.CommandHideListener;
@@ -100,6 +102,17 @@ public class XCommands extends JavaPlugin {
                 }
             } else {
                 logWarning("Vault not found. Economy actions will be disabled.");
+            }
+
+            // Register PlaceholderAPI expansion
+            if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                try {
+                    new XCommandsExpansion(this).register();
+                    logInfo("PlaceholderAPI expansion registered!");
+                    LoggerUtils.debug("PAPI: PlaceholderAPI expansion registered");
+                } catch (Exception e) {
+                    logWarning("Could not register PlaceholderAPI expansion: " + e.getMessage());
+                }
             }
 
             // Register main command

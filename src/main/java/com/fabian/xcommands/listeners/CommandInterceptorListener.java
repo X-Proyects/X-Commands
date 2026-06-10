@@ -2,6 +2,7 @@ package com.fabian.xcommands.listeners;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.executors.CustomCommandExecutor;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,6 +30,7 @@ public class CommandInterceptorListener implements Listener {
      * Rebuilds the alias lookup map. Should be called after commands are loaded/reloaded.
      */
     public void rebuildAliasLookup() {
+        LoggerUtils.debug("Rebuilding alias lookup map...");
         aliasLookup.clear();
         for (CustomCommandExecutor executor : plugin.getCommandManager().getCustomCommands().values()) {
             String commandName = executor.getCommandName().toLowerCase();
@@ -75,6 +77,7 @@ public class CommandInterceptorListener implements Listener {
         // If we found a command and it's NOT registered in Bukkit, we handle it manually
         if (executor != null && !executor.isRegistered()) {
             String[] args = parts.length > 1 ? Arrays.copyOfRange(parts, 1, parts.length) : new String[0];
+            LoggerUtils.debug("Intercepted unregistered command: " + cmdLabel + " by " + sender.getName());
             executor.onCommand(sender, null, cmdLabel, args);
             return true;
         }

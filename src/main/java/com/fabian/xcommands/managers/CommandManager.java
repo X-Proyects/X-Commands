@@ -3,6 +3,7 @@ package com.fabian.xcommands.managers;
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.executors.CustomCommandExecutor;
 import com.fabian.xcommands.utils.SchedulerUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -86,6 +87,7 @@ public class CommandManager {
      * Loads all custom commands from the commands folder
      */
     public void loadCommands() {
+        LoggerUtils.debug("Loading custom commands...");
         // Clear existing custom commands
         unregisterAllCommands();
 
@@ -125,12 +127,14 @@ public class CommandManager {
         }
 
         plugin.logInfo("Loaded " + customCommands.size() + " custom commands");
+        LoggerUtils.debug("Finished loading " + customCommands.size() + " custom commands");
     }
 
     /**
      * Loads a single command from a file
      */
     private void loadCommand(File file) {
+        LoggerUtils.debug("Loading command from file: " + file.getName());
         try {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
@@ -139,6 +143,7 @@ public class CommandManager {
 
             if (name == null || name.isEmpty()) {
                 plugin.logWarning("Command file " + file.getName() + " has no name");
+                LoggerUtils.debug("Skipped command file (no name): " + file.getName());
                 return;
             }
 
@@ -171,6 +176,7 @@ public class CommandManager {
             executor.setOriginalName(fileName);
 
             customCommands.put(name.toLowerCase(), executor);
+            LoggerUtils.debug("Registered command: " + name + " (register=" + register + ", actions=" + actions.size() + ")");
 
             if (register) {
                 registerCommand(name, executor);
@@ -186,6 +192,7 @@ public class CommandManager {
      * Registers a command with Bukkit
      */
     private void registerCommand(String name, CustomCommandExecutor executor) {
+        LoggerUtils.debug("Registering Bukkit command: " + name);
         if (commandMap == null) {
             plugin.logSevere("CommandMap is null, cannot register command: " + name);
             return;
@@ -317,6 +324,7 @@ public class CommandManager {
      * Reloads all custom commands
      */
     public void reload() {
+        LoggerUtils.debug("Reloading command manager...");
         loadCommands();
         refreshCommands();
     }
@@ -408,6 +416,7 @@ public class CommandManager {
      * @return true if the command was deleted successfully
      */
     public boolean deleteCommand(String commandName) {
+        LoggerUtils.debug("Deleting command: " + commandName);
         CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
         if (executor == null)
             return false;
@@ -740,6 +749,7 @@ public class CommandManager {
      * Unregisters a command from Bukkit
      */
     private void unregisterCommand(String commandName) {
+        LoggerUtils.debug("Unregistering command: " + commandName);
         stopTimer(commandName);
         if (commandMap == null) {
             return;

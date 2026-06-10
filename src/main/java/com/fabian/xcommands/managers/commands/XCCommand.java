@@ -2,6 +2,7 @@ package com.fabian.xcommands.managers.commands;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.managers.LanguageManager;
+import com.fabian.xcommands.utils.LoggerUtils;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -43,6 +44,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        LoggerUtils.debug("/xc command executed by " + sender.getName() + " args=" + java.util.Arrays.toString(args));
         if (args.length == 0) {
             sendHelp(sender);
             return true;

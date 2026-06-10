@@ -2,6 +2,7 @@ package com.fabian.xcommands.listeners;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ public class UpdateListener implements Listener {
 
     @EventHandler
     public void onServerLoad(ServerLoadEvent event) {
+        LoggerUtils.debug("Server load event received, checking for updates...");
         // Check for updates on server load (after "Done")
         if (plugin.getConfigManager().isCheckUpdates() && plugin.getUpdateChecker() != null) {
             plugin.getUpdateChecker().checkForUpdates();
@@ -41,6 +43,7 @@ public class UpdateListener implements Listener {
             return;
 
         if (plugin.getUpdateChecker().isUpdateAvailable()) {
+            LoggerUtils.debug("Update available notified to " + player.getName() + " (current=" + CompatibilityUtils.getVersion(plugin) + ", latest=" + plugin.getUpdateChecker().getLatestVersion() + ")");
             String latestVersion = plugin.getUpdateChecker().getLatestVersion();
             String currentVersion = CompatibilityUtils.getVersion(plugin);
 

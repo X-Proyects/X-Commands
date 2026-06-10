@@ -2,6 +2,7 @@ package com.fabian.xcommands.actions;
 
 import com.fabian.xcommands.utils.CompatibilityUtils;
 import com.fabian.xcommands.utils.PlaceholderUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ public class MessageAction implements Action {
         if (params == null) return;
 
         String message = PlaceholderUtils.process(params, player);
+        LoggerUtils.debug("[MESSAGE] Sending to " + (player != null ? player.getName() : "null") + ": " + message);
         CompatibilityUtils.sendMessage(player, message);
     }
 

@@ -2,6 +2,7 @@ package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.conditions.*;
 import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -22,11 +23,13 @@ public class ConditionManager {
     }
 
     private void registerDefaults() {
+        LoggerUtils.debug("Registering condition types...");
         registerCondition("IF_WORLD", new WorldCondition());
         registerCondition("IF_PERMISSION", new PermissionCondition());
         registerCondition("IF_MONEY", new MoneyCondition());
         registerCondition("IF_OP", new OpCondition());
         registerCondition("IF_CHANCE", new ChanceCondition());
+        LoggerUtils.debug("Registered " + conditions.size() + " condition types");
     }
 
     /**
@@ -34,6 +37,7 @@ public class ConditionManager {
      */
     public void registerCondition(String tag, Condition condition) {
         conditions.put(tag.toUpperCase(), condition);
+        LoggerUtils.debug("  Registered condition: " + tag);
     }
 
     /**
@@ -63,6 +67,7 @@ public class ConditionManager {
         Condition condition = conditions.get(tag);
         if (condition == null) {
             plugin.logWarning("Unknown condition type: " + tag);
+            LoggerUtils.debug("Unknown condition type: " + tag + " (player=" + (player != null ? player.getName() : "null") + ")");
             return false;
         }
 
@@ -70,6 +75,7 @@ public class ConditionManager {
         context.put("params", params);
         
         boolean result = condition.check(player, context);
+        LoggerUtils.debug("Condition check: " + tag + " -> " + (negate ? "!" : "") + result + " (player=" + (player != null ? player.getName() : "null") + ")");
         return negate ? !result : result;
     }
 
@@ -81,6 +87,7 @@ public class ConditionManager {
      * Reloads the condition manager
      */
     public void reload() {
+        LoggerUtils.debug("Reloading condition manager...");
         conditions.clear();
         registerDefaults();
     }

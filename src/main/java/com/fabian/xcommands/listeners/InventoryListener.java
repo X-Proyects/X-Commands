@@ -2,6 +2,7 @@ package com.fabian.xcommands.listeners;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.executors.CustomCommandExecutor;
+import com.fabian.xcommands.utils.LoggerUtils;
 import com.fabian.xcommands.managers.menus.TitleMenu;
 import com.fabian.xcommands.managers.menus.TeleportMenu;
 import com.fabian.xcommands.managers.menus.EffectMenu;
@@ -175,6 +176,7 @@ public class InventoryListener implements Listener {
         event.setCancelled(true);
         ItemStack clicked = event.getCurrentItem();
         String cmdName = holder.getCommandName();
+        LoggerUtils.debug("Inventory click: type=" + holder.getMenuType() + " slot=" + event.getSlot() + " cmd=" + cmdName + " player=" + player.getName());
 
         // Allow REORDER menu to handle clicks on empty slots (for placing items)
         if (holder.getMenuType() == MenuType.ACTION_REORDER) {

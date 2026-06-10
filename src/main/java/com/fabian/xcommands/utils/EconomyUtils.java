@@ -29,10 +29,12 @@ public class EconomyUtils {
 
         if (rsp == null) {
             plugin.logWarning("Vault was found, but no Economy Provider (like EssentialsX) is installed.");
+            LoggerUtils.debug("Economy setup failed: Vault found but no Economy provider");
             return false;
         }
 
         econ = rsp.getProvider();
+        LoggerUtils.debug("Economy provider found: " + econ.getName());
         return isEnabled();
     }
 
@@ -90,6 +92,7 @@ public class EconomyUtils {
      * Tears down the economy reference. Called on plugin disable.
      */
     public static void teardown() {
+        LoggerUtils.debug("Economy teardown: clearing provider");
         econ = null;
     }
 }

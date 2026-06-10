@@ -21,6 +21,7 @@ public class ConsoleAction implements Action {
 
         command = sanitizeCommand(command);
 
+        LoggerUtils.debug("[CONSOLE] Dispatching: " + command);
         org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), command);
     }
 

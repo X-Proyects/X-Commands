@@ -1,6 +1,7 @@
 package com.fabian.xcommands.actions;
 
 import com.fabian.xcommands.utils.PlaceholderUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class BroadcastAction implements Action {
         if (params == null) return;
 
         String processed = (player != null) ? PlaceholderUtils.process(params, player) : params;
+        LoggerUtils.debug("[BROADCAST] Broadcasting message");
         com.fabian.xcommands.utils.CompatibilityUtils.broadcast(processed);
     }
 

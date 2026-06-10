@@ -1,5 +1,6 @@
 package com.fabian.xcommands.conditions;
 
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ public class PermissionCondition implements Condition {
         if (permission == null || permission.isEmpty()) return false;
         
         permission = permission.trim();
+
+        LoggerUtils.debug("[IF_PERMISSION] Checking '" + permission + "' for " + player.getName());
 
         // Handle wildcard permission check (ends with %)
         if (permission.endsWith("%")) {

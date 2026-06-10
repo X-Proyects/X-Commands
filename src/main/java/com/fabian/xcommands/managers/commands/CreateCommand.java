@@ -2,6 +2,7 @@ package com.fabian.xcommands.managers.commands;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import com.fabian.xcommands.utils.SchedulerUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,12 +31,15 @@ public class CreateCommand {
 
         String commandName = args[1].toLowerCase();
 
+        LoggerUtils.debug("Create command requested: " + commandName + " by " + sender.getName());
+
         if (!commandName.matches("[a-zA-Z0-9_]+")) {
             CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("input-invalid-name"));
             return true;
         }
 
         if (plugin.getCommandManager().createCommand(commandName)) {
+            LoggerUtils.debug("Command created successfully: " + commandName);
             // Check if there is a create-success msg in EN.yml, else fallback
             String successMsg = plugin.getLanguageManager().getMessageWithPrefix("create-success");
             if (successMsg.contains("{0}")) {
@@ -50,6 +54,7 @@ public class CreateCommand {
                 });
             }
         } else {
+            LoggerUtils.debug("Command creation failed (already exists): " + commandName);
             String existsMsg = plugin.getLanguageManager().getMessageWithPrefix("create-exists");
             if (existsMsg.contains("{0}")) {
                 existsMsg = existsMsg.replace("{0}", commandName);

@@ -2,6 +2,7 @@ package com.fabian.xcommands.managers.commands;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.command.CommandSender;
 
 public class ReloadCommand {
@@ -19,6 +20,7 @@ public class ReloadCommand {
         }
 
         try {
+            LoggerUtils.debug("Reload requested by " + sender.getName());
             // Reload all managers
             plugin.getConfigManager().reload();
             plugin.getLanguageManager().reload();
@@ -32,8 +34,10 @@ public class ReloadCommand {
             plugin.getInventoryManager().reload();
 
             CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("reload-success"));
+            LoggerUtils.debug("Reload completed successfully");
         } catch (Exception e) {
             plugin.logSevere("Error reloading plugin: " + e.getMessage(), e);
+            LoggerUtils.debug("Reload failed: " + e.getMessage());
             CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("reload-error"));
         }
 

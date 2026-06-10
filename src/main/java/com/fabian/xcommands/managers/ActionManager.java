@@ -3,6 +3,7 @@ package com.fabian.xcommands.managers;
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.actions.*;
 import com.fabian.xcommands.utils.SchedulerUtils;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
@@ -56,6 +57,7 @@ public class ActionManager {
      * Registers all available actions
      */
     private void registerActions() {
+        LoggerUtils.debug("Registering action types...");
         registerAction(new MessageAction());
         registerAction(new BroadcastAction());
         registerAction(new ActionBarAction());
@@ -78,14 +80,15 @@ public class ActionManager {
         registerAction(new SendToAction());
         registerAction(new GiveMoneyAction());
         registerAction(new TakeMoneyAction());
+        LoggerUtils.debug("Registered " + actions.size() + " action types");
     }
-
 
     /**
      * Registers a single action
      */
     private void registerAction(Action action) {
         actions.put(action.getTag(), action);
+        LoggerUtils.debug("  Registered action: " + action.getTag());
     }
 
     /**
@@ -106,6 +109,7 @@ public class ActionManager {
      * @param args          The command arguments
      */
     public void executeActions(Player player, List<String> actionStrings, String[] args) {
+        LoggerUtils.debug("Executing " + actionStrings.size() + " actions for " + (player != null ? player.getName() : "console"));
         executeActionsLoop(player, actionStrings, 0, args);
     }
 
@@ -202,6 +206,7 @@ public class ActionManager {
 
         if (action == null && !tag.startsWith("IF_")) {
             plugin.logWarning("Unknown action type: " + tag);
+            LoggerUtils.debug("Unknown action type in string: " + actionString + " (tag=" + tag + ")");
             return null;
         }
 
@@ -237,6 +242,7 @@ public class ActionManager {
                 entry.action.execute(player, context);
             } catch (Exception e) {
                 plugin.logSevere("Error executing action [" + entry.tag + "] for player " + player.getName() + " with params: " + params, e);
+                LoggerUtils.debug("Action execution failed: " + entry.tag + " - " + e.getMessage());
             }
         });
     }
@@ -280,6 +286,7 @@ public class ActionManager {
      * Reloads the action manager
      */
     public void reload() {
+        LoggerUtils.debug("Reloading action manager...");
         actions.clear();
         actionCache.clear();
         registerActions();

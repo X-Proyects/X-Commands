@@ -2,6 +2,7 @@ package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.managers.menus.*;
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 
 /**
@@ -30,6 +31,7 @@ public class InventoryManager {
          * Opens the main menu with all custom commands (default page 0)
          */
         public void openMainMenu(Player player) {
+                LoggerUtils.debug("Opening main menu for " + player.getName());
                 mainMenu.open(player, 0);
         }
 
@@ -44,6 +46,7 @@ public class InventoryManager {
          * Opens the edit menu for a specific command
          */
         public void openCommandEditMenu(Player player, String commandName) {
+                LoggerUtils.debug("Opening command edit menu: " + commandName + " for " + player.getName());
                 commandEditMenu.open(player, commandName);
         }
 

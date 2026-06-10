@@ -1,5 +1,6 @@
 package com.fabian.xcommands.conditions;
 
+import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,6 +24,7 @@ public class ChanceCondition implements Condition {
             }
             return ThreadLocalRandom.current().nextDouble() * 100 <= chance;
         } catch (NumberFormatException e) {
+            LoggerUtils.debug("[IF_CHANCE] Invalid number format: " + params);
             return false;
         }
     }

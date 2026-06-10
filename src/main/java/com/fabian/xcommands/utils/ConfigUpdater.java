@@ -55,8 +55,10 @@ public class ConfigUpdater {
             }
 
             if (isFlat) {
+                LoggerUtils.debug("ConfigUpdater: updating flat file " + diskFile.getName());
                 updateFlatFile(plugin, resourcePath, diskFile, diskConfig);
             } else {
+                LoggerUtils.debug("ConfigUpdater: updating hierarchical file " + diskFile.getName());
                 updateHierarchicalFile(plugin, resourcePath, diskFile, diskConfig, resConfig);
             }
 

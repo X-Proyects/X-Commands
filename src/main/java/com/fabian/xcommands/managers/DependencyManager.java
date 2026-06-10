@@ -1,6 +1,7 @@
 package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.LoggerUtils;
 import net.byteflux.libby.BukkitLibraryManager;
 import net.byteflux.libby.Library;
 
@@ -29,12 +30,15 @@ public class DependencyManager {
     }
 
     public void loadDependencies() {
+        LoggerUtils.debug("Loading runtime dependencies via X-API...");
         try {
             plugin.logInfo("Loading runtime dependencies via X-API...");
             loadAdventureDependencies();
             plugin.logInfo("All dependencies loaded successfully!");
+            LoggerUtils.debug("All dependencies loaded successfully");
         } catch (Exception e) {
             plugin.logSevere("Failed to load runtime dependencies! " + e.getMessage());
+            LoggerUtils.debug("Dependency loading failed: " + e.getMessage());
         }
     }
 
