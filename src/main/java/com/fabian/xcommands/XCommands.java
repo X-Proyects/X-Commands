@@ -59,11 +59,11 @@ public class XCommands extends JavaPlugin {
     @SuppressWarnings("deprecation")
     @Override
     public void onEnable() {
-        // Load libraries before anything else
-        new DependencyManager(this).loadDependencies();
-        
         try {
             instance = this;
+
+            // Load libraries before anything else
+            new DependencyManager(this).loadDependencies();
 
             // Soporte temporal para nombre antiguo
             if (getDescription().getName().equalsIgnoreCase("X-Comands")) {
@@ -182,7 +182,9 @@ public class XCommands extends JavaPlugin {
         if (metrics != null) {
             metrics.shutdown();
         }
-        com.fabian.xcommands.utils.EconomyUtils.teardown();
+        if (instance != null) {
+            com.fabian.xcommands.utils.EconomyUtils.teardown();
+        }
 
         String version = getDescription().getVersion();
         Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(
