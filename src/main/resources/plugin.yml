@@ -1,9 +1,9 @@
 name: X-Commands
 version: 2.7
-main: com.fabian.XCommands
+main: com.fabian.xcommands.XCommands
 api-version: 1.18
 folia-supported: true
-authors: [Fabián ツ]
+authors: [Fabian]
 description: Custom commands plugin
 softdepend: [Vault, PlaceholderAPI]
 

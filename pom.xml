@@ -4,9 +4,29 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.fabian</groupId>
+    <groupId>com.fabian.xcommands</groupId>
     <artifactId>X-Commands</artifactId>
     <version>2.7</version>
+
+    <url>https://github.com/fabianfamr/X-Commands</url>
+    <inceptionYear>2026</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>fabianfamr</id>
+            <name>Fabian</name>
+            <url>https://github.com/fabianfamr</url>
+        </developer>
+    </developers>
+
     <packaging>jar</packaging>
 
     <name>X-Commands</name>
@@ -15,7 +35,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <adventure.version>4.17.0</adventure.version>
+        <adventure.version>4.14.0</adventure.version>
     </properties>
 
     <repositories>
