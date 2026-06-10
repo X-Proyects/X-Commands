@@ -12,14 +12,14 @@ import java.nio.file.Paths;
 public class DependencyManager {
 
     private final XCommands plugin;
-    private final BukkitLibraryManager libraryManager;
+    private BukkitLibraryManager libraryManager;
 
     public DependencyManager(XCommands plugin) {
         this.plugin = plugin;
         try {
             Path xapiPath = Paths.get(plugin.getDataFolder().getParent(), "X-API");
             Files.createDirectories(xapiPath);
-            this.libraryManager = new BukkitLibraryManager(plugin, xapiPath);
+            this.libraryManager = new BukkitLibraryManager(plugin, xapiPath.toString());
         } catch (Exception e) {
             plugin.getLogger().warning("Could not create X-API directory, using default: " + e.getMessage());
             this.libraryManager = new BukkitLibraryManager(plugin);
