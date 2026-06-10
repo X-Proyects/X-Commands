@@ -2,22 +2,29 @@ package com.fabian.xcommands.utils;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Utility class for safe sound handling with version compatibility
+ * Utility class for safe sound handling with version compatibility.
+ * Supports all server versions from 1.8.8+ through 1.21+.
  */
 public class SoundUtils {
 
     private static final Object NULL_MARKER = new Object();
     private static final Map<String, String> LEGACY_MAP = new HashMap<>();
     private static final Map<String, Object> SOUND_CACHE = new ConcurrentHashMap<>();
+
+    // Cached reflection for Registry.SOUNDS (1.20.5+)
+    private static volatile Object soundsRegistry = null;
+    private static volatile Method registryGetMethod = null;
+    private static volatile Boolean registryAvailable = null;
 
     static {
         // Map common 1.8 sounds to modern 1.9+ names
@@ -77,8 +84,9 @@ public class SoundUtils {
     }
 
     /**
-     * Resolves a sound name using the Paper Registry API (1.20.5+).
-     * Falls back through legacy name mappings. Uses a cache for performance.
+     * Resolves a sound name using the Paper Registry API (1.20.5+) via reflection.
+     * Falls back through legacy name mappings and Sound.valueOf().
+     * Uses a cache for performance.
      */
     public static Sound resolveSound(String soundName) {
         if (soundName == null || soundName.isEmpty())
@@ -110,31 +118,59 @@ public class SoundUtils {
             sound = tryRegistryLookup(key.split(":")[1]);
         }
 
+        // 4. Last resort: try Sound.valueOf() (works on all versions, for enum-style names)
+        if (sound == null) {
+            try {
+                sound = Sound.valueOf(key);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
         // Cache result
         SOUND_CACHE.put(key, sound != null ? sound : NULL_MARKER);
         return sound;
     }
 
     /**
-     * Looks up a Sound from the Bukkit Registry by name key.
+     * Looks up a Sound from the Bukkit Registry by name key using reflection.
      * Converts ENUM_STYLE_NAME to minecraft:enum_style_name format.
+     * Uses cached reflection for Registry.SOUNDS (1.20.5+) with Sound.valueOf() fallback.
      */
     private static Sound tryRegistryLookup(String enumKey) {
+        // Lazy-init reflection for Registry.SOUNDS (1.20.5+)
+        if (registryAvailable == null) {
+            try {
+                soundsRegistry = org.bukkit.Registry.class.getField("SOUNDS").get(null);
+                registryGetMethod = soundsRegistry.getClass().getMethod("get", NamespacedKey.class);
+                registryAvailable = true;
+            } catch (Exception e) {
+                soundsRegistry = null;
+                registryGetMethod = null;
+                registryAvailable = false;
+                LoggerUtils.debug("SoundUtils: Registry.SOUNDS not available (pre-1.20.5), using Sound.valueOf() fallback");
+                return null;
+            }
+        }
+
+        if (!registryAvailable || soundsRegistry == null || registryGetMethod == null) {
+            return null;
+        }
+
         // Registry keys are lowercase with dots, e.g. "entity.player.levelup"
         String registryKey = enumKey.toLowerCase(Locale.ROOT).replace("_", ".");
         try {
-            Sound s = Registry.SOUNDS.get(NamespacedKey.minecraft(registryKey));
+            Sound s = (Sound) registryGetMethod.invoke(soundsRegistry, NamespacedKey.minecraft(registryKey));
             if (s != null) return s;
         } catch (Exception ignored) {
         }
+
         // Also try with underscores (some keys use them)
         try {
             String underscoreKey = enumKey.toLowerCase(Locale.ROOT);
-            return Registry.SOUNDS.get(NamespacedKey.minecraft(underscoreKey));
+            return (Sound) registryGetMethod.invoke(soundsRegistry, NamespacedKey.minecraft(underscoreKey));
         } catch (Exception ignored) {
         }
+
         return null;
     }
 }
-
-

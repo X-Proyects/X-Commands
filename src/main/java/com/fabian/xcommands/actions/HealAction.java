@@ -2,14 +2,25 @@ package com.fabian.xcommands.actions;
 
 import org.bukkit.entity.Player;
 import java.util.Map;
+import java.lang.reflect.Method;
 
 /**
- * Heals the player to full health
- * Format: [HEAL]
+ * Heals the player to full health.
+ * Format: [HEAL] or [HEAL] <amount>
+ *
+ * Compatible with all versions from 1.8.8+ through 1.21+:
+ * - 1.21+: Uses Registry.ATTRIBUTE via reflection (max_health)
+ * - 1.20.6-1.21.1: Uses Registry.ATTRIBUTE via reflection (generic_max_health)
+ * - Pre-1.20.6: Uses deprecated Attribute.valueOf("GENERIC_MAX_HEALTH")
  */
 public class HealAction implements Action {
 
     private static final double DEFAULT_MAX_HEALTH = 20.0;
+
+    // Cached reflection for Registry.ATTRIBUTE (1.20.6+)
+    private static volatile Object attributeRegistry = null;
+    private static volatile Method registryGetMethod = null;
+    private static volatile Boolean registryAvailable = null;
 
     @Override
     public void execute(Player player, Map<String, Object> context) {
@@ -35,22 +46,14 @@ public class HealAction implements Action {
 
         Object attribute = null;
 
-        // 1. Try modern Registry (1.20.6+) — with safe fallback for pre-1.20.6
-        try {
-            org.bukkit.NamespacedKey modernKey = org.bukkit.NamespacedKey.minecraft("max_health");
-            attribute = org.bukkit.Registry.ATTRIBUTE.get(modernKey);
-        } catch (NoSuchFieldError | NoClassDefFoundError e) {
-            // Pre-1.20.6: Registry.ATTRIBUTE does not exist
+        // 1. Try modern Registry (1.20.6+) via reflection — safe for all compile targets
+        if (attribute == null) {
+            attribute = tryRegistryAttribute("max_health");
         }
 
-        // 2. Try legacy name if modern name not found (1.18.2 - 1.21.1)
+        // 2. Try legacy key name (1.20.6 - 1.21.1 used "generic.max_health")
         if (attribute == null) {
-            try {
-                org.bukkit.NamespacedKey legacyKey = org.bukkit.NamespacedKey.minecraft("generic_max_health");
-                attribute = org.bukkit.Registry.ATTRIBUTE.get(legacyKey);
-            } catch (NoSuchFieldError | NoClassDefFoundError ignored) {
-                // Pre-1.20.6: fall through to deprecated Attribute.valueOf
-            }
+            attribute = tryRegistryAttribute("generic_max_health");
         }
 
         // 3. Last resort: deprecated Attribute.valueOf (works on all versions)
@@ -78,6 +81,38 @@ public class HealAction implements Action {
         } else {
             player.setHealth(maxHealth);
         }
+    }
+
+    /**
+     * Looks up an attribute from Registry.ATTRIBUTE using reflection.
+     * This is safe to call on any version — returns null if Registry.ATTRIBUTE doesn't exist.
+     */
+    private static Object tryRegistryAttribute(String key) {
+        // Lazy-init reflection for Registry.ATTRIBUTE
+        if (registryAvailable == null) {
+            try {
+                attributeRegistry = org.bukkit.Registry.class.getField("ATTRIBUTE").get(null);
+                registryGetMethod = attributeRegistry.getClass().getMethod("get", org.bukkit.NamespacedKey.class);
+                registryAvailable = true;
+            } catch (Exception e) {
+                attributeRegistry = null;
+                registryGetMethod = null;
+                registryAvailable = false;
+                com.fabian.xcommands.utils.LoggerUtils.debug("HealAction: Registry.ATTRIBUTE not available (pre-1.20.6), using Attribute.valueOf() fallback");
+                return null;
+            }
+        }
+
+        if (!registryAvailable || attributeRegistry == null || registryGetMethod == null) {
+            return null;
+        }
+
+        try {
+            // Registry keys use underscores when created via NamespacedKey.minecraft()
+            return registryGetMethod.invoke(attributeRegistry, org.bukkit.NamespacedKey.minecraft(key));
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     @Override
