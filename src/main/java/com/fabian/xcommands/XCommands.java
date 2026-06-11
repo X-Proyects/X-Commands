@@ -3,16 +3,14 @@ package com.fabian.xcommands;
 import com.fabian.xcommands.managers.DependencyManager;
 import com.fabian.xcommands.managers.commands.XCCommand;
 import com.fabian.xcommands.managers.*;
-import com.fabian.xcommands.utils.ColorUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import com.fabian.xcommands.utils.EconomyUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
 import com.fabian.xcommands.utils.UpdateChecker;
 import com.fabian.xcommands.utils.XCommandsExpansion;
 import com.fabian.xcommands.listeners.UpdateListener;
 import com.fabian.xcommands.listeners.InventoryListener;
 import com.fabian.xcommands.listeners.CommandHideListener;
 import com.fabian.xcommands.listeners.CommandInterceptorListener;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
@@ -21,7 +19,6 @@ import java.io.File;
  */
 public class XCommands extends JavaPlugin {
 
-    public static final String INTERNAL_PREFIX = "&8[&bX-Commands&8]";
     private static final int BSTATS_ID = 30996;
     private static final int UPDATE_CHECKER_ID = 132155;
     private static XCommands instance;
@@ -37,23 +34,16 @@ public class XCommands extends JavaPlugin {
     private UpdateChecker updateChecker;
     private com.fabian.xcommands.metrics.Metrics metrics;
 
-    /**
-     * Sends an info message to console with custom prefix
-     */
     public void logInfo(String message) {
-        com.fabian.xcommands.utils.LoggerUtils.info(message);
+        getLogger().info(message);
     }
 
     public void logWarning(String message) {
-        com.fabian.xcommands.utils.LoggerUtils.warn(message);
+        getLogger().warning(message);
     }
 
-    public void logSevere(String message) {
-        com.fabian.xcommands.utils.LoggerUtils.error(message);
-    }
-
-    public void logSevere(String message, Throwable throwable) {
-        com.fabian.xcommands.utils.LoggerUtils.severe(message, throwable);
+    public void logError(String message) {
+        getLogger().severe(message);
     }
 
     @SuppressWarnings("deprecation")
@@ -64,6 +54,8 @@ public class XCommands extends JavaPlugin {
 
             // Load libraries before anything else
             new DependencyManager(this).loadDependencies();
+
+            DebugLogger.init(this);
 
             // Soporte temporal para nombre antiguo
             if (getDescription().getName().equalsIgnoreCase("X-Comands")) {
@@ -109,7 +101,7 @@ public class XCommands extends JavaPlugin {
                 try {
                     new XCommandsExpansion(this).register();
                     logInfo("PlaceholderAPI expansion registered!");
-                    LoggerUtils.debug("PAPI: PlaceholderAPI expansion registered");
+                    DebugLogger.debug("PAPI: PlaceholderAPI expansion registered");
                 } catch (Exception e) {
                     logWarning("Could not register PlaceholderAPI expansion: " + e.getMessage());
                 }
@@ -172,7 +164,8 @@ public class XCommands extends JavaPlugin {
 
             logInfo("v" + getDescription().getVersion() + " successfully started!");
         } catch (Exception e) {
-            logSevere("Failed to enable X-Commands! Please check your configuration and server version.", e);
+            logError("Failed to enable X-Commands! Please check your configuration and server version.");
+            e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -186,13 +179,7 @@ public class XCommands extends JavaPlugin {
             com.fabian.xcommands.utils.EconomyUtils.teardown();
         }
 
-        String version = getDescription().getVersion();
-        Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(
-                "&8[&bX-Commands&8] &8--------------------------------------------------"));
-        Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(
-                "&8[&bX-Commands&8] &c  Disabled v" + version + "! Goodbye."));
-        Bukkit.getConsoleSender().sendMessage(ColorUtils.translate(
-                "&8[&bX-Commands&8] &8--------------------------------------------------"));
+        logInfo("v" + getDescription().getVersion() + " disabled. Goodbye!");
     }
 
     /**

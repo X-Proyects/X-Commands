@@ -1,5 +1,6 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -19,12 +20,12 @@ public class DamageAction implements Action {
         try {
             double damage = Double.parseDouble(params.trim());
             if (Double.isNaN(damage) || Double.isInfinite(damage) || damage < 0) {
-                com.fabian.xcommands.utils.LoggerUtils.warn("Invalid damage value for [DAMAGE]: " + damage + " (must be a positive finite number). Action skipped.");
+                XCommands.getInstance().logWarning("Invalid damage value for [DAMAGE]: " + damage + " (must be a positive finite number). Action skipped.");
                 return;
             }
             player.damage(damage);
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Invalid parameters for action [DAMAGE]: " + params);
+            XCommands.getInstance().logWarning("Invalid parameters for action [DAMAGE]: " + params);
         }
     }
 

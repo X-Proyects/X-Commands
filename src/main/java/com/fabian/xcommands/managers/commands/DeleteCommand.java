@@ -2,7 +2,7 @@ package com.fabian.xcommands.managers.commands;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -29,11 +29,11 @@ public class DeleteCommand {
 
         String commandName = args[1].toLowerCase();
 
-        LoggerUtils.debug("Delete command requested: " + commandName + " by " + sender.getName());
+        DebugLogger.debug("Delete command requested: " + commandName + " by " + sender.getName());
 
         if (plugin.getCommandManager().getCustomCommands().containsKey(commandName)) {
             if (plugin.getCommandManager().deleteCommand(commandName)) {
-                LoggerUtils.debug("Command deleted successfully: " + commandName);
+                DebugLogger.debug("Command deleted successfully: " + commandName);
                 String successMsg = plugin.getLanguageManager().getMessageWithPrefix("delete-success");
                 if (successMsg.contains("{0}")) {
                     successMsg = successMsg.replace("{0}", commandName);

@@ -1,5 +1,6 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.EconomyUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class TakeMoneyAction implements Action {
 
             // Prevent negative amounts that would duplicate money instead of taking it
             if (amount <= 0) {
-                com.fabian.xcommands.utils.LoggerUtils.warn("Invalid amount for action [TAKE_MONEY]: " + amount + " (must be positive). Action skipped.");
+                XCommands.getInstance().logWarning("Invalid amount for action [TAKE_MONEY]: " + amount + " (must be positive). Action skipped.");
                 return;
             }
 
@@ -30,7 +31,7 @@ public class TakeMoneyAction implements Action {
                 EconomyUtils.withdraw(player, amount);
             }
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Invalid parameters for action [TAKE_MONEY]: " + params);
+            XCommands.getInstance().logWarning("Invalid parameters for action [TAKE_MONEY]: " + params);
         }
     }
 

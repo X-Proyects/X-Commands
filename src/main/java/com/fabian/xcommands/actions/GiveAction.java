@@ -1,5 +1,6 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class GiveAction implements Action {
 
             Material material = Material.matchMaterial(materialName);
             if (material == null) {
-                com.fabian.xcommands.utils.LoggerUtils.warn("Invalid material in [GIVE] action: " + materialName);
+                XCommands.getInstance().logWarning("Invalid material in [GIVE] action: " + materialName);
                 return;
             }
 
@@ -49,7 +50,8 @@ public class GiveAction implements Action {
                 );
             }
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.severe("Error executing [GIVE] action with params: " + params, e);
+            XCommands.getInstance().logError("Error executing [GIVE] action with params: " + params);
+            e.printStackTrace();
         }
     }
 

@@ -1,5 +1,6 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
 import com.fabian.xcommands.utils.PlaceholderUtils;
 import org.bukkit.entity.Player;
@@ -40,9 +41,9 @@ public class TitleAction implements Action {
                 CompatibilityUtils.sendTitle(player, title, subtitle, fadeIn, stay, fadeOut);
             }
         } catch (NumberFormatException e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Invalid number format in action [TITLE]: " + params);
+            XCommands.getInstance().logWarning("Invalid number format in action [TITLE]: " + params);
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Error executing action [TITLE]: " + e.getMessage());
+            XCommands.getInstance().logWarning("Error executing action [TITLE]: " + e.getMessage());
         }
     }
 

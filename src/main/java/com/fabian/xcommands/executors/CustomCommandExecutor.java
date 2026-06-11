@@ -2,7 +2,7 @@ package com.fabian.xcommands.executors;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -60,7 +60,7 @@ public class CustomCommandExecutor implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        LoggerUtils.debug("Custom command executed: /" + commandName + " by " + sender.getName() + " args=" + java.util.Arrays.toString(args));
+        DebugLogger.debug("Custom command executed: /" + commandName + " by " + sender.getName() + " args=" + java.util.Arrays.toString(args));
         // Check if sender is a player (some actions require a player)
         Player player = null;
         if (sender instanceof Player) {
@@ -69,7 +69,7 @@ public class CustomCommandExecutor implements CommandExecutor {
 
         // Check permission
         if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-            LoggerUtils.debug("Permission denied for /" + commandName + ": requires '" + permission + "', " + sender.getName() + " lacks it");
+            DebugLogger.debug("Permission denied for /" + commandName + ": requires '" + permission + "', " + sender.getName() + " lacks it");
             String message = plugin.getLanguageManager().getMessage("command-no-permission");
             CompatibilityUtils.sendMessage(sender, message);
             return true;
@@ -91,7 +91,7 @@ public class CustomCommandExecutor implements CommandExecutor {
             long remaining = (lastUsed + (cooldown * 1000L)) - currentTime;
 
             if (remaining > 0) {
-                LoggerUtils.debug("Cooldown active for /" + commandName + ": " + player.getName() + " must wait " + (remaining / 1000 + 1) + "s");
+                DebugLogger.debug("Cooldown active for /" + commandName + ": " + player.getName() + " must wait " + (remaining / 1000 + 1) + "s");
                 String message = plugin.getLanguageManager().getMessage("command-cooldown", (remaining / 1000) + 1);
                 CompatibilityUtils.sendMessage(player, message);
                 return true;
@@ -105,7 +105,7 @@ public class CustomCommandExecutor implements CommandExecutor {
         } catch (Exception e) {
             String message = plugin.getLanguageManager().getMessage("command-error");
             CompatibilityUtils.sendMessage(sender, message);
-            plugin.logSevere("Error executing command " + commandName + ": " + e.getMessage());
+            plugin.logError("Error executing command " + commandName + ": " + e.getMessage());
         }
 
         return true;

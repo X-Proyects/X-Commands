@@ -21,12 +21,12 @@ public class CompatibilityUtils {
      */
     public static boolean isPaper() {
         if (isPaper == null) {
-            LoggerUtils.debug("Detecting server platform (Paper/Spigot)...");
+            DebugLogger.debug("Detecting server platform (Paper/Spigot)...");
             try {
                 // Check for a class that is definitely Paper and likely to stay
                 Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
                 isPaper = true;
-                LoggerUtils.debug("Detected Paper (Folia RegionizedServer)");
+                DebugLogger.debug("Detected Paper (Folia RegionizedServer)");
                 return true;
             } catch (ClassNotFoundException ignored) {}
             
@@ -35,7 +35,7 @@ public class CompatibilityUtils {
                 isPaper = true;
             } catch (ClassNotFoundException e) {
                 isPaper = false;
-                LoggerUtils.debug("Detected Spigot (not Paper)");
+                DebugLogger.debug("Detected Spigot (not Paper)");
             }
         }
         return isPaper;

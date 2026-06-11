@@ -1,7 +1,7 @@
 package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,7 +27,7 @@ public class CooldownManager {
     public void setCooldown(UUID uuid, String key, double seconds) {
         long expiry = System.currentTimeMillis() + (long) (seconds * 1000);
         cooldowns.computeIfAbsent(key.toLowerCase(), k -> new ConcurrentHashMap<>()).put(uuid, expiry);
-        LoggerUtils.debug("Cooldown set: " + key + " for " + uuid + " (" + seconds + "s)");
+        DebugLogger.debug("Cooldown set: " + key + " for " + uuid + " (" + seconds + "s)");
     }
 
     /**
@@ -56,7 +56,7 @@ public class CooldownManager {
     public boolean isOnCooldown(UUID uuid, String key) {
         boolean onCooldown = getRemaining(uuid, key) > 0;
         if (onCooldown) {
-            LoggerUtils.debug("Cooldown active: " + key + " for " + uuid + " (" + getRemaining(uuid, key) + "s remaining)");
+            DebugLogger.debug("Cooldown active: " + key + " for " + uuid + " (" + getRemaining(uuid, key) + "s remaining)");
         }
         return onCooldown;
     }
@@ -66,7 +66,7 @@ public class CooldownManager {
      */
     public void clearCooldowns(String key) {
         cooldowns.remove(key.toLowerCase());
-        LoggerUtils.debug("Cooldowns cleared for key: " + key);
+        DebugLogger.debug("Cooldowns cleared for key: " + key);
     }
 
     /**
@@ -80,7 +80,7 @@ public class CooldownManager {
      * Reloads the cooldown manager (clears all)
      */
     public void reload() {
-        LoggerUtils.debug("Reloading cooldown manager (clearing all cooldowns)...");
+        DebugLogger.debug("Reloading cooldown manager (clearing all cooldowns)...");
         cooldowns.clear();
     }
 }

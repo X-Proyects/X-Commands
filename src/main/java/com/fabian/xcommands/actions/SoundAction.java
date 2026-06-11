@@ -1,5 +1,6 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class SoundAction implements Action {
 
             com.fabian.xcommands.utils.SoundUtils.playSound(player, soundName, volume, pitch);
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Invalid parameters for action [SOUND]: " + params);
+            XCommands.getInstance().logWarning("Invalid parameters for action [SOUND]: " + params);
         }
     }
 

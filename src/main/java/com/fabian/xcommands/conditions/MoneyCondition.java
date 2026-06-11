@@ -1,7 +1,7 @@
 package com.fabian.xcommands.conditions;
 
+import com.fabian.xcommands.utils.DebugLogger;
 import com.fabian.xcommands.utils.EconomyUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -12,7 +12,7 @@ public class MoneyCondition implements Condition {
     @Override
     public boolean check(Player player, Map<String, Object> context) {
         if (!EconomyUtils.isEnabled()) {
-            LoggerUtils.debug("[IF_MONEY] Economy disabled, passing condition for " + player.getName());
+            DebugLogger.debug("[IF_MONEY] Economy disabled, passing condition for " + player.getName());
             return true; // Assume true if economy is disabled
         }
         

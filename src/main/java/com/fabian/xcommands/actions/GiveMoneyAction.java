@@ -1,5 +1,6 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.EconomyUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
@@ -22,13 +23,13 @@ public class GiveMoneyAction implements Action {
 
             // Prevent negative amounts that could withdraw money instead of depositing
             if (amount <= 0) {
-                com.fabian.xcommands.utils.LoggerUtils.warn("Invalid amount for action [GIVE_MONEY]: " + amount + " (must be positive). Action skipped.");
+                XCommands.getInstance().logWarning("Invalid amount for action [GIVE_MONEY]: " + amount + " (must be positive). Action skipped.");
                 return;
             }
 
             EconomyUtils.deposit(player, amount);
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Invalid parameters for action [GIVE_MONEY]: " + params);
+            XCommands.getInstance().logWarning("Invalid parameters for action [GIVE_MONEY]: " + params);
         }
     }
 

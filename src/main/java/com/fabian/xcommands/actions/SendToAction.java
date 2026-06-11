@@ -1,6 +1,7 @@
 package com.fabian.xcommands.actions;
 
 import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.DebugLogger;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import org.bukkit.entity.Player;
@@ -21,10 +22,11 @@ public class SendToAction implements Action {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Connect");
             out.writeUTF(params.trim());
-            com.fabian.xcommands.utils.LoggerUtils.debug("Attempting to send player " + player.getName() + " to server (SEND_TO): " + params.trim());
+            DebugLogger.debug("Attempting to send player " + player.getName() + " to server (SEND_TO): " + params.trim());
             player.sendPluginMessage(XCommands.getInstance(), "BungeeCord", out.toByteArray());
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.severe("Failed to send player to proxy server: " + params, e);
+            XCommands.getInstance().logError("Failed to send player to proxy server: " + params);
+            e.printStackTrace();
         }
     }
 

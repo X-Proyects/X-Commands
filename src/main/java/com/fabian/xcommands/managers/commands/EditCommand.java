@@ -3,7 +3,7 @@ package com.fabian.xcommands.managers.commands;
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.executors.CustomCommandExecutor;
 import com.fabian.xcommands.utils.CompatibilityUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class EditCommand {
     }
 
     public boolean execute(CommandSender sender, String[] args) {
-        LoggerUtils.debug("Edit command by " + sender.getName() + ": " + java.util.Arrays.toString(args));
+        DebugLogger.debug("Edit command by " + sender.getName() + ": " + java.util.Arrays.toString(args));
         if (!sender.hasPermission("xcommands.admin.edit")) {
             CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("no-permission"));
             return true;
@@ -187,7 +187,7 @@ public class EditCommand {
     }
 
     private void save(CustomCommandExecutor cmd, CommandSender sender, String attribute) {
-        LoggerUtils.debug("Saving command edit: " + cmd.getCommandName() + " (" + attribute + ")");
+        DebugLogger.debug("Saving command edit: " + cmd.getCommandName() + " (" + attribute + ")");
         plugin.getCommandManager().markDirty(cmd.getCommandName());
         plugin.getCommandManager().saveCommand(cmd.getCommandName());
         String msg = plugin.getLanguageManager().getMessageWithPrefix("edit-success");

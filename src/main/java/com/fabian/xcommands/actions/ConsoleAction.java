@@ -1,7 +1,8 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.DebugLogger;
 import com.fabian.xcommands.utils.PlaceholderUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class ConsoleAction implements Action {
 
         command = sanitizeCommand(command);
 
-        LoggerUtils.debug("[CONSOLE] Dispatching: " + command);
+        DebugLogger.debug("[CONSOLE] Dispatching: " + command);
         org.bukkit.Bukkit.dispatchCommand(org.bukkit.Bukkit.getConsoleSender(), command);
     }
 
@@ -45,7 +46,7 @@ public class ConsoleAction implements Action {
         if (command.length() > 1024) {
             String original = command;
             command = command.substring(0, 1024);
-            LoggerUtils.warn("Console command truncated to 1024 chars. Original length: " + original.length());
+            XCommands.getInstance().logWarning("Console command truncated to 1024 chars. Original length: " + original.length());
         }
 
         return command.trim();

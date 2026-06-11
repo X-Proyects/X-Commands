@@ -147,7 +147,7 @@ public class SoundUtils {
                 soundsRegistry = null;
                 registryGetMethod = null;
                 registryAvailable = false;
-                LoggerUtils.debug("SoundUtils: Registry.SOUNDS not available (pre-1.20.5), using Sound.valueOf() fallback");
+                DebugLogger.debug("SoundUtils: Registry.SOUNDS not available (pre-1.20.5), using Sound.valueOf() fallback");
                 return null;
             }
         }

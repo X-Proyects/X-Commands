@@ -2,7 +2,7 @@ package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.ConfigUpdater;
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -34,7 +34,7 @@ public class ConfigManager {
      * Loads or reloads the configuration file
      */
     public void loadConfig() {
-        LoggerUtils.debug("Loading configuration...");
+        DebugLogger.debug("Loading configuration...");
         // Save default config if it doesn't exist
         plugin.saveDefaultConfig();
 
@@ -54,7 +54,7 @@ public class ConfigManager {
         // Also check if config needs auto-migration from an older version
         checkUpdate();
 
-        LoggerUtils.debug("Configuration loaded successfully (language=" + cachedLanguage + ")");
+        DebugLogger.debug("Configuration loaded successfully (language=" + cachedLanguage + ")");
 
         plugin.logInfo("Configuration loaded (" + cachedLanguage + ")!");
     }
@@ -84,7 +84,7 @@ public class ConfigManager {
         }
 
         if (changed) {
-            LoggerUtils.debug("Config validation added missing keys, saving...");
+            DebugLogger.debug("Config validation added missing keys, saving...");
             plugin.saveConfig();
         }
     }
@@ -103,7 +103,7 @@ public class ConfigManager {
             int diskCode = config.getInt("code", 0);
 
             if (diskCode < currentCode) {
-                LoggerUtils.debug("Config code outdated (disk=" + diskCode + ", resource=" + currentCode + "), updating...");
+                DebugLogger.debug("Config code outdated (disk=" + diskCode + ", resource=" + currentCode + "), updating...");
                 plugin.logInfo("Updating configuration files...");
 
                 // Use ConfigUpdater to add missing keys without wiping comments
@@ -135,7 +135,7 @@ public class ConfigManager {
      * Reloads the configuration from disk
      */
     public void reload() {
-        LoggerUtils.debug("Reloading configuration...");
+        DebugLogger.debug("Reloading configuration...");
         loadConfig();
     }
 

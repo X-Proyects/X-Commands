@@ -1,6 +1,6 @@
 package com.fabian.xcommands.conditions;
 
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -15,7 +15,7 @@ public class PermissionCondition implements Condition {
         
         permission = permission.trim();
 
-        LoggerUtils.debug("[IF_PERMISSION] Checking '" + permission + "' for " + player.getName());
+        DebugLogger.debug("[IF_PERMISSION] Checking '" + permission + "' for " + player.getName());
 
         // Handle wildcard permission check (ends with %)
         if (permission.endsWith("%")) {

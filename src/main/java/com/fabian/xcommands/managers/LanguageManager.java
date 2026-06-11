@@ -3,8 +3,7 @@ package com.fabian.xcommands.managers;
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.ColorUtils;
 import com.fabian.xcommands.utils.ConfigUpdater;
-import com.fabian.xcommands.utils.LoggerUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -34,7 +33,7 @@ public class LanguageManager {
      * Loads the language file based on config settings
      */
     public void loadLanguage() {
-        LoggerUtils.debug("Loading language file (lang=" + plugin.getConfigManager().getLanguage() + ")...");
+        DebugLogger.debug("Loading language file (lang=" + plugin.getConfigManager().getLanguage() + ")...");
         messageCache.clear();
         String lang = plugin.getConfigManager().getLanguage();
 
@@ -47,11 +46,11 @@ public class LanguageManager {
         // Migration: languages -> messages
         if (oldFolder.exists() && !messagesFolder.exists()) {
             plugin.logInfo("Migrating 'languages' folder to 'messages'...");
-            LoggerUtils.debug("Migrating legacy 'languages' folder to 'messages'...");
+            DebugLogger.debug("Migrating legacy 'languages' folder to 'messages'...");
             if (oldFolder.renameTo(messagesFolder)) {
                 plugin.logInfo("Migration successful.");
             } else {
-                plugin.logSevere("Failed to migrate 'languages' folder to 'messages'. Please rename it manually.");
+                plugin.logError("Failed to migrate 'languages' folder to 'messages'. Please rename it manually.");
             }
         }
 
@@ -92,9 +91,9 @@ public class LanguageManager {
             try (InputStreamReader reader = new InputStreamReader(
                     java.nio.file.Files.newInputStream(languageFile.toPath()), StandardCharsets.UTF_8)) {
                 languageConfig.load(reader);
-                LoggerUtils.debug("Language file loaded: " + fileName + " (" + languageConfig.getKeys(false).size() + " top-level keys)");
+                DebugLogger.debug("Language file loaded: " + fileName + " (" + languageConfig.getKeys(false).size() + " top-level keys)");
             } catch (Exception e) {
-                plugin.logSevere("Could not read language file " + fileName + ": " + e.getMessage());
+                plugin.logError("Could not read language file " + fileName + ": " + e.getMessage());
             }
 
             // Load internal fallbacks into memory ONLY
@@ -114,7 +113,7 @@ public class LanguageManager {
                 loadInternalFallbacks("en");
                 plugin.logInfo("Successfully fell back to en.yml");
             } else {
-                plugin.logSevere("CRITICAL: en.yml not found! Creating an empty configuration.");
+                plugin.logError("CRITICAL: en.yml not found! Creating an empty configuration.");
                 loadInternalFallbacks("en");
             }
         }
@@ -206,7 +205,7 @@ public class LanguageManager {
      * Reloads the language file
      */
     public void reload() {
-        LoggerUtils.debug("Reloading language manager...");
+        DebugLogger.debug("Reloading language manager...");
         loadLanguage();
     }
 
@@ -230,7 +229,7 @@ public class LanguageManager {
 
         if (message == null) {
             plugin.logWarning("Missing language key: " + key);
-            LoggerUtils.debug("Missing language key: " + key);
+            DebugLogger.debug("Missing language key: " + key);
             String missing = ColorUtils.translate("&cMissing message: " + key);
             messageCache.put(key, missing);
             return missing;

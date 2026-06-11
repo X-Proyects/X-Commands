@@ -43,7 +43,7 @@ public class SchedulerUtils {
                 scheduler.getClass().getMethod("run", Plugin.class, Consumer.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run());
             } catch (Throwable e) {
-                LoggerUtils.debug("Folia GlobalRegionScheduler 'run' failed: " + e.getMessage());
+                DebugLogger.debug("Folia GlobalRegionScheduler 'run' failed: " + e.getMessage());
                 // Fallback to async if global fails or other errors
                 runTaskAsynchronously(plugin, runnable);
             }
@@ -62,7 +62,7 @@ public class SchedulerUtils {
                 return scheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, long.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), Math.max(1L, delayTicks));
             } catch (Throwable e) {
-                LoggerUtils.debug("Folia GlobalRegionScheduler 'runDelayed' failed: " + e.getMessage());
+                DebugLogger.debug("Folia GlobalRegionScheduler 'runDelayed' failed: " + e.getMessage());
                 runTaskAsynchronously(plugin, runnable);
                 return null;
             }
@@ -81,7 +81,7 @@ public class SchedulerUtils {
                 scheduler.getClass().getMethod("runNow", Plugin.class, Consumer.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run());
             } catch (Throwable e) {
-                LoggerUtils.debug("Folia AsyncScheduler 'runNow' failed: " + e.getMessage());
+                DebugLogger.debug("Folia AsyncScheduler 'runNow' failed: " + e.getMessage());
                 // Last resort fallback
                 try {
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
@@ -103,7 +103,7 @@ public class SchedulerUtils {
                 return scheduler.getClass().getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), Math.max(1L, delayTicks), Math.max(1L, periodTicks));
             } catch (Throwable e) {
-                LoggerUtils.debug("Folia GlobalRegionScheduler 'runAtFixedRate' failed: " + e.getMessage());
+                DebugLogger.debug("Folia GlobalRegionScheduler 'runAtFixedRate' failed: " + e.getMessage());
                 // Cannot use Bukkit.getScheduler() on Folia, log and return null
                 return null;
             }
@@ -120,7 +120,7 @@ public class SchedulerUtils {
         try {
             task.getClass().getMethod("cancel").invoke(task);
         } catch (Throwable e) {
-            LoggerUtils.debug("Task cancellation failed: " + e.getMessage());
+            DebugLogger.debug("Task cancellation failed: " + e.getMessage());
         }
     }
 
@@ -140,7 +140,7 @@ public class SchedulerUtils {
                 scheduler.getClass().getMethod("run", Plugin.class, Consumer.class, Runnable.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), null);
             } catch (Throwable e) {
-                LoggerUtils.debug("Folia EntityScheduler 'run' failed for " + player.getName() + ": " + e.getMessage());
+                DebugLogger.debug("Folia EntityScheduler 'run' failed for " + player.getName() + ": " + e.getMessage());
                 runTask(plugin, runnable);
             }
         } else {
@@ -164,7 +164,7 @@ public class SchedulerUtils {
                 scheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, Runnable.class, long.class)
                          .invoke(scheduler, plugin, (Consumer<Object>) t -> runnable.run(), null, delayTicks);
             } catch (Throwable e) {
-                LoggerUtils.debug("Folia EntityScheduler 'runDelayed' failed for " + player.getName() + ": " + e.getMessage());
+                DebugLogger.debug("Folia EntityScheduler 'runDelayed' failed for " + player.getName() + ": " + e.getMessage());
                 runTaskLater(plugin, runnable, delayTicks);
             }
         } else {

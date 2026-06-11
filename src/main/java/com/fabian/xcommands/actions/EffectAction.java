@@ -1,5 +1,7 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.entity.Player;
 import java.util.Map;
 import org.bukkit.potion.PotionEffect;
@@ -33,13 +35,13 @@ public class EffectAction implements Action {
                 @SuppressWarnings("unchecked")
                 org.bukkit.Registry<PotionEffectType> registry = (org.bukkit.Registry<PotionEffectType>) org.bukkit.Registry.class.getField("EFFECT").get(null);
                 effectType = registry.get(key);
-            } catch (Exception e) { com.fabian.xcommands.utils.LoggerUtils.debug("Effect registry lookup failed: " + e.getMessage()); }
+            } catch (Exception e) { DebugLogger.debug("Effect registry lookup failed: " + e.getMessage()); }
 
             // 2. Try legacy Registry (1.18.2 - 1.21.1)
             if (effectType == null) {
                 try {
                     effectType = org.bukkit.Registry.POTION_EFFECT_TYPE.get(key);
-                } catch (Exception e) { com.fabian.xcommands.utils.LoggerUtils.debug("Effect registry lookup failed: " + e.getMessage()); }
+                } catch (Exception e) { DebugLogger.debug("Effect registry lookup failed: " + e.getMessage()); }
             }
 
             // 3. Last resort fallback (legacy method, may be removed in future versions)
@@ -50,13 +52,13 @@ public class EffectAction implements Action {
             }
 
             if (effectType == null) {
-                com.fabian.xcommands.utils.LoggerUtils.warn("Unknown effect type: " + effectName);
+                XCommands.getInstance().logWarning("Unknown effect type: " + effectName);
                 return;
             }
 
             player.addPotionEffect(new PotionEffect(effectType, duration, level));
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Invalid parameters for action [EFFECT]: " + params);
+            XCommands.getInstance().logWarning("Invalid parameters for action [EFFECT]: " + params);
         }
     }
 

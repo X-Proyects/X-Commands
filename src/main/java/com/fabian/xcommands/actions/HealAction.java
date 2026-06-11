@@ -1,8 +1,10 @@
 package com.fabian.xcommands.actions;
 
-import org.bukkit.entity.Player;
-import java.util.Map;
+import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.DebugLogger;
 import java.lang.reflect.Method;
+import java.util.Map;
+import org.bukkit.entity.Player;
 
 /**
  * Heals the player to full health.
@@ -38,7 +40,7 @@ public class HealAction implements Action {
 
         if (amount != null) {
             if (Double.isNaN(amount) || Double.isInfinite(amount)) {
-                com.fabian.xcommands.utils.LoggerUtils.warn("Invalid heal value (NaN/Infinity). Action skipped.");
+                XCommands.getInstance().logWarning("Invalid heal value (NaN/Infinity). Action skipped.");
                 return;
             }
             amount = Math.max(0, amount);
@@ -98,7 +100,7 @@ public class HealAction implements Action {
                 attributeRegistry = null;
                 registryGetMethod = null;
                 registryAvailable = false;
-                com.fabian.xcommands.utils.LoggerUtils.debug("HealAction: Registry.ATTRIBUTE not available (pre-1.20.6), using Attribute.valueOf() fallback");
+                DebugLogger.debug("HealAction: Registry.ATTRIBUTE not available (pre-1.20.6), using Attribute.valueOf() fallback");
                 return null;
             }
         }

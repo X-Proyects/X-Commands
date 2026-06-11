@@ -1,5 +1,6 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class ParticleAction implements Action {
 
             player.getWorld().spawnParticle(particle, player.getLocation(), count, offsetX, offsetY, offsetZ, 0.1);
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.warn("Invalid parameters for action [PARTICLE]: " + params);
+            XCommands.getInstance().logWarning("Invalid parameters for action [PARTICLE]: " + params);
         }
     }
 

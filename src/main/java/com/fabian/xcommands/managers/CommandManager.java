@@ -3,7 +3,7 @@ package com.fabian.xcommands.managers;
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.executors.CustomCommandExecutor;
 import com.fabian.xcommands.utils.SchedulerUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
+import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -79,7 +79,7 @@ public class CommandManager {
                 }
             }
         } catch (Exception e) {
-            plugin.logSevere("Failed to initialize CommandMap: " + e.getMessage());
+            plugin.logError("Failed to initialize CommandMap: " + e.getMessage());
         }
     }
 
@@ -87,7 +87,7 @@ public class CommandManager {
      * Loads all custom commands from the commands folder
      */
     public void loadCommands() {
-        LoggerUtils.debug("Loading custom commands...");
+        DebugLogger.debug("Loading custom commands...");
         // Clear existing custom commands
         unregisterAllCommands();
 
@@ -100,7 +100,7 @@ public class CommandManager {
             if (oldFolder.renameTo(commandsFolder)) {
                 plugin.logInfo("Successfully migrated legacy folder.");
             } else {
-                plugin.logSevere("Failed to rename 'comands' to 'commands'. Please do it manually.");
+                plugin.logError("Failed to rename 'comands' to 'commands'. Please do it manually.");
             }
         }
 
@@ -121,20 +121,21 @@ public class CommandManager {
                 try {
                     loadCommand(file);
                 } catch (Exception e) {
-                    plugin.logSevere("Critical error loading command file: " + file.getName(), e);
+                    plugin.logError("Critical error loading command file: " + file.getName());
+                    e.printStackTrace();
                 }
             }
         }
 
         plugin.logInfo("Loaded " + customCommands.size() + " custom commands");
-        LoggerUtils.debug("Finished loading " + customCommands.size() + " custom commands");
+        DebugLogger.debug("Finished loading " + customCommands.size() + " custom commands");
     }
 
     /**
      * Loads a single command from a file
      */
     private void loadCommand(File file) {
-        LoggerUtils.debug("Loading command from file: " + file.getName());
+        DebugLogger.debug("Loading command from file: " + file.getName());
         try {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
@@ -143,7 +144,7 @@ public class CommandManager {
 
             if (name == null || name.isEmpty()) {
                 plugin.logWarning("Command file " + file.getName() + " has no name");
-                LoggerUtils.debug("Skipped command file (no name): " + file.getName());
+                DebugLogger.debug("Skipped command file (no name): " + file.getName());
                 return;
             }
 
@@ -176,7 +177,7 @@ public class CommandManager {
             executor.setOriginalName(fileName);
 
             customCommands.put(name.toLowerCase(), executor);
-            LoggerUtils.debug("Registered command: " + name + " (register=" + register + ", actions=" + actions.size() + ")");
+            DebugLogger.debug("Registered command: " + name + " (register=" + register + ", actions=" + actions.size() + ")");
 
             if (register) {
                 registerCommand(name, executor);
@@ -184,7 +185,8 @@ public class CommandManager {
             }
 
         } catch (Exception e) {
-            plugin.logSevere("Error loading command from " + file.getName() + ": " + e.getMessage(), e);
+            plugin.logError("Error loading command from " + file.getName() + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -192,9 +194,9 @@ public class CommandManager {
      * Registers a command with Bukkit
      */
     private void registerCommand(String name, CustomCommandExecutor executor) {
-        LoggerUtils.debug("Registering Bukkit command: " + name);
+        DebugLogger.debug("Registering Bukkit command: " + name);
         if (commandMap == null) {
-            plugin.logSevere("CommandMap is null, cannot register command: " + name);
+            plugin.logError("CommandMap is null, cannot register command: " + name);
             return;
         }
 
@@ -324,7 +326,7 @@ public class CommandManager {
      * Reloads all custom commands
      */
     public void reload() {
-        LoggerUtils.debug("Reloading command manager...");
+        DebugLogger.debug("Reloading command manager...");
         loadCommands();
         refreshCommands();
     }
@@ -348,7 +350,7 @@ public class CommandManager {
                 resourceStream = plugin.getResource("comands/example.yml"); 
             }
             if (resourceStream == null) {
-                plugin.logSevere("Template 'commands/example.yml' not found in resources.");
+                plugin.logError("Template 'commands/example.yml' not found in resources.");
                 return false;
             }
 
@@ -404,7 +406,8 @@ public class CommandManager {
 
             return true;
         } catch (Exception e) {
-            plugin.logSevere("Error creating command from template: " + e.getMessage(), e);
+            plugin.logError("Error creating command from template: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
@@ -416,7 +419,7 @@ public class CommandManager {
      * @return true if the command was deleted successfully
      */
     public boolean deleteCommand(String commandName) {
-        LoggerUtils.debug("Deleting command: " + commandName);
+        DebugLogger.debug("Deleting command: " + commandName);
         CustomCommandExecutor executor = customCommands.get(commandName.toLowerCase());
         if (executor == null)
             return false;
@@ -616,7 +619,7 @@ public class CommandManager {
                                 java.nio.file.Files.copy(oldFile.toPath(), newFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                                 oldFile.delete();
                             } catch (java.io.IOException ioe) {
-                                plugin.logSevere("Failed to rename command file: " + ioe.getMessage());
+                                plugin.logError("Failed to rename command file: " + ioe.getMessage());
                                 return;
                             }
                         }
@@ -648,7 +651,7 @@ public class CommandManager {
                     org.bukkit.Bukkit.getOnlinePlayers().forEach(org.bukkit.entity.Player::updateCommands);
                 });
             } catch (Exception e) {
-                plugin.logSevere("Error saving command " + commandName + ": " + e.getMessage());
+                plugin.logError("Error saving command " + commandName + ": " + e.getMessage());
             }
         });
     }
@@ -749,7 +752,7 @@ public class CommandManager {
      * Unregisters a command from Bukkit
      */
     private void unregisterCommand(String commandName) {
-        LoggerUtils.debug("Unregistering command: " + commandName);
+        DebugLogger.debug("Unregistering command: " + commandName);
         stopTimer(commandName);
         if (commandMap == null) {
             return;

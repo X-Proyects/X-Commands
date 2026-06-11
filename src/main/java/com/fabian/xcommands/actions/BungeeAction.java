@@ -1,6 +1,7 @@
 package com.fabian.xcommands.actions;
 
 import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.DebugLogger;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import org.bukkit.entity.Player;
@@ -21,10 +22,11 @@ public class BungeeAction implements Action {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Connect");
             out.writeUTF(params.trim());
-            com.fabian.xcommands.utils.LoggerUtils.debug("Attempting to send player " + player.getName() + " to server: " + params.trim());
+            DebugLogger.debug("Attempting to send player " + player.getName() + " to server: " + params.trim());
             player.sendPluginMessage(XCommands.getInstance(), "BungeeCord", out.toByteArray());
         } catch (Exception e) {
-            com.fabian.xcommands.utils.LoggerUtils.severe("Failed to send player to server: " + params, e);
+            XCommands.getInstance().logError("Failed to send player to server: " + params);
+            e.printStackTrace();
         }
     }
 

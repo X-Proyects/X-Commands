@@ -1,7 +1,7 @@
 package com.fabian.xcommands.actions;
 
+import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.PlaceholderUtils;
-import com.fabian.xcommands.utils.LoggerUtils;
 import org.bukkit.entity.Player;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class PlayerAction implements Action {
         if (command.length() > 1024) {
             String original = command;
             command = command.substring(0, 1024);
-            LoggerUtils.warn("Player command truncated to 1024 chars. Original length: " + original.length());
+            XCommands.getInstance().logWarning("Player command truncated to 1024 chars. Original length: " + original.length());
         }
 
         return command.trim();

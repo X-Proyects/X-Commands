@@ -24,7 +24,7 @@ public class PlaceholderUtils {
 
         // Hook into PlaceholderAPI if available
         if (player != null && Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            LoggerUtils.debug("Replacing PlaceholderAPI placeholders for " + player.getName());
+            DebugLogger.debug("Replacing PlaceholderAPI placeholders for " + player.getName());
             message = PlaceholderAPI.setPlaceholders(player, message);
         }
 
