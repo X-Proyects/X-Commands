@@ -100,6 +100,15 @@ public class XCCommand implements CommandExecutor, TabCompleter {
             case "version":
                 return sendVersionInfo(sender);
 
+            case "debug":
+                boolean dbg = plugin.getConfigManager().getConfig().getBoolean("debug", false);
+                plugin.getConfig().set("debug", !dbg);
+                plugin.saveConfig();
+                plugin.getConfigManager().reload();
+                sender.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
+                        "&8[&bX-Commands&8] &7Debug mode: " + (!dbg ? "&aenabled" : "&cdisabled")));
+                return true;
+
             default:
                 sendHelp(sender);
                 return true;
@@ -164,6 +173,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 { "version", "xcommands.admin.version" },
                 { "locate",  "xcommands.admin.locate"  },
                 { "forcemessages", "xcommands.admin.forcemessages" },
+                { "debug",    "xcommands.admin"              },
             };
             for (String[] sub : allSubs) {
                 if (sender.hasPermission(sub[1]) && sub[0].startsWith(input)) {
