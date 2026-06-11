@@ -1,7 +1,7 @@
 package com.fabian.xcommands;
 
 import com.fabian.xcommands.managers.DependencyManager;
-import com.fabian.xcommands.managers.commands.XCCommand;
+import com.fabian.xcommands.commands.XCCommand;
 import com.fabian.xcommands.managers.*;
 import com.fabian.xcommands.utils.DebugLogger;
 import com.fabian.xcommands.utils.EconomyUtils;

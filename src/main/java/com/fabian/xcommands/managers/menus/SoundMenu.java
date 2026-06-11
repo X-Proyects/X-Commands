@@ -16,7 +16,7 @@ public class SoundMenu extends BaseMenu {
     }
 
     public void open(Player player, String commandName, int actionIndex) {
-        com.fabian.xcommands.executors.CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName.toLowerCase());
+        com.fabian.xcommands.commands.CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName.toLowerCase());
         if (cmd == null || actionIndex < 0 || actionIndex >= cmd.getActions().size()) return;
 
         String action = cmd.getActions().get(actionIndex);

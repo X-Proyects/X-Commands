@@ -1,7 +1,7 @@
 package com.fabian.xcommands.listeners;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.executors.CustomCommandExecutor;
+import com.fabian.xcommands.commands.CustomCommandExecutor;
 import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

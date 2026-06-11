@@ -1,7 +1,7 @@
 package com.fabian.xcommands.listeners;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.executors.CustomCommandExecutor;
+import com.fabian.xcommands.commands.CustomCommandExecutor;
 import com.fabian.xcommands.utils.DebugLogger;
 import com.fabian.xcommands.managers.menus.TitleMenu;
 import com.fabian.xcommands.managers.menus.TeleportMenu;
@@ -1578,7 +1578,7 @@ public class InventoryListener implements Listener {
         int slot = event.getSlot();
 
         // Get current values
-        com.fabian.xcommands.executors.CustomCommandExecutor exec = plugin.getCommandManager().getCustomCommands().get(cmdName.toLowerCase());
+        com.fabian.xcommands.commands.CustomCommandExecutor exec = plugin.getCommandManager().getCustomCommands().get(cmdName.toLowerCase());
         if (exec == null || actionIndex < 0 || actionIndex >= exec.getActions().size()) return;
 
         String action = exec.getActions().get(actionIndex);

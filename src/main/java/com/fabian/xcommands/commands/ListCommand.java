@@ -1,7 +1,6 @@
-package com.fabian.xcommands.managers.commands;
+package com.fabian.xcommands.commands;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.executors.CustomCommandExecutor;
 import com.fabian.xcommands.utils.CompatibilityUtils;
 import org.bukkit.command.CommandSender;
 import java.util.Map;

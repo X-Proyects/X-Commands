@@ -1,7 +1,7 @@
 package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.executors.CustomCommandExecutor;
+import com.fabian.xcommands.commands.CustomCommandExecutor;
 import com.fabian.xcommands.utils.SchedulerUtils;
 import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.Bukkit;

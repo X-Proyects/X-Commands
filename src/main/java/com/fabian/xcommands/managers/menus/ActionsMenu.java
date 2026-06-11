@@ -1,7 +1,7 @@
 package com.fabian.xcommands.managers.menus;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.executors.CustomCommandExecutor;
+import com.fabian.xcommands.commands.CustomCommandExecutor;
 import com.fabian.xcommands.utils.CompatibilityUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

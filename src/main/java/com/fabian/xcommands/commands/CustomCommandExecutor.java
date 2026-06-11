@@ -1,4 +1,4 @@
-package com.fabian.xcommands.executors;
+package com.fabian.xcommands.commands;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
