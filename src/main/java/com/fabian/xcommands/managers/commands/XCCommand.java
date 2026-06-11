@@ -61,7 +61,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 com.fabian.xcommands.utils.CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessage("player-only"));
                 return true;
             }
-            plugin.getInventoryManager().openMainMenu((org.bukkit.entity.Player) sender);
+            plugin.getGUIManager().openMainMenu((org.bukkit.entity.Player) sender);
             return true;
         }
 

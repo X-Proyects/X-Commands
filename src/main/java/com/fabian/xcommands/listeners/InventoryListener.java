@@ -265,9 +265,9 @@ public class InventoryListener implements Listener {
         if (clicked.getType() == Material.ARROW) {
             String itemName = com.fabian.xcommands.utils.ColorUtils.stripColor(com.fabian.xcommands.utils.CompatibilityUtils.getDisplayName(meta));
             if (itemName.equals(plugin.getLanguageManager().getMessage("gui-main-prev"))) {
-                plugin.getInventoryManager().openMainMenu(player, page - 1);
+                plugin.getGUIManager().openMainMenu(player, page - 1);
             } else if (itemName.equals(plugin.getLanguageManager().getMessage("gui-main-next"))) {
-                plugin.getInventoryManager().openMainMenu(player, page + 1);
+                plugin.getGUIManager().openMainMenu(player, page + 1);
             }
             return;
         }
@@ -291,7 +291,7 @@ public class InventoryListener implements Listener {
             showActionsInChat(player, targetCmd);
             player.closeInventory();
         } else {
-            plugin.getInventoryManager().openCommandEditMenu(player, targetCmd);
+            plugin.getGUIManager().openCommandEditMenu(player, targetCmd);
         }
     }
 
@@ -323,13 +323,13 @@ public class InventoryListener implements Listener {
                 scheduleTransition(player, () -> {
                     plugin.getCommandManager().toggleCommandRegistration(cmdName);
                     player.playSound(player.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 1, 1);
-                    plugin.getInventoryManager().openCommandEditMenu(player, cmdName);
+                    plugin.getGUIManager().openCommandEditMenu(player, cmdName);
                 });
                 break;
 
             case 15: // Actions Menu
                 scheduleTransition(player, () -> {
-                    plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                    plugin.getGUIManager().openActionsMenu(player, cmdName);
                 });
                 break;
 
@@ -359,7 +359,7 @@ public class InventoryListener implements Listener {
 
             case 36: // Back Button
                 scheduleTransition(player, () -> {
-                    plugin.getInventoryManager().openMainMenu(player);
+                    plugin.getGUIManager().openMainMenu(player);
                 });
                 break;
 
@@ -367,7 +367,7 @@ public class InventoryListener implements Listener {
                 scheduleTransition(player, () -> {
                     plugin.getCommandManager().saveCommand(cmdName);
                     player.sendMessage(plugin.getLanguageManager().getMessage("command-saved"));
-                    plugin.getInventoryManager().openMainMenu(player);
+                    plugin.getGUIManager().openMainMenu(player);
                 });
                 break;
 
@@ -375,7 +375,7 @@ public class InventoryListener implements Listener {
                 if (!hasPermission(player, "xcommands.admin.delete"))
                     return;
                 scheduleTransition(player, () -> {
-                    plugin.getInventoryManager().openConfirmationMenu(player, cmdName);
+                    plugin.getGUIManager().openConfirmationMenu(player, cmdName);
                 });
                 break;
 
@@ -392,12 +392,12 @@ public class InventoryListener implements Listener {
             }
             if (plugin.getCommandManager().deleteCommand(cmdName)) {
                 player.sendMessage(plugin.getLanguageManager().getMessage("command-deleted-success"));
-                plugin.getInventoryManager().openMainMenu(player);
+                plugin.getGUIManager().openMainMenu(player);
             }
         } else if (clicked.getType() == Material.RED_CONCRETE) {
             // Cancel deletion - don't show unsaved changes warning
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openCommandEditMenu(player, cmdName);
+                plugin.getGUIManager().openCommandEditMenu(player, cmdName);
             });
         }
     }
@@ -406,7 +406,7 @@ public class InventoryListener implements Listener {
             String cmdName) {
         if (clicked.getType() == Material.ARROW) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openCommandEditMenu(player, cmdName);
+                plugin.getGUIManager().openCommandEditMenu(player, cmdName);
             });
             return;
         }
@@ -425,7 +425,7 @@ public class InventoryListener implements Listener {
             CustomCommandExecutor exec = plugin.getCommandManager().getCustomCommands().get(cmdName.toLowerCase());
             if (exec != null) {
                 scheduleTransition(player, () -> {
-                    plugin.getInventoryManager().openActionTypeSelectionMenu(player, cmdName, -1);
+                    plugin.getGUIManager().openActionTypeSelectionMenu(player, cmdName, -1);
                 });
             }
             return;
@@ -446,7 +446,7 @@ public class InventoryListener implements Listener {
                         actions.remove(index);
                         plugin.getCommandManager().markDirty(cmdName);
                         scheduleTransition(player, () -> {
-                            plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                            plugin.getGUIManager().openActionsMenu(player, cmdName);
                         });
                     }
                 }
@@ -455,7 +455,7 @@ public class InventoryListener implements Listener {
                     return;
 
                 scheduleTransition(player, () -> {
-                    plugin.getInventoryManager().openActionEditMenu(player, cmdName, index);
+                    plugin.getGUIManager().openActionEditMenu(player, cmdName, index);
                 });
             }
         }
@@ -464,7 +464,7 @@ public class InventoryListener implements Listener {
     private void handleActionEditMenu(Player player, ItemStack clicked, String cmdName, int actionIdx) {
         if (clicked.getType() == Material.ARROW) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                plugin.getGUIManager().openActionsMenu(player, cmdName);
             });
             return;
         }
@@ -474,7 +474,7 @@ public class InventoryListener implements Listener {
                 return;
 
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionTypeSelectionMenu(player, cmdName, actionIdx);
+                plugin.getGUIManager().openActionTypeSelectionMenu(player, cmdName, actionIdx);
             });
         } else if (clicked.getType() == Material.PAPER) {
             if (!hasPermission(player, "xcommands.admin.edit"))
@@ -592,13 +592,13 @@ public class InventoryListener implements Listener {
         if (clicked.getType() == Material.ARROW) {
             scheduleTransition(player, () -> {
                 if (actionIndex == -1) {
-                    plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                    plugin.getGUIManager().openActionsMenu(player, cmdName);
                 } else {
                     CustomCommandExecutor executor = plugin.getCommandManager().getCustomCommands().get(cmdName.toLowerCase());
                     if (executor != null && actionIndex >= executor.getActions().size()) {
-                        plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                        plugin.getGUIManager().openActionsMenu(player, cmdName);
                     } else {
-                        plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                        plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex);
                     }
                 }
             });
@@ -642,7 +642,7 @@ public class InventoryListener implements Listener {
                 }
                 plugin.getCommandManager().markDirty(cmdName);
                 scheduleTransition(player, () -> {
-                    plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                    plugin.getGUIManager().openActionsMenu(player, cmdName);
                 });
                 return;
             }
@@ -692,7 +692,7 @@ public class InventoryListener implements Listener {
             }
 
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, finalActionIndex);
+                plugin.getGUIManager().openActionEditMenu(player, cmdName, finalActionIndex);
             });
         }
     }
@@ -716,7 +716,7 @@ public class InventoryListener implements Listener {
         if (input.equalsIgnoreCase(cancelWord) || input.equalsIgnoreCase("cancel")) {
             player.sendMessage(plugin.getLanguageManager().getMessage("input-cancelled"));
             SchedulerUtils.runForPlayer(plugin, player, () -> {
-                plugin.getInventoryManager().openCommandEditMenu(player, request.commandName);
+                plugin.getGUIManager().openCommandEditMenu(player, request.commandName);
             });
             return;
         }
@@ -726,7 +726,7 @@ public class InventoryListener implements Listener {
                 case COMMAND_NAME:
                     String newName = plugin.getCommandManager().updateConfigValue(request.commandName, "name", input);
                     player.sendMessage(plugin.getLanguageManager().getMessage("command-name-updated", input));
-                    plugin.getInventoryManager().openCommandEditMenu(player, newName);
+                    plugin.getGUIManager().openCommandEditMenu(player, newName);
                     return;
 
                 case COMMAND_DESCRIPTION:
@@ -817,7 +817,7 @@ public class InventoryListener implements Listener {
                     plugin.getCommandManager().editAction(request.commandName, request.actionIndex, newContent);
                     plugin.getCommandManager().markDirty(request.commandName);
                     player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
-                    plugin.getInventoryManager().openActionEditMenu(player, request.commandName, request.actionIndex);
+                    plugin.getGUIManager().openActionEditMenu(player, request.commandName, request.actionIndex);
                     return;
 
                 case CREATE_COMMAND:
@@ -828,12 +828,12 @@ public class InventoryListener implements Listener {
                     if (plugin.getCommandManager().createCommand(input)) {
                         player.sendMessage(plugin.getLanguageManager().getMessage("create-success-msg"));
                         SchedulerUtils.runTask(plugin,
-                                () -> plugin.getInventoryManager().openCommandEditMenu(player, input));
+                                () -> plugin.getGUIManager().openCommandEditMenu(player, input));
                         return;
                     } else {
                         player.sendMessage(plugin.getLanguageManager().getMessage("input-command-exists"));
                     }
-                    SchedulerUtils.runTask(plugin, () -> plugin.getInventoryManager().openMainMenu(player));
+                    SchedulerUtils.runTask(plugin, () -> plugin.getGUIManager().openMainMenu(player));
                     return;
 
                 case TITLE_MAIN:
@@ -1024,7 +1024,7 @@ public class InventoryListener implements Listener {
                 default:
                     break;
             }
-            plugin.getInventoryManager().openCommandEditMenu(player, request.commandName);
+            plugin.getGUIManager().openCommandEditMenu(player, request.commandName);
         });
     }
 
@@ -1156,7 +1156,7 @@ public class InventoryListener implements Listener {
             }
             saveReorderedActions(player, event.getView().getTopInventory(), cmdName);
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openCommandEditMenu(player, cmdName);
+                plugin.getGUIManager().openCommandEditMenu(player, cmdName);
             });
             return;
         }
@@ -1169,7 +1169,7 @@ public class InventoryListener implements Listener {
             }
             saveReorderedActions(player, event.getView().getTopInventory(), cmdName);
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                plugin.getGUIManager().openActionsMenu(player, cmdName);
             });
             return;
         }
@@ -1196,7 +1196,7 @@ public class InventoryListener implements Listener {
         // Back button
         if (clicked.getType() == Material.ARROW) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex);
             });
             return;
         }
@@ -1256,7 +1256,7 @@ public class InventoryListener implements Listener {
                         } else if (actionType.startsWith("SOUND_")) {
                             new SoundMenu(plugin).open(player, cmdName, actionIndex);
                         } else {
-                            plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                            plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex);
                         }
                     });
                 }
@@ -1365,7 +1365,7 @@ public class InventoryListener implements Listener {
         // Back button
         if (slot == 27) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openCommandEditMenu(player, cmdName);
+                plugin.getGUIManager().openCommandEditMenu(player, cmdName);
             });
             return;
         }
@@ -1444,7 +1444,7 @@ public class InventoryListener implements Listener {
         // Slot 26: Confirm
         if (slot == 26) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionsMenu(player, cmdName);
+                plugin.getGUIManager().openActionsMenu(player, cmdName);
             });
             return;
         }
@@ -1452,7 +1452,7 @@ public class InventoryListener implements Listener {
         // Slot 18: Back
         if (slot == 18) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex);
             });
         }
     }
@@ -1529,9 +1529,9 @@ public class InventoryListener implements Listener {
         } else if (slot == 15) {
             requestChatInput(player, cmdName, InputType.TELEPORT_WORLD, actionIndex);
         } else if (slot == 26) {
-            scheduleTransition(player, () -> plugin.getInventoryManager().openActionsMenu(player, cmdName));
+            scheduleTransition(player, () -> plugin.getGUIManager().openActionsMenu(player, cmdName));
         } else if (slot == 18) {
-            scheduleTransition(player, () -> plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex));
+            scheduleTransition(player, () -> plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex));
         }
     }
 
@@ -1548,9 +1548,9 @@ public class InventoryListener implements Listener {
         } else if (slot == 15) {
             requestChatInput(player, cmdName, InputType.EFFECT_AMPLIFIER, actionIndex);
         } else if (slot == 26) {
-            scheduleTransition(player, () -> plugin.getInventoryManager().openActionsMenu(player, cmdName));
+            scheduleTransition(player, () -> plugin.getGUIManager().openActionsMenu(player, cmdName));
         } else if (slot == 18) {
-            scheduleTransition(player, () -> plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex));
+            scheduleTransition(player, () -> plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex));
         }
     }
 
@@ -1565,9 +1565,9 @@ public class InventoryListener implements Listener {
         } else if (slot == 15) {
             requestChatInput(player, cmdName, InputType.PARTICLE_COUNT, actionIndex);
         } else if (slot == 26) {
-            scheduleTransition(player, () -> plugin.getInventoryManager().openActionsMenu(player, cmdName));
+            scheduleTransition(player, () -> plugin.getGUIManager().openActionsMenu(player, cmdName));
         } else if (slot == 18) {
-            scheduleTransition(player, () -> plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex));
+            scheduleTransition(player, () -> plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex));
         }
     }
 
@@ -1603,7 +1603,7 @@ public class InventoryListener implements Listener {
             });
         } else if (slot == 18) { // Back
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex);
             });
         }
     }
@@ -1619,7 +1619,7 @@ public class InventoryListener implements Listener {
         // Back button
         if (slot == 18) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex);
             });
             return;
         }
@@ -1667,7 +1667,7 @@ public class InventoryListener implements Listener {
         // Confirm
         if (slot == 26) {
             scheduleTransition(player, () -> {
-                plugin.getInventoryManager().openActionEditMenu(player, cmdName, actionIndex);
+                plugin.getGUIManager().openActionEditMenu(player, cmdName, actionIndex);
             });
         }
     }

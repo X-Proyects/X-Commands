@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
  * Manager responsible for opening all plugin menus by delegating to specific
  * menu classes
  */
-public class InventoryManager {
+public class GUIManager {
 
         private final MainMenu mainMenu;
         private final CommandEditMenu commandEditMenu;
@@ -18,7 +18,7 @@ public class InventoryManager {
         private final ActionTypeSelectionMenu actionTypeSelectionMenu;
         private final ConfirmDeleteMenu confirmDeleteMenu;
 
-        public InventoryManager(XCommands plugin) {
+        public GUIManager(XCommands plugin) {
                 this.mainMenu = new MainMenu(plugin);
                 this.commandEditMenu = new CommandEditMenu(plugin);
                 this.actionsMenu = new ActionsMenu(plugin);
@@ -79,7 +79,7 @@ public class InventoryManager {
         }
 
         /**
-         * Reloads the inventory manager (placeholder)
+         * Reloads the GUI manager (placeholder)
          */
         public void reload() {
             // Nothing to reload here as menus are dynamic

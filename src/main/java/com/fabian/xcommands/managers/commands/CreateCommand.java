@@ -50,7 +50,7 @@ public class CreateCommand {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 SchedulerUtils.runForPlayer(plugin, player, () -> {
-                    plugin.getInventoryManager().openCommandEditMenu(player, commandName);
+                    plugin.getGUIManager().openCommandEditMenu(player, commandName);
                 });
             }
         } else {

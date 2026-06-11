@@ -29,7 +29,7 @@ public class XCommands extends JavaPlugin {
     private ActionManager actionManager;
     private CooldownManager cooldownManager;
     private CommandManager commandManager;
-    private InventoryManager inventoryManager;
+    private GUIManager guiManager;
     private CommandInterceptorListener commandInterceptorListener;
     private UpdateChecker updateChecker;
     private com.fabian.xcommands.metrics.Metrics metrics;
@@ -80,7 +80,7 @@ public class XCommands extends JavaPlugin {
             this.conditionManager = new ConditionManager(this);
             this.actionManager = new ActionManager(this);
             this.commandManager = new CommandManager(this);
-            this.inventoryManager = new InventoryManager(this);
+            this.guiManager = new GUIManager(this);
 
             // Register BungeeCord channel
             getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -277,10 +277,10 @@ public class XCommands extends JavaPlugin {
     }
 
     /**
-     * Gets the inventory manager
+     * Gets the GUI manager
      */
-    public InventoryManager getInventoryManager() {
-        return inventoryManager;
+    public GUIManager getGUIManager() {
+        return guiManager;
     }
 
     /**

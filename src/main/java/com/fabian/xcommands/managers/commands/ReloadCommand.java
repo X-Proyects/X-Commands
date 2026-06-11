@@ -30,8 +30,8 @@ public class ReloadCommand {
             plugin.getCommandManager().reload();
             plugin.getCommandInterceptorListener().rebuildAliasLookup();
             
-            // Re-load inventory manager if needed
-            plugin.getInventoryManager().reload();
+            // Re-load GUI manager if needed
+            plugin.getGUIManager().reload();
 
             CompatibilityUtils.sendMessage(sender, plugin.getLanguageManager().getMessageWithPrefix("reload-success"));
             DebugLogger.debug("Reload completed successfully");
