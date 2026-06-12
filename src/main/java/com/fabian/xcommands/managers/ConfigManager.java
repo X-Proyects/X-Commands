@@ -45,7 +45,7 @@ public class ConfigManager {
         // Cache values
         this.cachedLanguage = config.getString("language", "en").trim().toLowerCase();
         this.cachedPrefix = config.getString("prefix", "&8[&bX-Commands&8]&r");
-        this.cachedCheckUpdates = config.getBoolean("check-updates", true);
+        this.cachedCheckUpdates = config.getBoolean("updates.check", true);
         this.cachedHideMinecraftCommands = config.getBoolean("hide-namespaced-commands.hide-minecraft", false);
         this.cachedHidePluginCommands = config.getBoolean("hide-namespaced-commands.hide-plugins", false);
 
@@ -72,8 +72,12 @@ public class ConfigManager {
             changed = true;
         }
 
-        if (!config.contains("check-updates")) {
-            config.set("check-updates", true);
+        if (!config.contains("updates.check")) {
+            config.set("updates.check", true);
+            changed = true;
+        }
+        if (!config.contains("updates.notify-on-join")) {
+            config.set("updates.notify-on-join", true);
             changed = true;
         }
 

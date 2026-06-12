@@ -33,6 +33,11 @@ public class UpdateListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
+        // Check if notify-on-join is enabled
+        if (!plugin.getConfigManager().getConfig().getBoolean("updates.notify-on-join", true)) {
+            return;
+        }
+
         // Check if player is OP or has permission
         if (!player.isOp() && !player.hasPermission("xcommands.admin.update")) {
             return;

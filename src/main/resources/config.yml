@@ -26,10 +26,15 @@ language: en
 # Supports color codes using '&'. This is universal and not tied to any language file.
 prefix: "&8[&bX-Commands&8]&r"
 
-# [check-updates]
-# When set to true, the plugin will check for new versions on SpigotMC at startup.
-# If an update is found, admins will receive a notification in the console.
-check-updates: true
+# ------------------------------------------------------------------------------
+# UPDATE CHECKER
+# Checks the SpigotMC API for new versions on startup.
+# ------------------------------------------------------------------------------
+updates:
+  # Check for updates when the server starts?
+  check: true
+  # Notify admins (players with xcommands.admin.update) on join if an update exists?
+  notify-on-join: true
 
 # [metrics]
 # When set to true, the plugin will send anonymous statistics to bStats.org.
