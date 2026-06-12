@@ -11,6 +11,8 @@ import com.fabian.xcommands.listeners.UpdateListener;
 import com.fabian.xcommands.listeners.InventoryListener;
 import com.fabian.xcommands.listeners.CommandHideListener;
 import com.fabian.xcommands.listeners.CommandInterceptorListener;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
@@ -49,33 +51,41 @@ public class XCommands extends JavaPlugin {
     @SuppressWarnings("deprecation")
     @Override
     public void onEnable() {
+        instance = this;
+
         try {
-            instance = this;
+            // Initialize config managers first
+            this.configManager = new ConfigManager(this);
+            DebugLogger.debug("Config", "ConfigManager initialized");
+            this.languageManager = new LanguageManager(this);
+            DebugLogger.debug("Config", "LanguageManager initialized");
+        } catch (Exception e) {
+            DebugLogger.debug("Config", "Failed to initialize config managers", e);
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
-            // Load libraries before anything else
-            new DependencyManager(this).loadDependencies();
+        // Load libraries before anything else
+        DebugLogger.debug("Dependency", "Initializing DependencyManager...");
+        new DependencyManager(this).loadDependencies();
 
+        // Initialize remaining managers
+        try {
             DebugLogger.init(this);
 
-            // Soporte temporal para nombre antiguo
+            // Support for old plugin name
             if (getDescription().getName().equalsIgnoreCase("X-Comands")) {
                 logWarning("Deprecated name detected, use X-Commands");
             }
 
-            // Initialize managers
-            logInfo("Initializing...");
-
-            // 1. Perform Data Folder Migration (X-Comands -> X-Commands)
+            // Perform Data Folder Migration (X-Comands -> X-Commands)
             performGlobalMigration();
 
-            // 2. Initialize Core Managers (Required for everything else)
-            this.configManager = new ConfigManager(this);
-            this.languageManager = new LanguageManager(this);
-
-            // 3. Perform Subfolder Migration (comands -> commands)
+            // Perform Subfolder Migration (comands -> commands)
             performInternalMigration();
 
-            // 4. Initialize rest of managers
+            DebugLogger.debug("Init", "Initializing remaining managers...");
             this.cooldownManager = new CooldownManager(this);
             this.conditionManager = new ConditionManager(this);
             this.actionManager = new ActionManager(this);
@@ -85,26 +95,15 @@ public class XCommands extends JavaPlugin {
             // Register BungeeCord channel
             getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-            // 5. Setup Economy
+            // Setup Economy
             if (getServer().getPluginManager().getPlugin("Vault") != null) {
                 if (EconomyUtils.setupEconomy()) {
-                    logInfo("Vault integration enabled using " + EconomyUtils.getEconomy().getName() + ".");
+                    DebugLogger.debug("Vault", "Vault integration enabled using " + EconomyUtils.getEconomy().getName());
                 } else {
                     logWarning("Vault found, but economy setup failed. Economy actions will be disabled.");
                 }
             } else {
-                logWarning("Vault not found. Economy actions will be disabled.");
-            }
-
-            // Register PlaceholderAPI expansion
-            if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                try {
-                    new XCommandsExpansion(this).register();
-                    logInfo("PlaceholderAPI expansion registered!");
-                    DebugLogger.debug("PAPI: PlaceholderAPI expansion registered");
-                } catch (Exception e) {
-                    logWarning("Could not register PlaceholderAPI expansion: " + e.getMessage());
-                }
+                DebugLogger.debug("Vault", "Vault not found, economy actions will be disabled");
             }
 
             // Register main command
@@ -114,18 +113,14 @@ public class XCommands extends JavaPlugin {
                 if (command != null) {
                     command.setExecutor(xcCommand);
                     command.setTabCompleter(xcCommand);
-                    // Register HelpTopic so /xc appears in /help and /?
                     getServer().getHelpMap().addTopic(new org.bukkit.help.GenericCommandHelpTopic(command));
                 } else {
                     logWarning("Failed to register /xc command! It might not be defined in plugin.yml.");
                 }
             } catch (UnsupportedOperationException e) {
-                // This happens on modern Paper plugins that handle commands differently.
-                // Since we rely on CommandInterceptorListener as a fallback for custom commands,
-                // we only log this if it's truly unexpected. 
-                // For now, we ignore it to allow the plugin to enable.
-                logWarning("Paper detected: Legacy command registration skipped. /xc might not work if not registered via Paper API.");
+                logWarning("Paper detected: Legacy command registration skipped.");
             }
+            DebugLogger.debug("Command", "Commands registered");
 
             // Register listeners
             getServer().getPluginManager().registerEvents(new UpdateListener(this), this);
@@ -137,13 +132,13 @@ public class XCommands extends JavaPlugin {
             // Load custom commands
             commandManager.loadCommands();
             commandInterceptorListener.rebuildAliasLookup();
+            DebugLogger.debug("Init", "Custom commands loaded and listeners registered");
 
             // Export all available guides
             File guidesFolder = new File(getDataFolder(), "guides");
             if (!guidesFolder.exists() && !guidesFolder.mkdirs()) {
                 logWarning("Could not create guides folder!");
             }
-
             String[] guideLangs = { "EN", "ES" };
             for (String lang : guideLangs) {
                 File guideFile = new File(guidesFolder, "guides_" + lang + ".yml");
@@ -152,26 +147,43 @@ public class XCommands extends JavaPlugin {
                 }
             }
 
-            // Check for updates if enabled
-            if (configManager.isCheckUpdates()) {
-                updateChecker = new UpdateChecker(this, UPDATE_CHECKER_ID);
+            // PlaceholderAPI Integration
+            if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                DebugLogger.debug("PAPI", "PlaceholderAPI found, registering expansion");
+                new XCommandsExpansion(this).register();
+            } else {
+                DebugLogger.debug("PAPI", "PlaceholderAPI not found, skipping expansion");
             }
 
-            // Initialize bStats Metrics if enabled
-            if (getConfig().getBoolean("metrics", true)) {
-                metrics = new com.fabian.xcommands.metrics.Metrics(this, BSTATS_ID);
-            }
-
-            logInfo("v" + getDescription().getVersion() + " successfully started!");
         } catch (Exception e) {
-            logError("Failed to enable X-Commands! Please check your configuration and server version.");
+            DebugLogger.debug("Init", "Failed to initialize managers", e);
             e.printStackTrace();
-            getServer().getPluginManager().disablePlugin(this);
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
+
+        // Check for updates
+        if (configManager.isCheckUpdates()) {
+            DebugLogger.debug("Update", "Update checker enabled");
+            updateChecker = new UpdateChecker(this, UPDATE_CHECKER_ID);
+        }
+
+        // Initialize bStats Metrics
+        setupMetrics();
+
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8]   &aEnabled v" + getDescription().getVersion() + "! Commands are now custom."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8]   &fLanguage: &e" + getConfig().getString("language", "en").toUpperCase()));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
     }
 
     @Override
     public void onDisable() {
+        DebugLogger.debug("Init", "Plugin disabling...");
         if (metrics != null) {
             metrics.shutdown();
         }
@@ -179,7 +191,22 @@ public class XCommands extends JavaPlugin {
             com.fabian.xcommands.utils.EconomyUtils.teardown();
         }
 
-        logInfo("v" + getDescription().getVersion() + " disabled. Goodbye!");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8]   &cDisabled v" + getDescription().getVersion() + "! Out."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
+    }
+
+    private void setupMetrics() {
+        if (getConfig().getBoolean("metrics", true)) {
+            try {
+                metrics = new com.fabian.xcommands.metrics.Metrics(this, BSTATS_ID);
+            } catch (Exception e) {
+                logWarning("Could not start bStats Metrics: " + e.getMessage());
+            }
+        }
     }
 
     /**
