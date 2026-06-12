@@ -1,23 +1,33 @@
-# ==============================================================================
-#  __  __         ____                                          _     
-#  \ \/ /        / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |___ 
-#   \  /  _____ | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __|
-#   /  \ |_____|| |__| (_) | | | | | | | | | | | (_| | | | | (_| \__ \
-#  /_/\_\        \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
-# 
-# ==============================================================================
-# X-Commands | Developed by Fabian (X Proyects)
-# Discord: http://discord.xproyects.qzz.io/
-# Supported versions: 1.18.2 - 26.1+
-# ==============================================================================
+#
+#   ____  _   _  ___  ____  ____  _     ___  ____  _   _  ___
+#  |  _ \| \ | |/ _ \|  _ \| __ )| |   |_ _/ ___|| | | |/ _ \
+#  | | | |  \| | | | | | | |  _ \| |    | | |    | |_| | | | |
+#  | |_| | |\  | |_| | |_| | |_) | |___ | | |___ |  _  | |_| |
+#  |____/|_| \_|\___/|____/|____/|_____|___\____||_| |_|\___/
+#
+# ======================================================== #
+#    X-Commands | Custom Command Creator Plugin for Minecraft  #
+#    Author: Fabian | Web: https://xproyects.qzz.io           #
+# ======================================================== #
+#
+# Features:
+#   - Create custom commands with GUI editor, actions and conditions
+#   - Action types: message, title, actionbar, sound, console command, and more
+#   - Condition system: permission, world, gamemode, cooldown, economy, and more
+#   - GUI-based command editor accessible via /xc
+#   - Hide namespaced commands (minecraft:, plugin:) from tab completion
+#   - Vault economy integration for paid commands
+#   - PlaceholderAPI expansion with command-related placeholders
+#
+# Supported versions: 1.18.2 - 26.1+ (Paper, Spigot, Folia)
 
 # [language]
 # Specifies the language file to be used for all plugin messages.
 # The plugin will look for a file named '<language>.yml' in the 'languages/' folder.
-# 
+#
 # Available defaults: en, es, ru, ja, pt, CUSTOM
 # Tip: You can create your own file (e.g., messages.yml) and set 'language: messages'
-# 
+#
 # Note: Filenames are case-insensitive (e.g., 'en' will load 'EN.yml').
 language: en
 
