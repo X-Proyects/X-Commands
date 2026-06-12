@@ -1,4 +1,4 @@
-package com.fabian.xcommands.managers.menus;
+package com.fabian.xcommands.menus;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;

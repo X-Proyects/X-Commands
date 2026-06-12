@@ -1,7 +1,7 @@
 package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.managers.menus.*;
+import com.fabian.xcommands.menus.*;
 import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.entity.Player;
 
