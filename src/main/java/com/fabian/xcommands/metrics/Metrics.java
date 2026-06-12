@@ -115,7 +115,7 @@ public class Metrics {
         this::appendServiceData,
         isFolia
             ? null
-            : submitDataTask -> com.fabian.xcommands.utils.SchedulerUtils.runTask(plugin, submitDataTask),
+            : submitDataTask -> com.fabian.xcommands.utils.SchedulerUtil.runTask(plugin, submitDataTask),
         plugin::isEnabled,
         (message, error) -> this.plugin.getLogger().log(Level.WARNING, message, error),
         (message) -> this.plugin.getLogger().log(Level.INFO, message),

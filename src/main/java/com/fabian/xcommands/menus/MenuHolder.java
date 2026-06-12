@@ -1,4 +1,4 @@
-package com.fabian.xcommands.utils;
+package com.fabian.xcommands.menus;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;

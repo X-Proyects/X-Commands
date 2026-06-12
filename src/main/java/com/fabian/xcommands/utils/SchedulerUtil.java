@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  * Utility class to handle scheduling tasks on both standard Bukkit/Spigot
  * and Folia's region-based threading model.
  */
-public class SchedulerUtils {
+public class SchedulerUtil {
 
     private static volatile Boolean isFolia = null;
     private static volatile java.lang.reflect.Method teleportAsyncMethod = null;

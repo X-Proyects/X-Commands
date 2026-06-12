@@ -1,7 +1,7 @@
 package com.fabian.xcommands.menus;
 
 import com.fabian.xcommands.XCommands;
-import com.fabian.xcommands.utils.MenuHolder;
+import com.fabian.xcommands.menus.MenuHolder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;

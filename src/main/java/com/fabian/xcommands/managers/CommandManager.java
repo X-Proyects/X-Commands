@@ -2,7 +2,7 @@ package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.commands.CustomCommandExecutor;
-import com.fabian.xcommands.utils.SchedulerUtils;
+import com.fabian.xcommands.utils.SchedulerUtil;
 import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -305,7 +305,7 @@ public class CommandManager {
 
         long ticks = executor.getInterval() * 20L;
         // Folia compatible timer
-        Object task = SchedulerUtils.runTaskTimer(plugin, () -> {
+        Object task = SchedulerUtil.runTaskTimer(plugin, () -> {
             plugin.getActionManager().executeActions(null, executor.getActions());
         }, ticks, ticks);
         
@@ -318,7 +318,7 @@ public class CommandManager {
     public void stopTimer(String commandName) {
         Object task = commandTimers.remove(commandName.toLowerCase());
         if (task != null) {
-            SchedulerUtils.cancelTask(task);
+            SchedulerUtil.cancelTask(task);
         }
     }
 
@@ -433,7 +433,7 @@ public class CommandManager {
 
         // Async file deletion
         String originalName = executor.getOriginalName();
-        SchedulerUtils.runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             File commandFile = new File(new File(plugin.getDataFolder(), "commands"), (originalName != null ? originalName : commandName) + ".yml");
             if (commandFile.exists()) {
                 commandFile.delete();
@@ -603,7 +603,7 @@ public class CommandManager {
         if (executor == null)
             return;
 
-        SchedulerUtils.runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             try {
                 File commandsFolder = new File(plugin.getDataFolder(), "commands");
                 String currentName = executor.getCommandName();
@@ -642,7 +642,7 @@ public class CommandManager {
                 conf.save(commandFile);
 
                 // Finalize updates on the Main Thread to ensure thread safety with Bukkit API
-                SchedulerUtils.runTask(plugin, () -> {
+                SchedulerUtil.runTask(plugin, () -> {
                     if (!plugin.isEnabled()) return;
                     executor.setOriginalName(currentName);
                     dirtyCommands.remove(currentName.toLowerCase());
@@ -743,7 +743,7 @@ public class CommandManager {
      * Forces all online players to refresh their command lists (tab-complete)
      */
     public void refreshCommands() {
-        SchedulerUtils.runTask(plugin, () -> {
+        SchedulerUtil.runTask(plugin, () -> {
             org.bukkit.Bukkit.getOnlinePlayers().forEach(org.bukkit.entity.Player::updateCommands);
         });
     }

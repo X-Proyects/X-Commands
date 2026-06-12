@@ -3,7 +3,7 @@ package com.fabian.xcommands.commands;
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.CompatibilityUtils;
 import com.fabian.xcommands.utils.DebugLogger;
-import com.fabian.xcommands.utils.SchedulerUtils;
+import com.fabian.xcommands.utils.SchedulerUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -49,7 +49,7 @@ public class CreateCommand {
 
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                SchedulerUtils.runForPlayer(plugin, player, () -> {
+                SchedulerUtil.runForPlayer(plugin, player, () -> {
                     plugin.getGUIManager().openCommandEditMenu(player, commandName);
                 });
             }

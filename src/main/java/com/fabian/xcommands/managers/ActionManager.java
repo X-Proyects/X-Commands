@@ -2,7 +2,7 @@ package com.fabian.xcommands.managers;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.actions.*;
-import com.fabian.xcommands.utils.SchedulerUtils;
+import com.fabian.xcommands.utils.SchedulerUtil;
 import com.fabian.xcommands.utils.DebugLogger;
 import org.bukkit.entity.Player;
 
@@ -152,7 +152,7 @@ public class ActionManager {
                 }
                 final long finalDelay = delayTicks;
                 // Schedule remainder of the list after the delay
-                SchedulerUtils.runTaskLaterForPlayer(plugin, player, () -> {
+                SchedulerUtil.runTaskLaterForPlayer(plugin, player, () -> {
                     executeActionsLoop(player, actionStrings, nextIndex, args);
                 }, finalDelay);
                 return; // Break current loop, remainder handled by the scheduled task
@@ -233,7 +233,7 @@ public class ActionManager {
         }
 
         // For players, we MUST ensure we are on the correct region thread (especially for Folia 26.1)
-        SchedulerUtils.runForPlayer(plugin, player, () -> {
+        SchedulerUtil.runForPlayer(plugin, player, () -> {
             try {
                 Map<String, Object> context = new HashMap<>();
                 context.put("params", params);

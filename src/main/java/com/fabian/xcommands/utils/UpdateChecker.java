@@ -29,7 +29,7 @@ public class UpdateChecker {
 
     @SuppressWarnings("deprecation")
     public void checkForUpdates(CommandSender sender) {
-        SchedulerUtils.runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             HttpURLConnection connection = null;
             BufferedReader reader = null;
             try {

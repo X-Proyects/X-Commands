@@ -3,7 +3,7 @@ package com.fabian.xcommands.menus;
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.managers.LanguageManager;
 import com.fabian.xcommands.utils.CompatibilityUtils;
-import com.fabian.xcommands.utils.MenuHolder;
+import com.fabian.xcommands.menus.MenuHolder;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Inventory;

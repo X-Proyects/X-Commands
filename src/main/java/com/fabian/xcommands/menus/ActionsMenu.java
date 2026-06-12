@@ -26,7 +26,7 @@ public class ActionsMenu extends BaseMenu {
         CustomCommandExecutor cmd = plugin.getCommandManager().getCustomCommands().get(commandName.toLowerCase());
         if (cmd == null) return;
 
-        Inventory inv = createInventory(new com.fabian.xcommands.utils.MenuHolder(com.fabian.xcommands.utils.MenuHolder.MenuType.ACTIONS, commandName, -1, 0), 54, 
+        Inventory inv = createInventory(new MenuHolder(MenuHolder.MenuType.ACTIONS, commandName, -1, 0), 54, 
                 lang.getMessage("gui-actions-title", commandName));
 
         List<String> actions = cmd.getActions();

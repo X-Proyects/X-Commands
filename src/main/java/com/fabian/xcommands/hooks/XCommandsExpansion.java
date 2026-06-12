@@ -1,4 +1,4 @@
-package com.fabian.xcommands.utils;
+package com.fabian.xcommands.hooks;
 
 import com.fabian.xcommands.XCommands;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;

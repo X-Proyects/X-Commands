@@ -2,7 +2,7 @@ package com.fabian.xcommands.actions;
 
 import com.fabian.xcommands.XCommands;
 import com.fabian.xcommands.utils.DebugLogger;
-import com.fabian.xcommands.utils.SchedulerUtils;
+import com.fabian.xcommands.utils.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -39,7 +39,7 @@ public class TeleportAction implements Action {
             
             // Safe asynchronous teleport for Folia and better performance
             DebugLogger.debug("[TELEPORT] " + (player != null ? player.getName() : "null") + " -> " + world.getName() + " " + x + "," + y + "," + z);
-            SchedulerUtils.teleportAsync(player, loc);
+            SchedulerUtil.teleportAsync(player, loc);
         } catch (Exception e) {
             XCommands.getInstance().logWarning("Invalid parameters for action [TELEPORT]: " + params);
         }

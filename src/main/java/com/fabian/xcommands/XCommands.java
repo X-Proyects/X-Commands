@@ -6,7 +6,7 @@ import com.fabian.xcommands.managers.*;
 import com.fabian.xcommands.utils.DebugLogger;
 import com.fabian.xcommands.utils.EconomyUtils;
 import com.fabian.xcommands.utils.UpdateChecker;
-import com.fabian.xcommands.utils.XCommandsExpansion;
+import com.fabian.xcommands.hooks.XCommandsExpansion;
 import com.fabian.xcommands.listeners.UpdateListener;
 import com.fabian.xcommands.listeners.InventoryListener;
 import com.fabian.xcommands.listeners.CommandHideListener;

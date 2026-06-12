@@ -12,9 +12,9 @@ import com.fabian.xcommands.menus.ActionReorderMenu;
 import com.fabian.xcommands.menus.NumericActionMenu;
 import com.fabian.xcommands.menus.AliasMenu;
 import com.fabian.xcommands.menus.SoundMenu;
-import com.fabian.xcommands.utils.MenuHolder;
-import com.fabian.xcommands.utils.MenuHolder.MenuType;
-import com.fabian.xcommands.utils.SchedulerUtils;
+import com.fabian.xcommands.menus.MenuHolder;
+import com.fabian.xcommands.menus.MenuHolder.MenuType;
+import com.fabian.xcommands.utils.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -138,7 +138,7 @@ public class InventoryListener implements Listener {
             closeWarningTimestamps.put(uuid, currentTime);
 
             // Re-open inventory to cancel close
-            SchedulerUtils.runForPlayer(plugin, event.getPlayer(), () -> {
+            SchedulerUtil.runForPlayer(plugin, event.getPlayer(), () -> {
                 event.getPlayer().openInventory(event.getInventory());
             });
             
@@ -715,13 +715,13 @@ public class InventoryListener implements Listener {
         String cancelWord = plugin.getLanguageManager().getMessage("chat-input-cancel");
         if (input.equalsIgnoreCase(cancelWord) || input.equalsIgnoreCase("cancel")) {
             player.sendMessage(plugin.getLanguageManager().getMessage("input-cancelled"));
-            SchedulerUtils.runForPlayer(plugin, player, () -> {
+            SchedulerUtil.runForPlayer(plugin, player, () -> {
                 plugin.getGUIManager().openCommandEditMenu(player, request.commandName);
             });
             return;
         }
 
-        SchedulerUtils.runForPlayer(plugin, player, () -> {
+        SchedulerUtil.runForPlayer(plugin, player, () -> {
             switch (request.type) {
                 case COMMAND_NAME:
                     String newName = plugin.getCommandManager().updateConfigValue(request.commandName, "name", input);
@@ -776,7 +776,7 @@ public class InventoryListener implements Listener {
                         plugin.getCommandManager().markDirty(request.commandName);
                         player.sendMessage(plugin.getLanguageManager().getMessage("alias-added"));
                     }
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new AliasMenu(plugin).open(player, request.commandName);
                     }, 1L);
                     return;
@@ -790,7 +790,7 @@ public class InventoryListener implements Listener {
                         plugin.getCommandManager().markDirty(request.commandName);
                         player.sendMessage(plugin.getLanguageManager().getMessage("alias-updated"));
                     }
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new AliasMenu(plugin).open(player, request.commandName);
                     }, 1L);
                     return;
@@ -827,13 +827,13 @@ public class InventoryListener implements Listener {
                     }
                     if (plugin.getCommandManager().createCommand(input)) {
                         player.sendMessage(plugin.getLanguageManager().getMessage("create-success-msg"));
-                        SchedulerUtils.runTask(plugin,
+                        SchedulerUtil.runTask(plugin,
                                 () -> plugin.getGUIManager().openCommandEditMenu(player, input));
                         return;
                     } else {
                         player.sendMessage(plugin.getLanguageManager().getMessage("input-command-exists"));
                     }
-                    SchedulerUtils.runTask(plugin, () -> plugin.getGUIManager().openMainMenu(player));
+                    SchedulerUtil.runTask(plugin, () -> plugin.getGUIManager().openMainMenu(player));
                     return;
 
                 case TITLE_MAIN:
@@ -879,7 +879,7 @@ public class InventoryListener implements Listener {
                     }
 
                     // Reopen title menu
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new TitleMenu(plugin).open(player, request.commandName, request.actionIndex);
                     }, 1L);
                     return;
@@ -914,7 +914,7 @@ public class InventoryListener implements Listener {
                         plugin.getCommandManager().markDirty(request.commandName);
                         player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
                     }
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new TeleportMenu(plugin).open(player, request.commandName, request.actionIndex);
                     }, 1L);
                     return;
@@ -946,7 +946,7 @@ public class InventoryListener implements Listener {
                         plugin.getCommandManager().markDirty(request.commandName);
                         player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
                     }
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new EffectMenu(plugin).open(player, request.commandName, request.actionIndex);
                     }, 1L);
                     return;
@@ -968,7 +968,7 @@ public class InventoryListener implements Listener {
                         plugin.getCommandManager().markDirty(request.commandName);
                         player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
                     }
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new SoundMenu(plugin).open(player, request.commandName, request.actionIndex);
                     }, 1L);
                     return;
@@ -988,7 +988,7 @@ public class InventoryListener implements Listener {
                         plugin.getCommandManager().markDirty(request.commandName);
                         player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
                     }
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new GiveMenu(plugin).open(player, request.commandName, request.actionIndex);
                     }, 1L);
                     return;
@@ -1016,7 +1016,7 @@ public class InventoryListener implements Listener {
                         plugin.getCommandManager().markDirty(request.commandName);
                         player.sendMessage(plugin.getLanguageManager().getMessage("action-updated"));
                     }
-                    SchedulerUtils.runTaskLater(plugin, () -> {
+                    SchedulerUtil.runTaskLater(plugin, () -> {
                         new ParticleMenu(plugin).open(player, request.commandName, request.actionIndex);
                     }, 1L);
                     return;
@@ -1081,7 +1081,7 @@ public class InventoryListener implements Listener {
 
     private void scheduleTransition(Player player, Runnable action) {
         scheduledTransitions.put(player.getUniqueId(), System.currentTimeMillis());
-        SchedulerUtils.runTaskLater(plugin, () -> {
+        SchedulerUtil.runTaskLater(plugin, () -> {
             try {
                 action.run();
             } finally {
@@ -1673,7 +1673,7 @@ public class InventoryListener implements Listener {
     }
 
     private void scheduleInputTimeout(UUID uuid) {
-        Object task = SchedulerUtils.runTaskLater(plugin, () -> {
+        Object task = SchedulerUtil.runTaskLater(plugin, () -> {
             if (chatInputs.remove(uuid) != null) {
                 Player p = Bukkit.getPlayer(uuid);
                 if (p != null && p.isOnline()) {
@@ -1687,7 +1687,7 @@ public class InventoryListener implements Listener {
     private void cancelInputTimeout(UUID uuid) {
         Object task = inputTimeoutTasks.remove(uuid);
         if (task != null) {
-            SchedulerUtils.cancelTask(task);
+            SchedulerUtil.cancelTask(task);
         }
     }
 

@@ -259,7 +259,7 @@ public class XCCommand implements CommandExecutor, TabCompleter {
         }
 
         String prefix = plugin.getLanguageManager().getPrefix();
-        String foliaStatus = com.fabian.xcommands.utils.SchedulerUtils.isFolia()
+        String foliaStatus = com.fabian.xcommands.utils.SchedulerUtil.isFolia()
                 ? plugin.getLanguageManager().getMessage("version-folia-on")
                 : plugin.getLanguageManager().getMessage("version-folia-off");
 
