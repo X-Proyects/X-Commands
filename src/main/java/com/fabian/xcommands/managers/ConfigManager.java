@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 /**
  * Manages the main configuration file
@@ -24,6 +25,7 @@ public class ConfigManager {
     private boolean cachedCheckUpdates;
     private boolean cachedHideMinecraftCommands;
     private boolean cachedHidePluginCommands;
+    public UUID debugPlayer; // player who enabled debug via command (null = console-only via config)
 
     public ConfigManager(XCommands plugin) {
         this.plugin = plugin;

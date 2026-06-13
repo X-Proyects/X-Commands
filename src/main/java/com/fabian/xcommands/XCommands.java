@@ -72,8 +72,6 @@ public class XCommands extends JavaPlugin {
 
         // Initialize remaining managers
         try {
-            DebugLogger.init(this);
-
             // Support for old plugin name
             if (getDescription().getName().equalsIgnoreCase("X-Comands")) {
                 logWarning("Deprecated name detected, use X-Commands");

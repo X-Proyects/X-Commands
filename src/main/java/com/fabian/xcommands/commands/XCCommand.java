@@ -1,6 +1,7 @@
 package com.fabian.xcommands.commands;
 
 import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.managers.ConfigManager;
 import com.fabian.xcommands.managers.LanguageManager;
 import com.fabian.xcommands.utils.DebugLogger;
 
@@ -8,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,12 +103,26 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                 return sendVersionInfo(sender);
 
             case "debug":
-                boolean dbg = plugin.getConfigManager().getConfig().getBoolean("debug", false);
-                plugin.getConfig().set("debug", !dbg);
-                plugin.saveConfig();
-                plugin.getConfigManager().reload();
-                sender.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
-                        "&8[&bX-Commands&8] &7Debug mode: " + (!dbg ? "&aenabled" : "&cdisabled")));
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    ConfigManager configMgr = plugin.getConfigManager();
+                    if (configMgr.debugPlayer != null && configMgr.debugPlayer.equals(player.getUniqueId())) {
+                        configMgr.debugPlayer = null;
+                        player.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
+                                configMgr.getPrefix() + " &7Debug mode: &cdisabled"));
+                    } else {
+                        configMgr.debugPlayer = player.getUniqueId();
+                        player.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
+                                configMgr.getPrefix() + " &7Debug mode: &aenabled &7(messages sent to you)"));
+                    }
+                } else {
+                    boolean dbg = plugin.getConfigManager().getConfig().getBoolean("debug", false);
+                    plugin.getConfig().set("debug", !dbg);
+                    plugin.saveConfig();
+                    plugin.getConfigManager().reload();
+                    sender.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
+                            plugin.getConfigManager().getPrefix() + " &7Debug mode: " + (!dbg ? "&aenabled &7(console)" : "&cdisabled")));
+                }
                 return true;
 
             default:
