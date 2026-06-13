@@ -98,7 +98,7 @@ public class CommandManager {
         if (oldFolder.exists() && !commandsFolder.exists()) {
             plugin.logWarning("Legacy 'comands' folder detected. Renaming it to 'commands'...");
             if (oldFolder.renameTo(commandsFolder)) {
-                plugin.logInfo("Successfully migrated legacy folder.");
+                plugin.logInfo("&aSuccessfully migrated legacy folder.");
             } else {
                 plugin.logError("Failed to rename 'comands' to 'commands'. Please do it manually.");
             }
@@ -127,7 +127,7 @@ public class CommandManager {
             }
         }
 
-        plugin.logInfo("Loaded " + customCommands.size() + " custom commands");
+        plugin.logInfo("&aLoaded &f" + customCommands.size() + " &acustom commands");
         DebugLogger.debug("Finished loading " + customCommands.size() + " custom commands");
     }
 

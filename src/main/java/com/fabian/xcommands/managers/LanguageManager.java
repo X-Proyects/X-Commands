@@ -45,10 +45,10 @@ public class LanguageManager {
         
         // Migration: languages -> messages
         if (oldFolder.exists() && !messagesFolder.exists()) {
-            plugin.logInfo("Migrating 'languages' folder to 'messages'...");
+            plugin.logInfo("&eMigrating &f'languages' &efolder to &f'messages'&e...");
             DebugLogger.debug("Migrating legacy 'languages' folder to 'messages'...");
             if (oldFolder.renameTo(messagesFolder)) {
-                plugin.logInfo("Migration successful.");
+                plugin.logInfo("&aMigration successful.");
             } else {
                 plugin.logError("Failed to migrate 'languages' folder to 'messages'. Please rename it manually.");
             }
@@ -106,12 +106,12 @@ public class LanguageManager {
             }
         } else {
             plugin.logWarning("Target language file not found: " + fileName);
-            plugin.logInfo("Attempting to fallback to en.yml...");
+            plugin.logInfo("&eAttempting to fallback to &fen.yml&e...");
             languageFile = new File(messagesFolder, "en.yml");
             if (languageFile.exists()) {
                 languageConfig = YamlConfiguration.loadConfiguration(languageFile);
                 loadInternalFallbacks("en");
-                plugin.logInfo("Successfully fell back to en.yml");
+                plugin.logInfo("&aSuccessfully fell back to &fen.yml");
             } else {
                 plugin.logError("CRITICAL: en.yml not found! Creating an empty configuration.");
                 loadInternalFallbacks("en");

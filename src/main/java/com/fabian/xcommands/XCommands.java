@@ -215,9 +215,9 @@ public class XCommands extends JavaPlugin {
         File newFolder = getDataFolder();
 
         if (oldFolder.exists() && !newFolder.exists()) {
-            logInfo("Old data folder detected. Migrating X-Comands -> X-Commands...");
+            logInfo("&eOld data folder detected. Migrating &fX-Comands &7-> &fX-Commands&e...");
             if (oldFolder.renameTo(newFolder)) {
-                logInfo("Successfully migrated data folder.");
+                logInfo("&aSuccessfully migrated data folder.");
             } else {
                 logWarning("Failed to migrate data folder. Please rename it manually.");
             }
@@ -234,14 +234,14 @@ public class XCommands extends JavaPlugin {
 
         if (legacyCommands.exists()) {
             if (!modernCommands.exists()) {
-                logInfo("Legacy folder 'comands' detected. Renaming to 'commands'...");
+                logInfo("&eLegacy folder &f'comands' &edetected. Renaming to &f'commands'&e...");
                 if (legacyCommands.renameTo(modernCommands)) {
-                    logInfo("Successfully renamed folder.");
+                    logInfo("&aSuccessfully renamed folder.");
                 } else {
                     logWarning("Could not rename 'comands' folder automatically.");
                 }
             } else {
-                logInfo("Both 'comands' and 'commands' found. Proceeding with both (compatibility).");
+                logInfo("&eBoth &f'comands' &eand &f'commands' &efound. Proceeding with both &f(compatibility)&e.");
             }
         }
     }

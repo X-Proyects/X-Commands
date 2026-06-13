@@ -58,7 +58,7 @@ public class ConfigManager {
 
         DebugLogger.debug("Configuration loaded successfully (language=" + cachedLanguage + ")");
 
-        plugin.logInfo("Configuration loaded (" + cachedLanguage + ")!");
+        plugin.logInfo("&aConfiguration loaded &f(&f" + cachedLanguage + "&f)&a!");
     }
 
     private void validateConfig() {
@@ -110,7 +110,7 @@ public class ConfigManager {
 
             if (diskCode < currentCode) {
                 DebugLogger.debug("Config code outdated (disk=" + diskCode + ", resource=" + currentCode + "), updating...");
-                plugin.logInfo("Updating configuration files...");
+                plugin.logInfo("&eUpdating configuration files...");
 
                 // Use ConfigUpdater to add missing keys without wiping comments
                 ConfigUpdater.update(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
