@@ -108,20 +108,20 @@ public class XCCommand implements CommandExecutor, TabCompleter {
                     ConfigManager configMgr = plugin.getConfigManager();
                     if (configMgr.debugPlayer != null && configMgr.debugPlayer.equals(player.getUniqueId())) {
                         configMgr.debugPlayer = null;
-                        player.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
-                                configMgr.getPrefix() + " &7Debug mode: &cdisabled"));
+                        com.fabian.xcommands.utils.CompatibilityUtils.sendMessage(player,
+                                configMgr.getPrefix() + " &7Debug mode: &cdisabled");
                     } else {
                         configMgr.debugPlayer = player.getUniqueId();
-                        player.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
-                                configMgr.getPrefix() + " &7Debug mode: &aenabled &7(messages sent to you)"));
+                        com.fabian.xcommands.utils.CompatibilityUtils.sendMessage(player,
+                                configMgr.getPrefix() + " &7Debug mode: &aenabled &7(messages sent to you)");
                     }
                 } else {
                     boolean dbg = plugin.getConfigManager().getConfig().getBoolean("debug", false);
                     plugin.getConfig().set("debug", !dbg);
                     plugin.saveConfig();
                     plugin.getConfigManager().reload();
-                    sender.sendMessage(com.fabian.xcommands.utils.ColorUtils.translate(
-                            plugin.getConfigManager().getPrefix() + " &7Debug mode: " + (!dbg ? "&aenabled &7(console)" : "&cdisabled")));
+                    com.fabian.xcommands.utils.CompatibilityUtils.sendMessage(sender,
+                            plugin.getConfigManager().getPrefix() + " &7Debug mode: " + (!dbg ? "&aenabled &7(console)" : "&cdisabled"));
                 }
                 return true;
 
