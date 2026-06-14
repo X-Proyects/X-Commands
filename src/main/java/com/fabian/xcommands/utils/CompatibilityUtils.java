@@ -278,7 +278,8 @@ public class CompatibilityUtils {
             } catch (NoSuchMethodError | Exception ignored) {}
         }
 
-        sender.sendMessage(translated);
+        // Console or fallback — strip § codes to avoid garbled output on Windows CP437/CP850
+        sender.sendMessage(org.bukkit.ChatColor.stripColor(translated));
     }
 
     /**
