@@ -12,6 +12,7 @@ import com.fabian.xcommands.listeners.InventoryListener;
 import com.fabian.xcommands.listeners.CommandHideListener;
 import com.fabian.xcommands.listeners.CommandInterceptorListener;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
@@ -168,10 +169,14 @@ public class XCommands extends JavaPlugin {
         // Initialize bStats Metrics
         setupMetrics();
 
-        getLogger().info(" ----------------------------------------------");
-        getLogger().info("   Enabled v" + getDescription().getVersion() + "! Commands are now custom.");
-        getLogger().info("   Language: " + getConfig().getString("language", "en").toUpperCase());
-        getLogger().info(" ----------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8]   &aEnabled v" + getDescription().getVersion() + "! Commands are now custom."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8]   &fLanguage: &e" + getConfig().getString("language", "en").toUpperCase()));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
     }
 
     @Override
@@ -184,9 +189,12 @@ public class XCommands extends JavaPlugin {
             com.fabian.xcommands.utils.EconomyUtils.teardown();
         }
 
-        getLogger().info(" ----------------------------------------------");
-        getLogger().info("   Disabled v" + getDescription().getVersion() + "! Out.");
-        getLogger().info(" ----------------------------------------------");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8]   &cDisabled v" + getDescription().getVersion() + "! Out."));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                "&8[&bX-Commands&8] &7----------------------------------------------"));
     }
 
     private void setupMetrics() {
