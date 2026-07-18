@@ -1,6 +1,7 @@
 package com.fabian.xcommands.actions;
 
 import com.fabian.xcommands.XCommands;
+import com.fabian.xcommands.utils.PlaceholderUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import java.util.Map;
@@ -37,7 +38,8 @@ public class GiveAction implements Action {
             if (parts.length > 2) {
                 org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
                 if (meta != null) {
-                    com.fabian.xcommands.utils.CompatibilityUtils.setDisplayName(meta, parts[2].trim());
+                    String displayName = PlaceholderUtils.process(parts[2].trim(), player);
+                    com.fabian.xcommands.utils.CompatibilityUtils.setDisplayName(meta, displayName);
                     item.setItemMeta(meta);
                 }
             }

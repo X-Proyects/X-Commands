@@ -66,7 +66,7 @@ help-footer: "&8&m--------------------------------"
 # ============================================
 command-no-permission: "&cYou don't have permission to use this command."
 command-wrong-world: "&cThis command cannot be used in this world."
-command-cooldown: "&cYou must wait %time% seconds before using this command again."
+command-cooldown: "&cYou must wait {0} seconds before using this command again."
 command-error: "&cError executing command. Check console for details."
 
 

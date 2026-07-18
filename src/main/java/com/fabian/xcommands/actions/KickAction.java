@@ -20,7 +20,6 @@ public class KickAction implements Action {
         if (params == null) return;
 
         String reason = PlaceholderUtils.process(params, player);
-        reason = ColorUtils.translate(reason);
         player.kick(LegacyComponentSerializer.legacySection().deserialize(ColorUtils.stripColor(reason)));
     }
 

@@ -182,6 +182,19 @@ placeholders:
       - "%player_uuid%: UUID único."
       - "%player_money%: Saldo de economía."
       - "%player_world%: Nombre del mundo actual."
+      - "%player_gamemode%: Modo de juego actual (SURVIVAL, CREATIVE, etc.)."
+      - "%player_health%: Salud actual (ej. 20.0)."
+      - "%player_food%: Nivel de hambre actual (0-20)."
+
+  PAPI:
+    description: "Placeholders de X-Commands para PlaceholderAPI (usables en Scoreboards, Tab, etc.)."
+    placeholders:
+      - "%xcommands_version%: Versión del plugin."
+      - "%xcommands_total_commands%: Total de comandos personalizados registrados."
+      - "%xcommands_language%: Código de idioma configurado."
+      - "%xcommands_cooldown_remaining_<comando>%: Segundos restantes de cooldown (ej. %xcommands_cooldown_remaining_kit%)."
+      - "%xcommands_on_cooldown_<comando>%: Si el jugador está en cooldown (true/false)."
+      - "%xcommands_player_cooldown_<comando>%: Alias de cooldown_remaining."
 
   COMMAND_ARGS:
     description: "Captura lo que el usuario escribe después del comando."
@@ -190,6 +203,10 @@ placeholders:
       - "{0}: La primera palabra (argumento)."
       - "{1}: La segunda palabra, y así sucesivamente."
     example: "[BROADCAST] &b[Aviso] &f{args}"
+
+  EXTERNAL:
+    description: "Si PlaceholderAPI está instalado, cualquier placeholder de PAPI funciona en todas las acciones de texto (MESSAGE, BROADCAST, ACTIONBAR, TITLE, CONSOLE, PLAYER, KICK)."
+    example: "[MESSAGE] &aJugadores online: %server_online%"
 
 # ============================================
 # COMANDOS
